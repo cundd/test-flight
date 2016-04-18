@@ -1,0 +1,29 @@
+{
+    "name": "cundd/test-flight",
+    "description": "Test runner for inline unit tests",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "5.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Corn",
+            "email": "info@cundd.net"
+        }
+    ],
+    "bin": ["bin/test-flight"],
+    "minimum-stability": "dev",
+    "require": {
+        "php" : "^7.0",
+        "ext-json": "*",
+        "ext-pcre": "*",
+        "ext-reflection": "*",
+        "ext-spl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cundd\\TestFlight\\": "src/"
+        }
+    }
+}
