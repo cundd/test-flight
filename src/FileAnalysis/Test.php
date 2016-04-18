@@ -13,8 +13,7 @@ class Cundd_TestFlight_FileAnalysis_Test
      */
     public function memberTest()
     {
-        $g = $f;
-//        $f->b();
+        assert(true);
     }
 
     /**
@@ -22,6 +21,6 @@ class Cundd_TestFlight_FileAnalysis_Test
      */
     public static function staticTest()
     {
-        assert(false);
+        assert(true);
     }
 }

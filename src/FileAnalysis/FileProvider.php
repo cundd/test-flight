@@ -63,6 +63,14 @@ class FileProvider
      */
     public function findFilesWithTestsInDirectoryTest()
     {
-        assert($this->findInDirectory(__DIR__ . '/../'));
+        // 3 <= 2 files with @test + 1 constants interface
+        $files = $this->findInDirectory(__DIR__.'/../');
+        assert(count($files) === 3);
+        assert($files[0] instanceof File);
+        
+        $oneFileIsThisFileClosure = function (File $file) {
+            return $file->getPath() === __FILE__;
+        };
+        assert(1 === count(array_filter($files, $oneFileIsThisFileClosure)));
     }
 }
