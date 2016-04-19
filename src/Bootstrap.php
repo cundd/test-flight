@@ -60,12 +60,14 @@ class Bootstrap
     /**
      * Find and run the tests
      */
-    public function run()
+    public function run(array $arguments)
     {
+        $testPath = (count($arguments) > 1) ? $arguments[1] : (__DIR__.'/../src/');
+
         $fileProvider = new \Cundd\TestFlight\FileAnalysis\FileProvider();
 
         $classProvider = new \Cundd\TestFlight\FileAnalysis\ClassProvider();
-        $classes = $classProvider->findClassesInFiles($fileProvider->findInDirectory(__DIR__.'/../src/'));
+        $classes = $classProvider->findClassesInFiles($fileProvider->findInDirectory($testPath));
 
         $provider = new \Cundd\TestFlight\FileAnalysis\DefinitionProvider($this->classLoader);
         $testDefinitions = $provider->createForClasses($classes);

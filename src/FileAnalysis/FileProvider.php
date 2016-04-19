@@ -25,9 +25,9 @@ class FileProvider
      */
     public function findInDirectory($directory)
     {
-        $directory         = $this->validateDirectory($directory);
+        $directory = $this->validateDirectory($directory);
         $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
-        $regexIterator     = new RegexIterator($directoryIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+        $regexIterator = new RegexIterator($directoryIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
         $fileIncludingTests = [];
         foreach ($regexIterator as $pathCollection) {
@@ -49,10 +49,10 @@ class FileProvider
         $directory = realpath($directory) ?: $directory;
 
         if (!file_exists($directory)) {
-            FileNotExistsException::exceptionForFile($directory);
+            throw FileNotExistsException::exceptionForFile($directory);
         }
         if (!is_readable($directory)) {
-            FileNotReadableException::exceptionForFile($directory);
+            throw FileNotReadableException::exceptionForFile($directory);
         }
 
         return $directory;

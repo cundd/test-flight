@@ -9,5 +9,5 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
 
 (new \Cundd\TestFlight\Bootstrap())
     ->init()
-    ->run();
+    ->run($argv);
 ?>
