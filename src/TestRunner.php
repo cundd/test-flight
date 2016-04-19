@@ -30,6 +30,16 @@ class TestRunner
     private $objectManager;
 
     /**
+     * @var int
+     */
+    private $successes = 0;
+
+    /**
+     * @var int
+     */
+    private $failures = 0;
+
+    /**
      * TestRunner constructor.
      *
      * @param ClassLoader   $classLoader
@@ -37,47 +47,55 @@ class TestRunner
      */
     public function __construct(ClassLoader $classLoader, ObjectManager $objectManager)
     {
-        $this->classLoader   = $classLoader;
+        $this->classLoader = $classLoader;
         $this->objectManager = $objectManager;
     }
 
     /**
-     * @param TestDefinition[] $testCollection
+     * @param Definition[] $testCollection
      */
     public function runTestDefinitions(array $testCollection)
     {
-        $successes = 0;
-        $failures  = 0;
-        foreach ($testCollection as $definition) {
-            if ($this->runTestDefinition($definition)) {
-                $successes += 1;
-            } else {
-                $failures += 1;
-            }
+        foreach ($testCollection as $className => $definitionCollection) {
+            $this->runTestDefinitionsForClass($className, $definitionCollection);
         }
-
-        $this->getPrinter()->println('Successful: %d | Failures: %d', $successes, $failures);
+        $this->getPrinter()->println('Successful: %d | Failures: %d', $this->successes, $this->failures);
     }
 
     /**
-     * @param TestDefinition $definition
+     * @param string       $className
+     * @param Definition[] $definitionCollection
+     */
+    public function runTestDefinitionsForClass($className, array $definitionCollection)
+    {
+        $this->getPrinter()->println('Run tests: %s', $className);
+        foreach ($definitionCollection as $definition) {
+            if ($this->runTestDefinition($definition)) {
+                $this->successes += 1;
+            } else {
+                $this->failures += 1;
+            }
+        }
+    }
+
+    /**
+     * @param Definition $definition
      * @return bool
      */
-    public function runTestDefinition(TestDefinition $definition)
+    public function runTestDefinition(Definition $definition)
     {
         $this->classLoader->loadClass($definition->getClassName(), $definition->getFile());
 
         error_clear_last();
         ob_start();
         try {
-            if ($definition->isStatic()) {
+            if ($definition->getMethodIsStatic()) {
                 @$this->runStaticTest($definition);
             } else {
                 @$this->runInstanceTest($definition);
             }
 
             $result = true;
-
         } catch (\Error $exception) {
             $this->printException($definition, $exception);
 
@@ -106,38 +124,43 @@ class TestRunner
     }
 
     /**
-     * @param TestDefinition $definition
+     * @param Definition $definition
      * @return bool
      */
-    private function runStaticTest(TestDefinition $definition)
+    private function runStaticTest(Definition $definition)
     {
-        call_user_func([$definition->getClassName(), $definition->getMethod()]);
+        call_user_func([$definition->getClassName(), $definition->getMethodName()]);
     }
 
     /**
-     * @param TestDefinition $definition
+     * @param Definition $definition
      * @return bool
      */
-    private function runInstanceTest(TestDefinition $definition)
+    private function runInstanceTest(Definition $definition)
     {
-        $instance   = $this->objectManager->createInstanceOfClass($definition->getClassName());
-        $methodName = $definition->getMethod();
+        $instance = $this->objectManager->createInstanceOfClass($definition->getClassName());
+        $methodName = $definition->getMethodName();
 
-        $instance->$methodName();
+        if ($definition->getMethodIsPublic()) {
+            $instance->$methodName();
+        } else {
+            $definition->getReflectionMethod()->setAccessible(true);
+            $definition->getReflectionMethod()->invoke($instance);
+        }
     }
 
     /**
-     * @param TestDefinition $definition
-     * @param \Throwable     $exception
+     * @param Definition $definition
+     * @param \Throwable $exception
      */
-    private function printException(TestDefinition $definition, $exception)
+    private function printException(Definition $definition, $exception)
     {
         $printer = $this->getPrinter();
         $printer->println(
             'Error during test %s%s%s: #%s %s in %s at %s',
             $definition->getClassName(),
-            $definition->isStatic() ? '::' : '->',
-            $definition->getMethod(),
+            $definition->getMethodIsStatic() ? '::' : '->',
+            $definition->getMethodName(),
             $exception->getCode(),
             $exception->getMessage(),
             $exception->getFile(),
@@ -146,17 +169,12 @@ class TestRunner
     }
 
     /**
-     * @param TestDefinition $definition
+     * @param Definition $definition
      */
-    private function printSuccess(TestDefinition $definition)
+    private function printSuccess(Definition $definition)
     {
         $printer = $this->getPrinter();
-        $printer->println(
-            'Success for test %s%s%s',
-            $definition->getClassName(),
-            $definition->isStatic() ? '::' : '->',
-            $definition->getMethod()
-        );
+        $printer->println('Run %s', $this->getDescriptionForMethod($definition));
     }
 
     /**
@@ -175,5 +193,14 @@ class TestRunner
     private function createExceptionFromError(array $error, $code = 0)
     {
         return new ErrorException($error['message'], $code, $error['type'], $error['file'], $error['line']);
+    }
+
+    /**
+     * @param Definition $definition
+     * @return string
+     */
+    private function getDescriptionForMethod(Definition $definition)
+    {
+        return ucfirst(ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $definition->getMethodName()))));
     }
 }

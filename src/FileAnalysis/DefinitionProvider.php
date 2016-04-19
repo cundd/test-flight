@@ -10,8 +10,7 @@ namespace Cundd\TestFlight\FileAnalysis;
 
 use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\Constants;
-use Cundd\TestFlight\TestDefinition;
-use ReflectionMethod;
+use Cundd\TestFlight\Definition;
 
 /**
  * Provider for test definitions of classes containing test methods
@@ -34,18 +33,14 @@ class DefinitionProvider
     }
 
     /**
-     * @param string $directory
-     * @return string[]
+     * @param $classNameToFiles
+     * @return Definition[]
      */
-    public function findInDirectory($directory)
+    public function createForClasses(array $classNameToFiles)
     {
         $definitionCollection = [];
-        $provider             = new ClassProvider();
-        foreach ($provider->findInDirectory($directory) as $className => $file) {
-            $definitionCollection = array_merge(
-                $definitionCollection,
-                $this->collectDefinitionsForClass($className, $file)
-            );
+        foreach ($classNameToFiles as $className => $file) {
+            $definitionCollection[$className] = $this->collectDefinitionsForClass($className, $file);
         }
 
         return $definitionCollection;
@@ -54,22 +49,18 @@ class DefinitionProvider
     /**
      * @param string $className
      * @param File   $file
-     * @return TestDefinition[]
+     * @return Definition[]
      */
     private function collectDefinitionsForClass($className, File $file)
     {
         $this->classLoader->loadClass($className, $file);
-
-        $testMethods     = [];
+        
+        $testMethods = [];
         $reflectionClass = new \ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
             if (false !== strpos($method->getDocComment(), Constants::TEST_KEYWORD)) {
-                $modifiers = $method->getModifiers();
-                $testMethods[] = new TestDefinition(
-                    $className,
-                    $method->getName(),
-                    $file,
-                    $modifiers & ReflectionMethod::IS_STATIC
+                $testMethods[] = new Definition(
+                    $className, $method->getName(), $file, $method
                 );
             }
         }

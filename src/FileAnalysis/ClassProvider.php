@@ -14,14 +14,13 @@ namespace Cundd\TestFlight\FileAnalysis;
 class ClassProvider
 {
     /**
-     * @param string $directory
+     * @param File[] $files
      * @return array
      */
-    public function findInDirectory($directory)
+    public function findClassesInFiles($files)
     {
-        $classes      = [];
-        $fileProvider = new FileProvider();
-        foreach ($fileProvider->findInDirectory($directory) as $file) {
+        $classes = [];
+        foreach ($files as $file) {
             $classesInFile = $this->getClassFromFile($file);
             $classes       = array_merge(
                 $classes,
