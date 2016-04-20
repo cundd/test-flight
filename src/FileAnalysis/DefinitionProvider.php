@@ -36,7 +36,7 @@ class DefinitionProvider
      * @param $classNameToFiles
      * @return Definition[]
      */
-    public function createForClasses(array $classNameToFiles)
+    public function createForClasses(array $classNameToFiles): array
     {
         $definitionCollection = [];
         foreach ($classNameToFiles as $className => $file) {
@@ -51,10 +51,10 @@ class DefinitionProvider
      * @param File   $file
      * @return Definition[]
      */
-    private function collectDefinitionsForClass($className, File $file)
+    private function collectDefinitionsForClass($className, File $file): array
     {
         $this->classLoader->loadClass($className, $file);
-        
+
         $testMethods = [];
         $reflectionClass = new \ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {

@@ -5,6 +5,7 @@
  * Date: 16/04/16
  * Time: 22:34
  */
+declare(strict_types = 1);
 
 namespace Cundd\TestFlight;
 
@@ -41,15 +42,19 @@ class Definition
     /**
      * TestDefinition constructor.
      *
-     * @param string           $className
-     * @param string           $method
-     * @param File             $file
+     * @param string $className
+     * @param string $methodName
+     * @param File $file
      * @param ReflectionMethod $reflectionMethod
      */
-    public function __construct($className, $method, File $file, ReflectionMethod $reflectionMethod = null)
-    {
+    public function __construct(
+        string $className,
+        string $methodName,
+        File $file,
+        ReflectionMethod $reflectionMethod = null
+    ) {
         $this->className = $className;
-        $this->methodName = $method;
+        $this->methodName = $methodName;
         $this->file = $file;
         $this->reflectionMethod = $reflectionMethod;
     }
@@ -57,7 +62,7 @@ class Definition
     /**
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
@@ -65,7 +70,7 @@ class Definition
     /**
      * @return string
      */
-    public function getMethodName()
+    public function getMethodName(): string
     {
         return $this->methodName;
     }
@@ -73,7 +78,7 @@ class Definition
     /**
      * @return File
      */
-    public function getFile()
+    public function getFile(): File
     {
         return $this->file;
     }
@@ -81,31 +86,33 @@ class Definition
     /**
      * @return boolean
      */
-    public function getMethodIsStatic()
+    public function getMethodIsStatic(): bool
     {
         $reflectionMethod = $this->getReflectionMethod();
         if (!$reflectionMethod) {
             return false;
         }
-        return $reflectionMethod->getModifiers() & ReflectionMethod::IS_STATIC;
+
+        return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_STATIC);
     }
 
     /**
      * @return boolean
      */
-    public function getMethodIsPublic()
+    public function getMethodIsPublic(): bool
     {
         $reflectionMethod = $this->getReflectionMethod();
         if (!$reflectionMethod) {
             return false;
         }
-        return $reflectionMethod->getModifiers() & ReflectionMethod::IS_PUBLIC;
+
+        return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_PUBLIC);
     }
 
     /**
      * @return ReflectionMethod
      */
-    public function getReflectionMethod()
+    public function getReflectionMethod(): ReflectionMethod
     {
         return $this->reflectionMethod;
     }

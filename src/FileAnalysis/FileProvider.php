@@ -5,6 +5,7 @@
  * Date: 16/04/16
  * Time: 13:05
  */
+declare(strict_types = 1);
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -18,13 +19,22 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 
+/**
+ * Class that scans for matching files
+ */
 class FileProvider
 {
     /**
+     * Returns the matching files containing the test doc comment
+     *
+     * If path is a single file and it contains test it will be returned,
+     * if it is a directory it will be scanned for files with test in
+     * it's content
+     *
      * @param string $path
      * @return File[]
      */
-    public function findMatchingFiles($path)
+    public function findMatchingFiles(string $path): array
     {
         $path = $this->validatePath($path);
 
@@ -48,10 +58,10 @@ class FileProvider
     }
 
     /**
-     * @param $path
-     * @return RegexIterator
+     * @param string $path
+     * @return array
      */
-    private function findMatchingFilesInDirectory($path)
+    private function findMatchingFilesInDirectory(string $path): array
     {
         $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
         $regexIterator = new RegexIterator($directoryIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
@@ -68,7 +78,7 @@ class FileProvider
      * @param string $path
      * @return string
      */
-    private function validatePath($path)
+    private function validatePath(string $path): string
     {
         $path = realpath($path) ?: $path;
 

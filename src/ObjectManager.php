@@ -5,10 +5,11 @@
  * Date: 18/04/16
  * Time: 21:03
  */
+declare(strict_types = 1);
 
 namespace Cundd\TestFlight;
 
-use Cundd\TestFlight\Exception\InvalidArgumentException;
+use ReflectionClass;
 
 
 /**
@@ -19,28 +20,56 @@ use Cundd\TestFlight\Exception\InvalidArgumentException;
 class ObjectManager
 {
     /**
+     * @var array
+     */
+    private $container = [];
+
+    /**
+     * Retrieve the class from the container or creates a new instance
+     *
      * @param string $className
+     * @param array  $constructorArguments
      * @return object
      */
-    public function createInstanceOfClass($className)
+    public function get(string $className, ...$constructorArguments)
     {
-        $this->assertStringType($className, 'className');
+        if (!isset($this->container[$className])) {
+            $this->container[$className] = $this->createInstanceOfClassWithArguments(
+                $className,
+                $constructorArguments
+            );
+        }
 
-        return new $className();
+        return $this->container[$className];
     }
 
     /**
-     * @param mixed  $input
-     * @param string $argumentName
+     * Returns a new instance of the given class
+     *
+     * @param string $className
+     * @param array  $constructorArguments
+     * @return object
      */
-    private function assertStringType($input, $argumentName)
+    public function createInstanceOfClass(string $className, ...$constructorArguments)
     {
-        if (!is_string($input)) {
-            throw InvalidArgumentException::exceptionForVariableAndExpectedTypes(
-                $argumentName,
-                ['string'],
-                $input
-            );
+        return $this->createInstanceOfClassWithArguments($className, $constructorArguments);
+    }
+
+    /**
+     * Returns a new instance of the given class
+     *
+     * @param string $className
+     * @param array  $constructorArguments
+     * @return object
+     */
+    private function createInstanceOfClassWithArguments(string $className, array $constructorArguments)
+    {
+        if ($constructorArguments) {
+            $reflector = new ReflectionClass($className);
+
+            return $reflector->newInstanceArgs($constructorArguments);
         }
+
+        return new $className();
     }
 }

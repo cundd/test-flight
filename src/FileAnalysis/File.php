@@ -11,7 +11,6 @@ namespace Cundd\TestFlight\FileAnalysis;
 
 use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\Exception\FileNotReadableException;
-use Cundd\TestFlight\Exception\InvalidArgumentException;
 
 class File
 {
@@ -21,20 +20,19 @@ class File
     private $path;
 
     /**
-     * File constructor.
+     * File constructor
      *
      * @param string $path
      */
-    public function __construct($path)
+    public function __construct(string $path)
     {
-        $this->assertStringType($path, 'path');
         $this->path = $path;
     }
 
     /**
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -42,7 +40,7 @@ class File
     /**
      * @return string
      */
-    public function getContents()
+    public function getContents(): string
     {
         if (!file_exists($this->path)) {
             FileNotExistsException::exceptionForFile($this->path);
@@ -58,25 +56,8 @@ class File
      * @param string $keyword
      * @return bool
      */
-    public function containsKeyword($keyword)
+    public function containsKeyword(string $keyword): bool
     {
-        $this->assertStringType($keyword, 'keyword');
-
         return false !== strpos($this->getContents(), $keyword);
-    }
-
-    /**
-     * @param mixed  $input
-     * @param string $argumentName
-     */
-    private function assertStringType($input, $argumentName)
-    {
-        if (!is_string($input)) {
-            throw InvalidArgumentException::exceptionForVariableAndExpectedTypes(
-                $argumentName,
-                ['string'],
-                $input
-            );
-        }
     }
 }

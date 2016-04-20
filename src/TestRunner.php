@@ -14,8 +14,6 @@ use ErrorException;
 
 /**
  * Class that invokes the test methods
- *
- * @package Cundd\TestFlight
  */
 class TestRunner
 {
@@ -40,7 +38,7 @@ class TestRunner
     private $failures = 0;
 
     /**
-     * TestRunner constructor.
+     * TestRunner
      *
      * @param ClassLoader   $classLoader
      * @param ObjectManager $objectManager
@@ -53,20 +51,23 @@ class TestRunner
 
     /**
      * @param Definition[] $testCollection
+     * @return bool Return if all tests succeeded
      */
-    public function runTestDefinitions(array $testCollection)
+    public function runTestDefinitions(array $testCollection): bool
     {
         foreach ($testCollection as $className => $definitionCollection) {
             $this->runTestDefinitionsForClass($className, $definitionCollection);
         }
         $this->getPrinter()->println('Successful: %d | Failures: %d', $this->successes, $this->failures);
+
+        return 0 < $this->failures;
     }
 
     /**
      * @param string       $className
      * @param Definition[] $definitionCollection
      */
-    public function runTestDefinitionsForClass($className, array $definitionCollection)
+    private function runTestDefinitionsForClass(string $className, array $definitionCollection)
     {
         $this->getPrinter()->println('Run tests: %s', $className);
         foreach ($definitionCollection as $definition) {
@@ -82,7 +83,7 @@ class TestRunner
      * @param Definition $definition
      * @return bool
      */
-    public function runTestDefinition(Definition $definition)
+    private function runTestDefinition(Definition $definition): bool
     {
         $this->classLoader->loadClass($definition->getClassName(), $definition->getFile());
 
