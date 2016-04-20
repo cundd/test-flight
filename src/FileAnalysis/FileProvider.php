@@ -10,6 +10,7 @@ namespace Cundd\TestFlight\FileAnalysis;
 
 
 use Cundd\TestFlight\Constants;
+use Cundd\TestFlight\Exception\FileException;
 use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\Exception\FileNotReadableException;
 use RecursiveDirectoryIterator;
@@ -20,18 +21,24 @@ use RegexIterator;
 class FileProvider
 {
     /**
-     * @param string $directory
+     * @param string $path
      * @return File[]
      */
-    public function findInDirectory($directory)
+    public function findMatchingFiles($path)
     {
-        $directory = $this->validateDirectory($directory);
-        $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
-        $regexIterator = new RegexIterator($directoryIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+        $path = $this->validatePath($path);
+
+        if (is_dir($path)) {
+            $pathCollection = $this->findMatchingFilesInDirectory($path);
+        } elseif (is_file($path)) {
+            $pathCollection = [$path];
+        } else {
+            throw new FileException(sprintf('Could not get file(s) for path %s', $path));
+        }
 
         $fileIncludingTests = [];
-        foreach ($regexIterator as $pathCollection) {
-            $file = new File($pathCollection[0]);
+        foreach ($pathCollection as $path) {
+            $file = new File($path);
             if ($file->containsKeyword(Constants::TEST_KEYWORD)) {
                 $fileIncludingTests[] = $file;
             }
@@ -41,30 +48,47 @@ class FileProvider
     }
 
     /**
-     * @param string $directory
+     * @param $path
+     * @return RegexIterator
+     */
+    private function findMatchingFilesInDirectory($path)
+    {
+        $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+        $regexIterator = new RegexIterator($directoryIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+
+        return array_map(
+            function ($pathCollection) {
+                return $pathCollection[0];
+            },
+            iterator_to_array($regexIterator)
+        );
+    }
+
+    /**
+     * @param string $path
      * @return string
      */
-    private function validateDirectory($directory)
+    private function validatePath($path)
     {
-        $directory = realpath($directory) ?: $directory;
+        $path = realpath($path) ?: $path;
 
-        if (!file_exists($directory)) {
-            throw FileNotExistsException::exceptionForFile($directory);
+        if (!file_exists($path)) {
+            throw FileNotExistsException::exceptionForFile($path);
         }
-        if (!is_readable($directory)) {
-            throw FileNotReadableException::exceptionForFile($directory);
+        if (!is_readable($path)) {
+            throw FileNotReadableException::exceptionForFile($path);
         }
 
-        return $directory;
+        return $path;
     }
 
     /**
      * @test
      */
-    protected function findFilesWithTestsInDirectoryTest()
+    protected function findMatchingFilesTest()
     {
         // 3 <= 2 files with @test + 1 constants interface
-        $files = $this->findInDirectory(__DIR__.'/../');
+        $files = $this->findMatchingFiles(__DIR__.'/../');
         assert(count($files) === 3);
         assert($files[0] instanceof File);
 

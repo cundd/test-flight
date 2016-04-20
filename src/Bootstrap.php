@@ -67,7 +67,7 @@ class Bootstrap
         $fileProvider = new \Cundd\TestFlight\FileAnalysis\FileProvider();
 
         $classProvider = new \Cundd\TestFlight\FileAnalysis\ClassProvider();
-        $classes = $classProvider->findClassesInFiles($fileProvider->findInDirectory($testPath));
+        $classes = $classProvider->findClassesInFiles($fileProvider->findMatchingFiles($testPath));
 
         $provider = new \Cundd\TestFlight\FileAnalysis\DefinitionProvider($this->classLoader);
         $testDefinitions = $provider->createForClasses($classes);
