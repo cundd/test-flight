@@ -157,7 +157,7 @@ class TestRunner
     private function printException(Definition $definition, $exception)
     {
         $printer = $this->getPrinter();
-        $printer->println(
+        $printer->printError(
             'Error during test %s%s%s: #%s %s in %s at %s',
             $definition->getClassName(),
             $definition->getMethodIsStatic() ? '::' : '->',
