@@ -97,9 +97,9 @@ class FileProvider
      */
     protected function findMatchingFilesTest()
     {
-        // 3 <= 2 files with @test + 1 constants interface
+        // x <= y files with @test + 1 constants interface
         $files = $this->findMatchingFiles(__DIR__.'/../');
-        assert(count($files) === 3);
+        assert(count($files) === 4);
         assert($files[0] instanceof File);
 
         $oneFileIsThisFileClosure = function (File $file) {

@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace Cundd\TestFlight;
 
+use Cundd\TestFlight\Exception\ClassDoesNotExistException;
 use ReflectionClass;
 
 
@@ -23,6 +24,14 @@ class ObjectManager
      * @var array
      */
     private $container = [];
+
+    /**
+     * ObjectManager constructor
+     */
+    public function __construct()
+    {
+        $this->container[__CLASS__] = $this;
+    }
 
     /**
      * Retrieve the class from the container or creates a new instance
@@ -64,6 +73,9 @@ class ObjectManager
      */
     private function createInstanceOfClassWithArguments(string $className, array $constructorArguments)
     {
+        if (!class_exists($className)) {
+            throw ClassDoesNotExistException::exceptionWithClassName($className);
+        }
         if ($constructorArguments) {
             $reflector = new ReflectionClass($className);
 
@@ -71,5 +83,24 @@ class ObjectManager
         }
 
         return new $className();
+    }
+
+    /**
+     * @test
+     */
+    protected function getObjectSingletonTest()
+    {
+        assert($this->get(__CLASS__) === $this);
+        assert($this->get(__CLASS__) === $this->get(__CLASS__));
+        assert($this->get(__CLASS__) === $this->get(ObjectManager::class));
+        assert($this->get(__CLASS__) === $this->get('Cundd\\TestFlight\\ObjectManager'));
+
+        $exceptionRaised = false;
+        try {
+            $this->get('Not_Existing_Class');
+        } catch (ClassDoesNotExistException $e) {
+            $exceptionRaised = true;
+        }
+        assert($exceptionRaised);
     }
 }
