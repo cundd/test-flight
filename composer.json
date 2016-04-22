@@ -3,7 +3,7 @@
     "description": "Test runner for inline unit tests",
     "type": "library",
     "require-dev": {
-        "phpunit/phpunit": "5.3"
+        "phpspec/prophecy": "^1.3.1"
     },
     "license": "MIT",
     "authors": [
@@ -24,6 +24,10 @@
     "autoload": {
         "psr-4": {
             "Cundd\\TestFlight\\": "src/"
-        }
+        },
+        "files": ["src/functions.php"]
+    },
+    "suggests": {
+        "phpunit/phpunit": "More assert methods and separate Unit tests"
     }
 }
