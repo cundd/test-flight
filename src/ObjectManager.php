@@ -26,6 +26,21 @@ class ObjectManager
     private $container = [];
 
     /**
+     * Retrieve a shared instance of the ObjectManager
+     *
+     * @return ObjectManager
+     */
+    public static function sharedInstance()
+    {
+        static $sharedInstance = null;
+        if (!$sharedInstance) {
+            $sharedInstance = new static();
+        }
+
+        return $sharedInstance;
+    }
+
+    /**
      * ObjectManager constructor
      */
     public function __construct()
@@ -95,12 +110,22 @@ class ObjectManager
         assert($this->get(__CLASS__) === $this->get(ObjectManager::class));
         assert($this->get(__CLASS__) === $this->get('Cundd\\TestFlight\\ObjectManager'));
 
-        $exceptionRaised = false;
-        try {
-            $this->get('Not_Existing_Class');
-        } catch (ClassDoesNotExistException $e) {
-            $exceptionRaised = true;
-        }
-        assert($exceptionRaised);
+        Assert::throws(
+            function () {
+                $this->get('Not_Existing_Class');
+            },
+            ClassDoesNotExistException::class
+        );
+    }
+
+    /**
+     * @test
+     */
+    protected static function getSharedInstanceTest()
+    {
+        assert(self::sharedInstance() instanceof ObjectManager);
+        assert(self::sharedInstance()->get(__CLASS__) === self::sharedInstance());
+
+
     }
 }
