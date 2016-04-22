@@ -6,6 +6,8 @@
  * Time: 22:16
  */
 
+declare(strict_types = 1);
+
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\FileAnalysis\ClassProvider;

@@ -51,7 +51,7 @@ class DefinitionProvider
      * @param File   $file
      * @return Definition[]
      */
-    private function collectDefinitionsForClass($className, File $file): array
+    private function collectDefinitionsForClass(string $className, File $file): array
     {
         $this->classLoader->loadClass($className, $file);
 
@@ -66,5 +66,28 @@ class DefinitionProvider
         }
 
         return $testMethods;
+    }
+
+    /**
+     * @test
+     */
+    protected static function createForThisClassTest()
+    {
+        $prophet = new \Prophecy\Prophet();
+        /** @var ClassLoader $dummy */
+        $dummy = $prophet->prophesize(ClassLoader::class)->reveal();
+        $provider = new static($dummy);
+
+        $definitions = $provider->createForClasses([__CLASS__ => new File(__FILE__)]);
+        test_flight_assert(key($definitions) === __CLASS__);
+        test_flight_assert(is_array($definitions[__CLASS__]));
+        test_flight_assert(current($definitions[__CLASS__]) instanceof Definition);
+
+        test_flight_throws(
+            function () use ($provider) {
+                $provider->createForClasses(['NotExistingClass' => new File(__FILE__)]);
+            },
+            \ReflectionException::class
+        );
     }
 }
