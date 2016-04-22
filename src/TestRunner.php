@@ -60,7 +60,7 @@ class TestRunner
         }
         $this->getPrinter()->println('Successful: %d | Failures: %d', $this->successes, $this->failures);
 
-        return 0 < $this->failures;
+        return 0 === $this->failures;
     }
 
     /**
@@ -88,7 +88,7 @@ class TestRunner
         $this->classLoader->loadClass($definition->getClassName(), $definition->getFile());
 
         error_clear_last();
-        ob_start();
+//        ob_start();
         try {
             if ($definition->getMethodIsStatic()) {
                 @$this->runStaticTest($definition);
@@ -106,7 +106,7 @@ class TestRunner
 
             $result = false;
         }
-        ob_end_clean();
+//        ob_end_clean();
 
         if (!$result) {
             return false;
@@ -130,7 +130,16 @@ class TestRunner
      */
     private function runStaticTest(Definition $definition)
     {
-        call_user_func([$definition->getClassName(), $definition->getMethodName()]);
+        $className = $definition->getClassName();
+        $methodName = $definition->getMethodName();
+
+        if ($definition->getMethodIsPublic()) {
+            call_user_func([$className, $methodName]);
+        } else {
+            $method = new \ReflectionMethod($className, $methodName);
+            $method->setAccessible(true);
+            $method->invoke(null);
+        }
     }
 
     /**
@@ -158,11 +167,12 @@ class TestRunner
     {
         $printer = $this->getPrinter();
         $printer->printError(
-            'Error during test %s%s%s: #%s %s in %s at %s',
+            "Error %s #%s during test %s%s%s(): \n%s \nin %s at %s",
+            get_class($exception),
+            $exception->getCode(),
             $definition->getClassName(),
             $definition->getMethodIsStatic() ? '::' : '->',
             $definition->getMethodName(),
-            $exception->getCode(),
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine()
@@ -183,7 +193,7 @@ class TestRunner
      */
     private function getPrinter()
     {
-        return new Printer(STDOUT);
+        return new Printer(STDOUT, STDERR);
     }
 
     /**

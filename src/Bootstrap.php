@@ -52,10 +52,10 @@ class Bootstrap
     public function run(array $arguments)
     {
         $testDefinitions = $this->collectTestDefinitions($arguments);
+        /** @var TestRunner $testRunner */
         $testRunner = $this->objectManager->get(TestRunner::class, $this->classLoader, $this->objectManager);
-        $testRunner->runTestDefinitions($testDefinitions);
 
-        return $this;
+        return $testRunner->runTestDefinitions($testDefinitions);
     }
 
     /**

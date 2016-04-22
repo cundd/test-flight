@@ -8,7 +8,9 @@
 
 namespace Cundd\TestFlight\Output;
 
-
+/**
+ * Printer implementation
+ */
 class Printer implements PrinterInterface
 {
     /**
@@ -17,13 +19,20 @@ class Printer implements PrinterInterface
     private $outputStream;
 
     /**
+     * @var
+     */
+    private $errorStream;
+
+    /**
      * Printer constructor.
      *
      * @param resource $outputStream
+     * @param          $errorStream
      */
-    public function __construct($outputStream)
+    public function __construct($outputStream, $errorStream)
     {
         $this->outputStream = $outputStream;
+        $this->errorStream = $errorStream;
     }
 
     /**
@@ -51,7 +60,7 @@ class Printer implements PrinterInterface
         } else {
             $format .= PHP_EOL;
         }
-        fwrite($this->outputStream, vsprintf($format, $arguments));
+        fwrite($this->errorStream, vsprintf($format, $arguments));
 
         return $this;
     }
