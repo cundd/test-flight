@@ -88,7 +88,6 @@ class TestRunner
         $this->classLoader->loadClass($definition->getClassName(), $definition->getFile());
 
         error_clear_last();
-//        ob_start();
         try {
             if ($definition->getMethodIsStatic()) {
                 @$this->runStaticTest($definition);
@@ -106,7 +105,6 @@ class TestRunner
 
             $result = false;
         }
-//        ob_end_clean();
 
         if (!$result) {
             return false;
