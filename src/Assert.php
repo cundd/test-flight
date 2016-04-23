@@ -39,6 +39,7 @@ abstract class Assert
      * @param callable $callback
      * @param string   $expectedException
      * @param string   $message
+     * @throws AssertionError
      */
     public static function throws(callable $callback, string $expectedException = '', string $message = '')
     {
@@ -67,51 +68,12 @@ abstract class Assert
     }
 
     /**
+     * Returns the number of preformed assertions
+     *
      * @return int
      */
     public static function getCount():int
     {
         return self::$count;
     }
-
-
-//    /**
-//     * @param mixed  $expected
-//     * @param mixed  $actual
-//     * @param string $message
-//     */
-//    public static function same($expected, $actual, string $message = '')
-//    {
-//        assert($expected === $actual, $message);
-//    }
-//
-//    /**
-//     * @param mixed  $expected
-//     * @param mixed  $actual
-//     * @param string $message
-//     */
-//    public static function equals($expected, $actual, string $message = '')
-//    {
-//        assert($expected === $actual, $message);
-//    }
-//
-//    /**
-//     * @param mixed  $expected
-//     * @param mixed  $actual
-//     * @param string $message
-//     */
-//    public static function notSame($expected, $actual, string $message = '')
-//    {
-//        assert($expected !== $actual, $message);
-//    }
-//
-//    /**
-//     * @param mixed  $expected
-//     * @param mixed  $actual
-//     * @param string $message
-//     */
-//    public static function notEquals($expected, $actual, string $message = '')
-//    {
-//        assert($expected == $actual, $message);
-//    }
 }

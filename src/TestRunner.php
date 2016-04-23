@@ -8,8 +8,8 @@
 
 namespace Cundd\TestFlight;
 
-
 use Cundd\TestFlight\Output\Printer;
+use Cundd\TestFlight\Output\PrinterInterface;
 use ErrorException;
 
 /**
@@ -55,10 +55,11 @@ class TestRunner
      */
     public function runTestDefinitions(array $testCollection): bool
     {
+        $this->printHeader();
         foreach ($testCollection as $className => $definitionCollection) {
             $this->runTestDefinitionsForClass($className, $definitionCollection);
         }
-        $this->getPrinter()->println('Successful: %d | Failures: %d', $this->successes, $this->failures);
+        $this->printFooter();
 
         return 0 === $this->failures;
     }
@@ -146,7 +147,7 @@ class TestRunner
      */
     private function runInstanceTest(Definition $definition)
     {
-        $instance = $this->objectManager->createInstanceOfClass($definition->getClassName());
+        $instance = $this->objectManager->create($definition->getClassName());
         $methodName = $definition->getMethodName();
 
         if ($definition->getMethodIsPublic()) {
@@ -191,7 +192,7 @@ class TestRunner
      */
     private function getPrinter()
     {
-        return new Printer(STDOUT, STDERR);
+        return $this->objectManager->get(PrinterInterface::class, STDOUT, STDERR);
     }
 
     /**
@@ -211,5 +212,26 @@ class TestRunner
     private function getDescriptionForMethod(Definition $definition)
     {
         return ucfirst(ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $definition->getMethodName()))));
+    }
+
+    /**
+     * Print the test footer output
+     */
+    private function printFooter()
+    {
+        $this->getPrinter()->println(
+            '%d Assertions | Successful: %d | Failures: %d',
+            Assert::getCount(),
+            $this->successes,
+            $this->failures
+        );
+    }
+    
+    /**
+     * Print the test header output
+     */
+    private function printHeader()
+    {
+        $this->getPrinter()->println('Test-Flight %s', Constants::VERSION);
     }
 }

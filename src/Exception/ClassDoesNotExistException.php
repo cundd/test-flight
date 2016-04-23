@@ -9,7 +9,7 @@
 namespace Cundd\TestFlight\Exception;
 
 
-class ClassDoesNotExistException extends \LogicException
+class ClassDoesNotExistException extends ClassException
 {
     /**
      * @param string          $className

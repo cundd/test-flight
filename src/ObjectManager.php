@@ -10,15 +10,14 @@ declare(strict_types = 1);
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\Exception\ClassDoesNotExistException;
+use Cundd\TestFlight\Exception\NoImplementationForInterfaceException;
 use ReflectionClass;
 
 
 /**
  * Class that manages the creation of instances of test classes
- *
- * @package Cundd\TestFlight
  */
-class ObjectManager
+class ObjectManager implements ObjectManagerInterface
 {
     /**
      * @var array
@@ -46,6 +45,7 @@ class ObjectManager
     public function __construct()
     {
         $this->container[__CLASS__] = $this;
+        $this->container[ObjectManagerInterface::class] = $this;
     }
 
     /**
@@ -58,10 +58,16 @@ class ObjectManager
     public function get(string $className, ...$constructorArguments)
     {
         if (!isset($this->container[$className])) {
-            $this->container[$className] = $this->createInstanceOfClassWithArguments(
+            $instance = $this->createWithArguments(
                 $className,
-                $constructorArguments
+                $constructorArguments,
+                $implementationClassName
             );
+
+            $this->container[$className] = $instance;
+            if ($implementationClassName) {
+                $this->container[$implementationClassName] = $instance;
+            }
         }
 
         return $this->container[$className];
@@ -74,9 +80,9 @@ class ObjectManager
      * @param array  $constructorArguments
      * @return object
      */
-    public function createInstanceOfClass(string $className, ...$constructorArguments)
+    public function create(string $className, ...$constructorArguments)
     {
-        return $this->createInstanceOfClassWithArguments($className, $constructorArguments);
+        return $this->createWithArguments($className, $constructorArguments);
     }
 
     /**
@@ -84,10 +90,17 @@ class ObjectManager
      *
      * @param string $className
      * @param array  $constructorArguments
+     * @param string $implementationClassName
      * @return object
      */
-    private function createInstanceOfClassWithArguments(string $className, array $constructorArguments)
-    {
+    private function createWithArguments(
+        string $className,
+        array $constructorArguments,
+        &$implementationClassName = null
+    ) {
+        if (interface_exists($className)) {
+            $className = $implementationClassName = $this->getClassForInterface($className);
+        }
         if (!class_exists($className)) {
             throw ClassDoesNotExistException::exceptionWithClassName($className);
         }
@@ -98,6 +111,26 @@ class ObjectManager
         }
 
         return new $className();
+    }
+
+    /**
+     * Try to find the class name for the given interface
+     *
+     * @param string $interfaceName
+     * @return string
+     */
+    private function getClassForInterface(string $interfaceName)
+    {
+        $implementationName = '';
+        if (strtolower(substr($interfaceName, -9)) === 'interface') {
+            $implementationName = substr($interfaceName, 0, -9);
+        }
+
+        if (!class_exists($implementationName)) {
+            throw NoImplementationForInterfaceException::exceptionWithInterfaceName($interfaceName);
+        }
+
+        return $implementationName;
     }
 
     /**
@@ -121,11 +154,17 @@ class ObjectManager
     /**
      * @test
      */
+    protected function getObjectInterfaceTest()
+    {
+        assert($this->get(ObjectManagerInterface::class) === $this);
+    }
+
+    /**
+     * @test
+     */
     protected static function getSharedInstanceTest()
     {
         assert(self::sharedInstance() instanceof ObjectManager);
         assert(self::sharedInstance()->get(__CLASS__) === self::sharedInstance());
-
-
     }
 }
