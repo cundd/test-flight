@@ -4,7 +4,7 @@
 if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     require_once __DIR__.'/../vendor/autoload.php';
 } else {
-    throw new Exception('Could not find autoloader');
+    throw new Exception('Could not find the autoloader');
 }
 
 $exitCode = (new \Cundd\TestFlight\Bootstrap())

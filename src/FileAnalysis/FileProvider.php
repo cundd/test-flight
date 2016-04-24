@@ -32,7 +32,7 @@ class FileProvider
      * it's content
      *
      * @param string $path
-     * @return File[]
+     * @return FileInterface[]
      */
     public function findMatchingFiles(string $path): array
     {
@@ -97,16 +97,16 @@ class FileProvider
      */
     protected function findMatchingFilesTest()
     {
-        $expectedNumberOfFiles = 4;
+        $expectedNumberOfFiles = 5;
         // x <= y files with @test + 1 constants interface
         $files = $this->findMatchingFiles(__DIR__.'/../');
         assert(
             count($files) === $expectedNumberOfFiles,
-            sprintf('Expected %d test files, found %d', count($files), $expectedNumberOfFiles)
+            sprintf('Expected %d test files, found %d', $expectedNumberOfFiles, count($files))
         );
         assert($files[0] instanceof File);
 
-        $oneFileIsThisFileClosure = function (File $file) {
+        $oneFileIsThisFileClosure = function (FileInterface $file) {
             return $file->getPath() === __FILE__;
         };
         assert(1 === count(array_filter($files, $oneFileIsThisFileClosure)));

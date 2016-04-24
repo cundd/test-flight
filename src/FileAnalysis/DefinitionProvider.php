@@ -47,11 +47,11 @@ class DefinitionProvider
     }
 
     /**
-     * @param string $className
-     * @param File   $file
+     * @param string        $className
+     * @param FileInterface $file
      * @return Definition[]
      */
-    private function collectDefinitionsForClass(string $className, File $file): array
+    private function collectDefinitionsForClass(string $className, FileInterface $file): array
     {
         $this->classLoader->loadClass($className, $file);
 

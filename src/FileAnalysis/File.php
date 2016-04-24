@@ -12,7 +12,10 @@ namespace Cundd\TestFlight\FileAnalysis;
 use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\Exception\FileNotReadableException;
 
-class File
+/**
+ * File implementation
+ */
+class File implements FileInterface
 {
     /**
      * @var string

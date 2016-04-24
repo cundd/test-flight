@@ -138,10 +138,10 @@ class ObjectManager implements ObjectManagerInterface
      */
     protected function getObjectSingletonTest()
     {
-        assert($this->get(__CLASS__) === $this);
-        assert($this->get(__CLASS__) === $this->get(__CLASS__));
-        assert($this->get(__CLASS__) === $this->get(ObjectManager::class));
-        assert($this->get(__CLASS__) === $this->get('Cundd\\TestFlight\\ObjectManager'));
+        test_flight_assert($this->get(__CLASS__) === $this);
+        test_flight_assert($this->get(__CLASS__) === $this->get(__CLASS__));
+        test_flight_assert($this->get(__CLASS__) === $this->get(ObjectManager::class));
+        test_flight_assert($this->get(__CLASS__) === $this->get('Cundd\\TestFlight\\ObjectManager'));
 
         Assert::throws(
             function () {
@@ -156,7 +156,7 @@ class ObjectManager implements ObjectManagerInterface
      */
     protected function getObjectInterfaceTest()
     {
-        assert($this->get(ObjectManagerInterface::class) === $this);
+        test_flight_assert($this->get(ObjectManagerInterface::class) === $this);
     }
 
     /**
@@ -164,7 +164,7 @@ class ObjectManager implements ObjectManagerInterface
      */
     protected static function getSharedInstanceTest()
     {
-        assert(self::sharedInstance() instanceof ObjectManager);
-        assert(self::sharedInstance()->get(__CLASS__) === self::sharedInstance());
+        test_flight_assert(self::sharedInstance() instanceof ObjectManager);
+        test_flight_assert(self::sharedInstance()->get(__CLASS__) === self::sharedInstance());
     }
 }

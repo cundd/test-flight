@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\FileAnalysis\File;
+use Cundd\TestFlight\FileAnalysis\FileInterface;
 use ReflectionMethod;
 
 /**
@@ -30,7 +31,7 @@ class Definition
     private $methodName;
 
     /**
-     * @var File
+     * @var FileInterface
      */
     private $file;
 
@@ -42,15 +43,15 @@ class Definition
     /**
      * TestDefinition constructor.
      *
-     * @param string $className
-     * @param string $methodName
-     * @param File $file
+     * @param string           $className
+     * @param string           $methodName
+     * @param FileInterface    $file
      * @param ReflectionMethod $reflectionMethod
      */
     public function __construct(
         string $className,
         string $methodName,
-        File $file,
+        FileInterface $file,
         ReflectionMethod $reflectionMethod = null
     ) {
         $this->className = $className;
@@ -76,7 +77,7 @@ class Definition
     }
 
     /**
-     * @return File
+     * @return FileInterface
      */
     public function getFile(): File
     {

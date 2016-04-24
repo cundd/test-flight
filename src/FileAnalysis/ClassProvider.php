@@ -14,7 +14,7 @@ namespace Cundd\TestFlight\FileAnalysis;
 class ClassProvider
 {
     /**
-     * @param File[] $files
+     * @param FileInterface[] $files
      * @return array
      */
     public function findClassesInFiles(array $files): array
@@ -32,11 +32,11 @@ class ClassProvider
     }
 
     /**
-     * @param string[] $classes
-     * @param File     $file
+     * @param string[]      $classes
+     * @param FileInterface $file
      * @return array
      */
-    private function buildDictionaryWithClassesAndFile(array $classes, File $file): array
+    private function buildDictionaryWithClassesAndFile(array $classes, FileInterface $file): array
     {
         $dictionary = array_flip($classes);
         array_walk(
@@ -50,10 +50,10 @@ class ClassProvider
     }
 
     /**
-     * @param \Cundd\TestFlight\FileAnalysis\File $file
+     * @param FileInterface $file
      * @return string[]
      */
-    private function getClassFromFile(File $file): array
+    private function getClassFromFile(FileInterface $file): array
     {
         $classes   = [];
         $tokens    = token_get_all($file->getContents());
@@ -90,5 +90,15 @@ class ClassProvider
         }
 
         return $classes;
+    }
+
+
+    /**
+     * @test
+     */
+    protected function findClassesInFilesTest() {
+        $classes = $this->findClassesInFiles([new File(__FILE__)]);
+        test_flight_assert(1 === count($classes));
+        test_flight_assert(__CLASS__ === key($classes));
     }
 }
