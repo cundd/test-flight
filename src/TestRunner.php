@@ -8,6 +8,7 @@
 
 namespace Cundd\TestFlight;
 
+use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\Printer;
 use Cundd\TestFlight\Output\PrinterInterface;
 use ErrorException;
@@ -164,18 +165,7 @@ class TestRunner
      */
     private function printException(Definition $definition, $exception)
     {
-        $printer = $this->getPrinter();
-        $printer->printError(
-            "Error %s #%s during test %s%s%s(): \n%s \nin %s at %s",
-            get_class($exception),
-            $exception->getCode(),
-            $definition->getClassName(),
-            $definition->getMethodIsStatic() ? '::' : '->',
-            $definition->getMethodName(),
-            $exception->getMessage(),
-            $exception->getFile(),
-            $exception->getLine()
-        );
+        $this->getExceptionPrinter()->printException($definition, $exception);
     }
 
     /**
@@ -193,6 +183,14 @@ class TestRunner
     private function getPrinter()
     {
         return $this->objectManager->get(PrinterInterface::class, STDOUT, STDERR);
+    }
+
+    /**
+     * @return ExceptionPrinterInterface
+     */
+    private function getExceptionPrinter()
+    {
+        return $this->objectManager->get(ExceptionPrinterInterface::class, STDOUT, STDERR);
     }
 
     /**

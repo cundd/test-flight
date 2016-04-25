@@ -9,7 +9,6 @@ declare(strict_types = 1);
 
 namespace Cundd\TestFlight;
 
-use Cundd\TestFlight\FileAnalysis\File;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 use ReflectionMethod;
 
@@ -79,9 +78,17 @@ class Definition
     /**
      * @return FileInterface
      */
-    public function getFile(): File
+    public function getFile(): FileInterface
     {
         return $this->file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilePath(): string
+    {
+        return $this->getFile()->getPath();
     }
 
     /**

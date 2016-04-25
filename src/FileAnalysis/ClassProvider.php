@@ -100,5 +100,8 @@ class ClassProvider
         $classes = $this->findClassesInFiles([new File(__FILE__)]);
         test_flight_assert(1 === count($classes));
         test_flight_assert(__CLASS__ === key($classes));
+
+        $classes = $this->findClassesInFiles([new File(__DIR__ . '/../functions.php')]);
+        test_flight_assert(0 === count($classes));
     }
 }
