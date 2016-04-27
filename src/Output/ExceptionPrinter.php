@@ -49,7 +49,10 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
      * @param \Throwable $exception
      * @return string
      */
-    private function getTraceAsString(Definition $definition, $exception): string
+    private function getTraceAsString(
+        Definition $definition,
+        $exception
+    ): string
     {
         $stringParts = [];
         $previousStep = [];
@@ -62,7 +65,11 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             $stepAsString = $this->getTraceStepAsString($step, $i);
 
             if ($enableColoredOutput
-                && $this->getTraceStepIsTestMethod($definition, $step, $previousStep)
+                && $this->getTraceStepIsTestMethod(
+                    $definition,
+                    $step,
+                    $previousStep
+                )
             ) {
                 $stringParts[] = self::NORMAL.self::LIGHT_RED.$stepAsString.self::RED;
             } else {
@@ -144,7 +151,11 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
      * @param array      $previousStep
      * @return bool
      */
-    private function getTraceStepIsTestMethod(Definition $definition, array $step, array $previousStep): bool
+    private function getTraceStepIsTestMethod(
+        Definition $definition,
+        array $step,
+        array $previousStep
+    ): bool
     {
         $filePath = $previousStep['file'] ?? '';
 
@@ -168,7 +179,9 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         $prophecy = $prophet->prophesize(Definition::class);
         $prophecy->getClassName()->willReturn(__CLASS__);
         $prophecy->getMethodIsStatic()->willReturn(false);
-        $prophecy->getMethodName()->willReturn('thisIsTheDummyTestMethodForTheTest');
+        $prophecy->getMethodName()->willReturn(
+            'thisIsTheDummyTestMethodForTheTest'
+        );
         $prophecy->getFilePath()->willReturn(__FILE__);
         $testDefinition = $prophecy->reveal();
 
@@ -176,7 +189,10 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
 
         $printer = new static($tempOutputStream, $tempOutputStream);
         $printer->setEnableColoredOutput(false);
-        $printer->printException($testDefinition, new \Exception('ExceptionMessage'));
+        $printer->printException(
+            $testDefinition,
+            new \Exception('ExceptionMessage')
+        );
 
         rewind($tempOutputStream);
         $output = stream_get_contents($tempOutputStream);
@@ -185,6 +201,8 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             .'Cundd\\TestFlight\\Output\\ExceptionPrinter->thisIsTheDummyTestMethodForTheTest(): '
             ."\n"
             .'ExceptionMessage';
-        test_flight_assert($testString === substr($output, 0, strlen($testString)));
+        test_flight_assert(
+            $testString === substr($output, 0, strlen($testString))
+        );
     }
 }
