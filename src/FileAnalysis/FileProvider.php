@@ -49,7 +49,9 @@ class FileProvider
         $fileIncludingTests = [];
         foreach ($pathCollection as $path) {
             $file = new File($path);
-            if ($file->containsKeyword(Constants::TEST_KEYWORD)) {
+            if ($file->containsKeyword(Constants::TEST_KEYWORD)
+                || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
+            ) {
                 $fileIncludingTests[] = $file;
             }
         }
@@ -97,7 +99,7 @@ class FileProvider
      */
     protected function findMatchingFilesTest()
     {
-        $expectedNumberOfFiles = 6;
+        $expectedNumberOfFiles = 8;
         // x <= y files with @test + 1 constants interface
         $files = $this->findMatchingFiles(__DIR__.'/../');
         assert(

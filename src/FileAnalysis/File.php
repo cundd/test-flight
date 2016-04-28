@@ -23,6 +23,11 @@ class File implements FileInterface
     private $path;
 
     /**
+     * @var string
+     */
+    private $contents;
+
+    /**
      * File constructor
      *
      * @param string $path
@@ -33,6 +38,9 @@ class File implements FileInterface
     }
 
     /**
+     * Returns the file's path
+     *
+     * @example assert(__FILE__ === (new \Cundd\TestFlight\FileAnalysis\File(__FILE__))->getPath())
      * @return string
      */
     public function getPath(): string
@@ -45,14 +53,18 @@ class File implements FileInterface
      */
     public function getContents(): string
     {
-        if (!file_exists($this->path)) {
-            FileNotExistsException::exceptionForFile($this->path);
-        }
-        if (!is_readable($this->path)) {
-            FileNotReadableException::exceptionForFile($this->path);
+        if (!$this->contents) {
+            if (!file_exists($this->path)) {
+                FileNotExistsException::exceptionForFile($this->path);
+            }
+            if (!is_readable($this->path)) {
+                FileNotReadableException::exceptionForFile($this->path);
+            }
+
+            $this->contents = file_get_contents($this->path);
         }
 
-        return file_get_contents($this->path);
+        return $this->contents;
     }
 
     /**

@@ -7,17 +7,17 @@
  */
 declare(strict_types = 1);
 
-namespace Cundd\TestFlight;
+namespace Cundd\TestFlight\Definition;
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 use ReflectionMethod;
 
 /**
- * Definition of a test
+ * Definition of a test defined as a method
  *
  * @package Cundd\TestFlight
  */
-class Definition
+class MethodDefinition implements DefinitionInterface
 {
     /**
      * @var string
@@ -101,7 +101,8 @@ class Definition
             return false;
         }
 
-        return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_STATIC);
+        return 0 < ($reflectionMethod->getModifiers(
+            ) & ReflectionMethod::IS_STATIC);
     }
 
     /**
@@ -114,7 +115,8 @@ class Definition
             return false;
         }
 
-        return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_PUBLIC);
+        return 0 < ($reflectionMethod->getModifiers(
+            ) & ReflectionMethod::IS_PUBLIC);
     }
 
     /**

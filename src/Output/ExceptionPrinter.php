@@ -9,7 +9,9 @@
 namespace Cundd\TestFlight\Output;
 
 
-use Cundd\TestFlight\Definition;
+use Cundd\TestFlight\Definition\CodeDefinition;
+use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Definition\MethodDefinition;
 
 /**
  * Special printer for exception output
@@ -21,20 +23,18 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     /**
      * Prints the exception for the given test definition
      *
-     * @param Definition $definition
-     * @param \Throwable $exception
+     * @param DefinitionInterface $definition
+     * @param \Throwable          $exception
      * @return $this
      */
-    public function printException(Definition $definition, $exception)
+    public function printException(DefinitionInterface $definition, $exception)
     {
         $traceAsString = $this->getTraceAsString($definition, $exception);
         $this->printError(
-            "Error %s #%s during test %s%s%s(): \n%s \nin %s at %s\n%s",
+            "Error %s #%s during test %s: \n%s \nin %s at %s\n%s",
             get_class($exception),
             $exception->getCode(),
-            $definition->getClassName(),
-            $definition->getMethodIsStatic() ? '::' : '->',
-            $definition->getMethodName(),
+            $this->getTestDescriptionForDefinition($definition),
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),
@@ -45,12 +45,33 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param \Throwable $exception
+     * @param DefinitionInterface $definition
+     * @return string
+     */
+    private function getTestDescriptionForDefinition(
+        DefinitionInterface $definition
+    ) {
+        if ($definition instanceof MethodDefinition) {
+            return sprintf(
+                '%s%s%s()',
+                $definition->getClassName(),
+                $definition->getMethodIsStatic() ? '::' : '->',
+                $definition->getMethodName()
+            );
+        } elseif ($definition instanceof CodeDefinition) {
+            return get_class($definition);
+        }
+
+        return '';
+    }
+
+    /**
+     * @param DefinitionInterface $definition
+     * @param \Throwable          $exception
      * @return string
      */
     private function getTraceAsString(
-        Definition $definition,
+        DefinitionInterface $definition,
         $exception
     ): string
     {
@@ -95,7 +116,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
                 $step['class'],
                 $step['type'],
                 $step['function'],
-                $this->argumentsToString($step['args']),
+                $this->argumentsToString($step['args'] ?? []),
                 $this->pathFromStep($step)
             );
         }
@@ -104,7 +125,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             '#%d %s(%s)%s',
             $stepNumber,
             $step['function'],
-            $this->argumentsToString($step['args']),
+            $this->argumentsToString($step['args'] ?? []),
             $this->pathFromStep($step)
         );
     }
@@ -146,18 +167,22 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param array      $step
-     * @param array      $previousStep
+     * @param DefinitionInterface $definition
+     * @param array               $step
+     * @param array               $previousStep
      * @return bool
      */
     private function getTraceStepIsTestMethod(
-        Definition $definition,
+        DefinitionInterface $definition,
         array $step,
         array $previousStep
     ): bool
     {
         $filePath = $previousStep['file'] ?? '';
+
+        if (!($definition instanceof MethodDefinition)) {
+            return false;
+        }
 
         if ($filePath === $definition->getFilePath()
             && $step['function'] === $definition->getMethodName()
@@ -174,9 +199,9 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     protected static function printExceptionTest()
     {
         $prophet = new \Prophecy\Prophet();
-        /** @var Definition $testDefinition */
-        /** @var Definition|object $prophecy */
-        $prophecy = $prophet->prophesize(Definition::class);
+        /** @var MethodDefinition $testDefinition */
+        /** @var MethodDefinition|object $prophecy */
+        $prophecy = $prophet->prophesize(MethodDefinition::class);
         $prophecy->getClassName()->willReturn(__CLASS__);
         $prophecy->getMethodIsStatic()->willReturn(false);
         $prophecy->getMethodName()->willReturn(

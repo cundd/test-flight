@@ -50,31 +50,37 @@ class Bootstrap
 
     /**
      * Find and run the tests
+     *
+     * @param array $arguments
+     * @return bool
      */
     public function run(array $arguments)
     {
         $testDefinitions = $this->collectTestDefinitions($arguments);
-        /** @var TestRunner $testRunner */
-        $testRunner = $this->objectManager->get(TestRunner::class, $this->classLoader, $this->objectManager);
+        /** @var TestDispatcher $testRunner */
+        $testRunner = $this->objectManager->get(TestDispatcher::class, $this->classLoader, $this->objectManager);
 
         return $testRunner->runTestDefinitions($testDefinitions);
     }
 
     /**
      * @param array $arguments
-     * @return Definition[]
+     * @return Definition\MethodDefinition[]
      */
     private function collectTestDefinitions(array $arguments)
     {
         $testPath = (count($arguments) > 1) ? $arguments[1] : (__DIR__.'/../src/');
+        $types = (count($arguments) > 2) ? explode(',', $arguments[2]) : [];
 
+        $codeExtractor  = $this->objectManager->get(CodeExtractor::class);
         $fileProvider = $this->objectManager->get(FileProvider::class);
         $classProvider = $this->objectManager->get(ClassProvider::class);
         $classes = $classProvider->findClassesInFiles($fileProvider->findMatchingFiles($testPath));
 
-        $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader);
+        /** @var DefinitionProvider $provider */
+        $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
 
-        $testDefinitions = $provider->createForClasses($classes);
+        $testDefinitions = $provider->createForClasses($classes, $types);
 
         return $testDefinitions;
     }

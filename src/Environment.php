@@ -89,7 +89,7 @@ class Environment
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getLocale(): string
     {
