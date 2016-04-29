@@ -46,7 +46,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         $this->classLoader = $classLoader;
         $this->objectManager = $objectManager;
     }
-    
+
     /**
      * @param DefinitionInterface $definition
      * @return void
@@ -112,11 +112,8 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      */
     private function printSuccess(DefinitionInterface $definition)
     {
-        $printer = $this->getPrinter();
-        $printer->println(
-            'Run %s',
-            $this->getDescriptionForMethod($definition)
-        );
+        $this->getPrinter()->printf('.');
+        $this->getPrinter()->debug('Run %s', $this->getDescriptionForMethod($definition));
     }
 
     /**

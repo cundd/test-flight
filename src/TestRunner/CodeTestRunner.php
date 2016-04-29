@@ -33,9 +33,11 @@ class CodeTestRunner extends AbstractTestRunner
      */
     private function evaluate(string $code)
     {
-        return call_user_func(function () use ($code) {
-            return eval($code);
-        });
+        return call_user_func(
+            function () use ($code) {
+                return eval($code);
+            }
+        );
     }
 
     /**
@@ -60,6 +62,11 @@ class CodeTestRunner extends AbstractTestRunner
         $code = str_replace(
             '__CLASS__',
             "'".$definition->getClassName()."'",
+            $code
+        );
+        $code = preg_replace(
+            '/\bassert\(/',
+            'test_flight_assert(',
             $code
         );
 
