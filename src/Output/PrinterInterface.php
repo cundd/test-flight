@@ -44,6 +44,13 @@ interface PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
+    public function printf(string $format, ...$arguments);
+
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
     public function println(string $format, ...$arguments);
 
     /**
@@ -52,4 +59,22 @@ interface PrinterInterface
      * @return $this
      */
     public function printError(string $format, ...$arguments);
+
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
+    public function debug(string $format, ...$arguments);
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function setVerbose(bool $flag = false);
+
+    /**
+     * @return bool
+     */
+    public function getVerbose(): bool;
 }

@@ -29,6 +29,11 @@ class Printer implements PrinterInterface
     private $enableColoredOutput = true;
 
     /**
+     * @var bool
+     */
+    private $verbose = false;
+
+    /**
      * Printer constructor.
      *
      * @param resource $outputStream
@@ -45,12 +50,19 @@ class Printer implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
+    public function printf(string $format, ...$arguments)
+    {
+        return $this->printWithArray($format, $arguments);
+    }
+
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
     public function println(string $format, ...$arguments)
     {
-        $format .= PHP_EOL;
-        fwrite($this->outputStream, vsprintf($format, $arguments));
-
-        return $this;
+        return $this->printWithArray($format.PHP_EOL, $arguments);
     }
 
     /**
@@ -69,6 +81,21 @@ class Printer implements PrinterInterface
 
         return $this;
     }
+
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
+    public function debug(string $format, ...$arguments)
+    {
+        if ($this->getVerbose()) {
+            $this->println($format, $arguments);
+        }
+
+        return $this;
+    }
+
 
     /**
      * Returns if colors should be enabled
@@ -98,6 +125,25 @@ class Printer implements PrinterInterface
     }
 
     /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function setVerbose(bool $flag = false)
+    {
+        $this->verbose = $flag;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVerbose(): bool
+    {
+        return $this->verbose;
+    }
+
+    /**
      * @return bool
      */
     protected function getCliHasColorSupport()
@@ -107,5 +153,17 @@ class Printer implements PrinterInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param string $format
+     * @param array  $arguments
+     * @return $this
+     */
+    private function printWithArray($format, array $arguments)
+    {
+        fwrite($this->outputStream, vsprintf($format, $arguments));
+
+        return $this;
     }
 }
