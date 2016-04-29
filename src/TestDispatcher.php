@@ -16,6 +16,7 @@ use Cundd\TestFlight\Output\PrinterInterface;
 use Cundd\TestFlight\TestRunner\CodeTestRunner;
 use Cundd\TestFlight\TestRunner\MethodTestRunner;
 use Cundd\TestFlight\TestRunner\StaticMethodTestRunner;
+use Cundd\TestFlight\TestRunner\TestRunnerInterface;
 
 /**
  * Class to forward the test definitions to the matching test runner
@@ -82,12 +83,14 @@ class TestDispatcher
         string $className,
         array $definitionCollection
     ) {
-        $this->getPrinter()->println('Run tests: %s', $className);
-        foreach ($definitionCollection as $definition) {
-            if ($this->runTestDefinition($definition)) {
-                $this->successes += 1;
-            } else {
-                $this->failures += 1;
+        if (count($definitionCollection) > 0) {
+            $this->printClassInfo($className);
+            foreach ($definitionCollection as $definition) {
+                if ($this->runTestDefinition($definition)) {
+                    $this->successes += 1;
+                } else {
+                    $this->failures += 1;
+                }
             }
         }
     }
@@ -115,10 +118,13 @@ class TestDispatcher
                 )
             );
         }
+        $this->printTestInfo($definition);
 
-        return $this->objectManager
-            ->get($testRunnerClass, $this->classLoader, $this->objectManager)
-            ->runTestDefinition($definition);
+        /** @var TestRunnerInterface $testRunner */
+        $testRunner = $this->objectManager
+            ->get($testRunnerClass, $this->classLoader, $this->objectManager);
+
+        return $testRunner->runTestDefinition($definition);
     }
 
     /**
@@ -138,6 +144,7 @@ class TestDispatcher
      */
     private function printFooter()
     {
+        $this->getPrinter()->println('');
         $this->getPrinter()->println(
             '%d Assertions | Successful: %d | Failures: %d',
             Assert::getCount(),
@@ -152,5 +159,24 @@ class TestDispatcher
     private function printHeader()
     {
         $this->getPrinter()->println('Test-Flight %s', Constants::VERSION);
+    }
+
+    /**
+     * Print information about the current test class
+     *
+     * @param string $className
+     */
+    private function printClassInfo(string $className)
+    {
+        $this->getPrinter()->debug('Run tests: %s', $className);
+    }
+
+    /**
+     * Print information about the current test
+     *
+     * @param DefinitionInterface $definition
+     */
+    private function printTestInfo(DefinitionInterface $definition)
+    {
     }
 }

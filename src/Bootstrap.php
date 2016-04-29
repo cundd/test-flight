@@ -10,9 +10,11 @@ declare(strict_types = 1);
 
 namespace Cundd\TestFlight;
 
+use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\FileAnalysis\ClassProvider;
 use Cundd\TestFlight\FileAnalysis\DefinitionProvider;
 use Cundd\TestFlight\FileAnalysis\FileProvider;
+use Cundd\TestFlight\Output\PrinterInterface;
 
 /**
  * Bootstrap the test environment
@@ -40,10 +42,16 @@ class Bootstrap
     public function init()
     {
         $this->objectManager = new ObjectManager();
+        $this->classLoader = $this->objectManager->get(ClassLoader::class);
+
+        // Prepare the printer
+        $this->objectManager->get(
+            PrinterInterface::class,
+            STDOUT,
+            STDERR
+        );
 
         $this->initEnvironment();
-
-        $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
         return $this;
     }
@@ -56,7 +64,8 @@ class Bootstrap
      */
     public function run(array $arguments)
     {
-        $testDefinitions = $this->collectTestDefinitions($arguments);
+        $options = $this->prepareArguments($arguments);
+        $testDefinitions = $this->collectTestDefinitions($options);
         /** @var TestDispatcher $testRunner */
         $testRunner = $this->objectManager->get(TestDispatcher::class, $this->classLoader, $this->objectManager);
 
@@ -64,15 +73,15 @@ class Bootstrap
     }
 
     /**
-     * @param array $arguments
+     * @param array $options
      * @return Definition\MethodDefinition[]
      */
-    private function collectTestDefinitions(array $arguments)
+    private function collectTestDefinitions(array $options)
     {
-        $testPath = (count($arguments) > 1) ? $arguments[1] : (__DIR__.'/../src/');
-        $types = (count($arguments) > 2) ? explode(',', $arguments[2]) : [];
+        $testPath = $options['path'];
+        $types = $options['types'];
 
-        $codeExtractor  = $this->objectManager->get(CodeExtractor::class);
+        $codeExtractor = $this->objectManager->get(CodeExtractor::class);
         $fileProvider = $this->objectManager->get(FileProvider::class);
         $classProvider = $this->objectManager->get(ClassProvider::class);
         $classes = $classProvider->findClassesInFiles($fileProvider->findMatchingFiles($testPath));
@@ -112,5 +121,28 @@ class Bootstrap
         } catch (\TypeError $error) {
             echo $error;
         }
+    }
+
+    /**
+     * @param string[] $arguments
+     * @return array
+     * @throws \Exception
+     */
+    private function prepareArguments(array $arguments)
+    {
+        $options = $this->objectManager->get(OptionParser::class)->parse($arguments);
+
+        if (!isset($options['path'])) {
+            $options['path'] = __DIR__.'/../src/';
+        }
+        if (isset($options['types'])) {
+            $options['types'] = explode(',', $options['types']);
+        } elseif (isset($options['type'])) {
+            $options['types'] = explode(',', $options['type']);
+        } else {
+            $options['types'] = [];
+        }
+
+        return $options;
     }
 }

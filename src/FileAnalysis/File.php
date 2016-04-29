@@ -40,7 +40,9 @@ class File implements FileInterface
     /**
      * Returns the file's path
      *
-     * @example assert(__FILE__ === (new \Cundd\TestFlight\FileAnalysis\File(__FILE__))->getPath())
+     * @example
+     *  $file = new \Cundd\TestFlight\FileAnalysis\File(__FILE__);
+     *  assert(__FILE__ === $file->getPath())
      * @return string
      */
     public function getPath(): string
