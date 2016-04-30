@@ -17,7 +17,7 @@ class OptionParser
      * Parse CLI arguments
      *
      * @example
-     *  $arguments = ['the/path', '--type', 'doccomment'];
+     *  $arguments = ['path/to/cli-script', 'the/path', '--type', 'doccomment'];
      *  $parser = new \Cundd\TestFlight\Cli\OptionParser();
      *  $parsedArguments = $parser->parse($arguments);
      *  test_flight_assert(is_array($parsedArguments));
@@ -32,7 +32,7 @@ class OptionParser
         $preparedArguments = [];
         $argumentsLength = count($arguments);
 
-        for ($i = 0; $i < $argumentsLength; $i++) {
+        for ($i = 1; $i < $argumentsLength; $i++) {
             $currentArgument = $arguments[$i];
             if (substr($currentArgument, 0, 2) === '--') {
                 $name = substr($currentArgument, 2);
