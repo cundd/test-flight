@@ -27,7 +27,7 @@
         },
         "files": ["src/functions.php"]
     },
-    "suggests": {
+    "suggest": {
         "phpspec/prophecy": "PHP object mocking framework",
         "phpunit/phpunit": "More assert methods and separate Unit tests"
     }
