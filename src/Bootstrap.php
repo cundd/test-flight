@@ -37,6 +37,11 @@ class Bootstrap
     private $classLoader;
 
     /**
+     * @var PrinterInterface
+     */
+    private $printer;
+
+    /**
      * @return $this
      */
     public function init()
@@ -45,7 +50,7 @@ class Bootstrap
         $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
         // Prepare the printer
-        $this->objectManager->get(
+        $this->printer = $this->objectManager->get(
             PrinterInterface::class,
             STDOUT,
             STDERR
@@ -133,7 +138,8 @@ class Bootstrap
         $options = $this->objectManager->get(OptionParser::class)->parse($arguments);
 
         if (!isset($options['path'])) {
-            $options['path'] = __DIR__.'/../src/';
+            // TODO: Read the composer.json and scan the sources?
+            $this->error('Please specify a path to look for tests');
         }
         if (isset($options['types'])) {
             $options['types'] = explode(',', $options['types']);
@@ -144,5 +150,17 @@ class Bootstrap
         }
 
         return $options;
+    }
+
+    /**
+     * Print a error message and exit
+     *
+     * @param string $message
+     * @param int    $status
+     */
+    private function error(string $message, $status = 1)
+    {
+        $this->printer->printError($message);
+        exit($status);
     }
 }
