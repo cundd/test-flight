@@ -17,11 +17,11 @@ class OptionParser
      * Parse CLI arguments
      *
      * @example
-     *  $arguments = ['path/to/cli-script', 'the/path', '--type', 'doccomment'];
+     *  $arguments = ['path/to/cli-script', 'the/path', '--type', 'doccomment', '-v'];
      *  $parser = new \Cundd\TestFlight\Cli\OptionParser();
      *  $parsedArguments = $parser->parse($arguments);
      *  test_flight_assert(is_array($parsedArguments));
-     *  test_flight_assert($parsedArguments === ['path' => 'the/path', 'type' => 'doccomment']);
+     *  test_flight_assert($parsedArguments === ['path' => 'the/path', 'type' => 'doccomment', 'v' => true]);
      *
      * @param string[] $arguments
      * @return array
@@ -34,7 +34,7 @@ class OptionParser
 
         for ($i = 1; $i < $argumentsLength; $i++) {
             $currentArgument = $arguments[$i];
-            if (substr($currentArgument, 0, 2) === '--') {
+            if (substr($currentArgument, 0, 2) === '--') { // Value option
                 $name = substr($currentArgument, 2);
 
                 if (strpos($name, '=') !== false) {
@@ -47,6 +47,8 @@ class OptionParser
                     throw new \Exception('Invalid arguments');
                 }
                 $preparedArguments[$name] = $value;
+            } elseif ($currentArgument[0] === '-') { // Flag option
+                $preparedArguments[substr($currentArgument, 1)] = true;
             } else {
                 $preparedArguments['path'] = $currentArgument;
             }

@@ -70,6 +70,9 @@ class Bootstrap
     public function run(array $arguments)
     {
         $options = $this->prepareArguments($arguments);
+
+        $this->printer->setVerbose($options['verbose']);
+
         $testDefinitions = $this->collectTestDefinitions($options);
         /** @var TestDispatcher $testRunner */
         $testRunner = $this->objectManager->get(TestDispatcher::class, $this->classLoader, $this->objectManager);
@@ -147,6 +150,14 @@ class Bootstrap
             $options['types'] = explode(',', $options['type']);
         } else {
             $options['types'] = [];
+        }
+
+        if (isset($options['verbose'])) {
+            $options['verbose'] = boolval($options['verbose']);
+        } elseif (isset($options['v'])) {
+            $options['verbose'] = true;
+        } else {
+            $options['verbose'] = false;
         }
 
         return $options;

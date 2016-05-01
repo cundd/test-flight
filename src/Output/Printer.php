@@ -90,12 +90,28 @@ class Printer implements PrinterInterface
     public function debug(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($format, $arguments);
+            $this->printWithArray($format . PHP_EOL, $arguments);
         }
 
         return $this;
     }
 
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
+    public function info(string $format, ...$arguments)
+    {
+        if ($this->getVerbose()) {
+            if ($this->getEnableColoredOutput()) {
+                $format = self::BLUE.$format.self::NORMAL;
+            }
+            $this->printWithArray($format.PHP_EOL, $arguments);
+        }
+
+        return $this;
+    }
 
     /**
      * Returns if colors should be enabled

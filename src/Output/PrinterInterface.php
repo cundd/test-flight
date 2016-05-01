@@ -65,6 +65,13 @@ interface PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
+    public function info(string $format, ...$arguments);
+
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
     public function debug(string $format, ...$arguments);
 
     /**

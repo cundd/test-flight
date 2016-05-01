@@ -168,7 +168,7 @@ class TestDispatcher
      */
     private function printClassInfo(string $className)
     {
-        $this->getPrinter()->debug('Run tests: %s', $className);
+        $this->getPrinter()->info('Run tests: %s', $className);
     }
 
     /**
