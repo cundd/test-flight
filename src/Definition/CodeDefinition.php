@@ -32,6 +32,10 @@ class CodeDefinition implements DefinitionInterface
      * @var FileInterface
      */
     private $file;
+    /**
+     * @var string
+     */
+    private $relatedMethodName;
 
     /**
      * CodeDefinition constructor.
@@ -39,12 +43,14 @@ class CodeDefinition implements DefinitionInterface
      * @param string        $className
      * @param string        $code
      * @param FileInterface $file
+     * @param string        $relatedMethodName
      */
-    public function __construct(string $className, string $code, FileInterface $file)
+    public function __construct(string $className, string $code, FileInterface $file, string $relatedMethodName)
     {
         $this->className = $className;
         $this->code = $code;
         $this->file = $file;
+        $this->relatedMethodName = $relatedMethodName;
     }
 
     /**
@@ -77,5 +83,13 @@ class CodeDefinition implements DefinitionInterface
     public function getFilePath(): string
     {
         return $this->getFile()->getPath();
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelatedMethodName(): string
+    {
+        return $this->relatedMethodName;
     }
 }

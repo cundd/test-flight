@@ -92,7 +92,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
                     $previousStep
                 )
             ) {
-                $stringParts[] = self::NORMAL.self::LIGHT_RED.$stepAsString.self::RED;
+                $stringParts[] = self::NORMAL.self::RED_BACKGROUND.$stepAsString.self::RED;
             } else {
                 $stringParts[] = $stepAsString;
             }
@@ -180,12 +180,16 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $filePath = $previousStep['file'] ?? '';
 
-        if (!($definition instanceof MethodDefinition)) {
+        if ($definition instanceof MethodDefinition) {
+            $functionName = $definition->getMethodName();
+        } elseif ($definition instanceof CodeDefinition) {
+            $functionName = $definition->getRelatedMethodName();
+        } else {
             return false;
         }
 
         if ($filePath === $definition->getFilePath()
-            && $step['function'] === $definition->getMethodName()
+            && $step['function'] === $functionName
         ) {
             return true;
         }
