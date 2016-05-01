@@ -9,9 +9,7 @@
 namespace Cundd\TestFlight\TestRunner;
 
 use Cundd\TestFlight\ClassLoader;
-use Cundd\TestFlight\Definition\CodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
-use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\ObjectManager;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\Printer;
@@ -112,8 +110,12 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      */
     private function printSuccess(DefinitionInterface $definition)
     {
-        $this->getPrinter()->printf('.');
-        $this->getPrinter()->debug('Run %s', $this->getDescriptionForMethod($definition));
+        $printer = $this->getPrinter();
+        if ($printer->getVerbose()) {
+            $printer->info('Successfully ran %s', $definition->getDescription());
+        } else {
+            $printer->printf('.');
+        }
     }
 
     /**
@@ -154,22 +156,5 @@ abstract class AbstractTestRunner implements TestRunnerInterface
             $error['file'],
             $error['line']
         );
-    }
-
-    /**
-     * @param DefinitionInterface $definition
-     * @return string
-     */
-    private function getDescriptionForMethod(DefinitionInterface $definition)
-    {
-        if ($definition instanceof MethodDefinition) {
-            return ucwords(
-                ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $definition->getMethodName())))
-            );
-        } elseif ($definition instanceof CodeDefinition) {
-            return get_class($definition);
-        }
-
-        return '';
     }
 }

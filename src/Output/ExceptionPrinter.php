@@ -59,7 +59,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
                 $definition->getMethodName()
             );
         } elseif ($definition instanceof CodeDefinition) {
-            return get_class($definition);
+            return $definition->getDescription();
         }
 
         return '';
@@ -85,13 +85,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             $step = $stackTrace[$i];
             $stepAsString = $this->getTraceStepAsString($step, $i);
 
-            if ($enableColoredOutput
-                && $this->getTraceStepIsTestMethod(
-                    $definition,
-                    $step,
-                    $previousStep
-                )
-            ) {
+            if ($enableColoredOutput && $this->getTraceStepIsTestMethod($definition, $step, $previousStep)) {
                 $stringParts[] = self::NORMAL.self::RED_BACKGROUND.$stepAsString.self::RED;
             } else {
                 $stringParts[] = $stepAsString;

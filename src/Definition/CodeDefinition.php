@@ -86,6 +86,21 @@ class CodeDefinition implements DefinitionInterface
     }
 
     /**
+     * Returns a description for the output
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return sprintf(
+            'DocComment test "%s"',
+            ucwords(
+                ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getRelatedMethodName())))
+            )
+        );
+    }
+
+    /**
      * @return string
      */
     public function getRelatedMethodName(): string

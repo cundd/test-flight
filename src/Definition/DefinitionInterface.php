@@ -37,4 +37,11 @@ interface DefinitionInterface
      * @return string
      */
     public function getFilePath() : string;
+
+    /**
+     * Returns a description for the output
+     * 
+     * @return string
+     */
+    public function getDescription(): string;
 }

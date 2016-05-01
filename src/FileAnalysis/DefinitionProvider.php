@@ -50,6 +50,7 @@ class DefinitionProvider
      * @param array $classNameToFiles
      * @param array $types
      * @return array|\Cundd\TestFlight\Definition\MethodDefinition[]
+     * @throws \Exception
      */
     public function createForClasses(array $classNameToFiles, array $types = array()): array
     {
@@ -129,7 +130,7 @@ class DefinitionProvider
                     $className,
                     $this->codeExtractor->getCodeFromDocComment($method->getDocComment()),
                     $file,
-                    $method
+                    $method->getName()
                 );
             }
         }

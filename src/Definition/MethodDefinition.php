@@ -92,6 +92,18 @@ class MethodDefinition implements DefinitionInterface
     }
 
     /**
+     * Returns a description for the output
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return ucwords(
+            ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getMethodName())))
+        );
+    }
+
+    /**
      * @return boolean
      */
     public function getMethodIsStatic(): bool
@@ -126,4 +138,6 @@ class MethodDefinition implements DefinitionInterface
     {
         return $this->reflectionMethod;
     }
+
+
 }
