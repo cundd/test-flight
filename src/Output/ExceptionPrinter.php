@@ -31,13 +31,12 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $traceAsString = $this->getTraceAsString($definition, $exception);
         $this->printError(
-            "Error %s #%s during test %s: \n%s \nin %s at %s\n%s",
+            "Error %s #%s during test %s: \n%s \nin %s\n%s",
             get_class($exception),
             $exception->getCode(),
             $this->getTestDescriptionForDefinition($definition),
             $exception->getMessage(),
-            $exception->getFile(),
-            $exception->getLine(),
+            $this->getTestLocationForDefinitionAndException($definition, $exception),
             $traceAsString
         );
 
@@ -227,5 +226,19 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         test_flight_assert(
             $testString === substr($output, 0, strlen($testString))
         );
+    }
+
+    /**
+     * @param DefinitionInterface $definition
+     * @param \Throwable          $exception
+     * @return string
+     */
+    private function getTestLocationForDefinitionAndException(DefinitionInterface $definition, $exception): string
+    {
+        if ($definition instanceof CodeDefinition) {
+            return $definition->getFilePath();
+        }
+
+        return $exception->getFile().' at '.$exception->getLine();
     }
 }
