@@ -34,6 +34,55 @@ abstract class Assert
     }
 
     /**
+     * Test if the actual value matches the expected
+     *
+     * @param mixed  $expected
+     * @param mixed  $actual
+     * @param string $message
+     * @throws AssertionError if the values are not equal
+     */
+    public static function assertSame($expected, $actual, string $message = '')
+    {
+        self::$count += 1;
+
+        if ($expected === $actual) {
+            return;
+        }
+        if (!$message) {
+            $message = sprintf(
+                'Failed asserting that %s matches %s',
+                var_export($actual, true),
+                var_export($expected, true)
+            );
+        }
+        throw new AssertionError($message);
+    }
+
+    /**
+     * Test if the value is true truthy
+     *
+     * @param mixed  $actual
+     * @param string $message
+     * @throws AssertionError if the value is false, null, 0, '', '0', ...
+     */
+    public static function assertTrue($actual, string $message = '')
+    {
+        self::$count += 1;
+
+        if ((bool)$actual) {
+            return;
+        }
+
+        if (!$message) {
+            $message = sprintf(
+                'Failed asserting that %s is truthy',
+                var_export($actual, true)
+            );
+        }
+        throw new AssertionError($message);
+    }
+
+    /**
      * Test if the callback throws an exception
      *
      * @param callable $callback
