@@ -21,8 +21,9 @@ class ClassProvider
     {
         $classes = [];
         foreach ($files as $file) {
+            // TODO: Check for duplicate class names
             $classesInFile = $this->getClassFromFile($file);
-            $classes       = array_merge(
+            $classes = array_merge(
                 $classes,
                 $this->buildDictionaryWithClassesAndFile($classesInFile, $file)
             );
@@ -55,9 +56,9 @@ class ClassProvider
      */
     private function getClassFromFile(FileInterface $file): array
     {
-        $classes   = [];
-        $tokens    = token_get_all($file->getContents());
-        $count     = count($tokens);
+        $classes = [];
+        $tokens = token_get_all($file->getContents());
+        $count = count($tokens);
         $namespace = '';
         for ($i = 2; $i < $count; $i++) {
             // Detect the namespace
@@ -92,16 +93,16 @@ class ClassProvider
         return $classes;
     }
 
-
     /**
      * @test
      */
-    protected function findClassesInFilesTest() {
+    protected function findClassesInFilesTest()
+    {
         $classes = $this->findClassesInFiles([new File(__FILE__)]);
         test_flight_assert(1 === count($classes));
         test_flight_assert(__CLASS__ === key($classes));
 
-        $classes = $this->findClassesInFiles([new File(__DIR__ . '/../functions.php')]);
+        $classes = $this->findClassesInFiles([new File(__DIR__.'/../functions.php')]);
         test_flight_assert(0 === count($classes));
     }
 }
