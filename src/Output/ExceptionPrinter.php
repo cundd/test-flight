@@ -31,7 +31,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $traceAsString = $this->getTraceAsString($definition, $exception);
         $this->printError(
-            "Error %s #%s during test %s: \n%s \nin %s\n%s",
+            "Error %s #%s during test %s: \n%s \nin %s\n\n%s",
             get_class($exception),
             $exception->getCode(),
             $this->getTestDescriptionForDefinition($definition),
