@@ -90,7 +90,7 @@ class Printer implements PrinterInterface
     public function debug(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            $this->println($format, $arguments);
+            $this->printWithArray($format, $arguments);
         }
 
         return $this;
