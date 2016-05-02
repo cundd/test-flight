@@ -37,7 +37,8 @@ function test_flight_assert_same($expected, $actual, string $message = '')
  * @param string $message
  * @throws AssertionError if the value is false, null, 0, '', '0', ...
  */
-function test_flight_assert_true($actual, string $message = ''){
+function test_flight_assert_true($actual, string $message = '')
+{
     \Cundd\TestFlight\Assert::assertTrue($actual, $message);
 }
 
