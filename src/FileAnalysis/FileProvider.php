@@ -99,7 +99,7 @@ class FileProvider
      */
     protected function findMatchingFilesTest()
     {
-        $expectedNumberOfFiles = 9;
+        $expectedNumberOfFiles = 10;
         // x <= y files with @test + 1 constants interface
         $files = $this->findMatchingFiles(__DIR__.'/../');
         assert(
