@@ -43,7 +43,7 @@ function test_flight_assert_same($expected, $actual, string $message = '')
 }
 
 /**
- * Test if the value is true truthy
+ * Test if the value is truthy
  *
  * @param mixed  $actual
  * @param string $message
@@ -55,7 +55,7 @@ function test_flight_assert_true($actual, string $message = '')
 }
 
 /**
- * Test if the value is true falsy
+ * Test if the value is falsy
  *
  * @param mixed  $actual
  * @param string $message

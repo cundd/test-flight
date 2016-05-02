@@ -75,7 +75,7 @@ abstract class Assert
     }
 
     /**
-     * Test if the value is true truthy
+     * Test if the value is truthy
      *
      * @example
      *  \Cundd\TestFlight\Assert::assertTrue(true);
@@ -112,7 +112,7 @@ abstract class Assert
     }
 
     /**
-     * Test if the value is true falsy
+     * Test if the value is falsy
      *
      * @example
      *  \Cundd\TestFlight\Assert::assertFalse(false);
