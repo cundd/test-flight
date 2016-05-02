@@ -24,7 +24,7 @@ class CodeTestRunner extends AbstractTestRunner
      */
     protected function performTest(DefinitionInterface $definition)
     {
-        $this->evaluate($this->getPreparedCode($definition));
+        $this->evaluate($this->preprocessCode($definition));
     }
 
     /**
@@ -44,7 +44,7 @@ class CodeTestRunner extends AbstractTestRunner
      * @param CodeDefinition $definition
      * @return string
      */
-    private function getPreparedCode(CodeDefinition $definition): string
+    private function preprocessCode(CodeDefinition $definition): string
     {
         $code = $definition->getCode();
 
@@ -82,5 +82,4 @@ class CodeTestRunner extends AbstractTestRunner
 //
 //        file_put_contents($tempFilePath, '<?php ' . $definition->getCode() . ' ?' . '>');
 //    }
-
 }

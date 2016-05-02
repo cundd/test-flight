@@ -123,7 +123,8 @@ class Bootstrap
                 $_ENV,
                 date_default_timezone_get(),
                 $locales,
-                error_reporting(null)
+                error_reporting(null),
+                $GLOBALS
             );
             $this->environment->reset();
         } catch (\TypeError $error) {
