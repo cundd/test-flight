@@ -65,7 +65,7 @@ class CodeTestRunner extends AbstractTestRunner
             $code
         );
         $code = preg_replace(
-            '/\bassert\(/',
+            '/[^\w:]assert\(/',
             'test_flight_assert(',
             $code
         );
