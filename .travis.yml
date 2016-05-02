@@ -1,0 +1,18 @@
+language: php
+
+php:
+  - 7
+  - hhvm
+
+matrix:
+  allow_failures:
+    - php: hhvm
+    - php: 7
+
+sudo: false
+
+before_script:
+  - composer install --prefer-source
+
+script:
+  bin/test-flight src/
