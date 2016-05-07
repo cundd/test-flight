@@ -15,7 +15,8 @@ namespace Cundd\TestFlight;
  */
 class CodeExtractor
 {
-    const REGEX = '\s+([^@]*)[.\s@]+';
+    const DOC_COMMENT_REGEX = '\s+([^@]*)[.\s@]+';
+    const DOCUMENTATION_REGEX = '\n([^`]*)```';
 
     /**
      * Extract the example code from the doc comment
@@ -28,7 +29,7 @@ class CodeExtractor
         $start = strpos($docComment, Constants::EXAMPLE_KEYWORD);
         $code = substr($docComment, $start);
 
-        $regularExpression = '!'.Constants::EXAMPLE_KEYWORD.self::REGEX.'!';
+        $regularExpression = '!'.Constants::EXAMPLE_KEYWORD.self::DOC_COMMENT_REGEX.'!';
         if (!preg_match($regularExpression, $code, $matches)) {
             return '';
         }
@@ -53,7 +54,20 @@ class CodeExtractor
      */
     public function getCodeFromDocumentation(string $fileContent): array
     {
-        return ['assert(true);'];
+        $start = strpos($fileContent, Constants::MARKDOWN_PHP_CODE_KEYWORD);
+        $code = substr($fileContent, $start);
+
+        $regularExpression = '!'.Constants::MARKDOWN_PHP_CODE_KEYWORD.self::DOCUMENTATION_REGEX.'!';
+        if (!preg_match_all($regularExpression, $code, $matches)) {
+            return [];
+        }
+
+        return array_map(
+            function ($line) {
+                return trim($line);
+            },
+            $matches[1]
+        );
     }
 
     /**
@@ -91,5 +105,33 @@ class CodeExtractor
         $code = $this->getCodeFromDocComment($docComment);
         test_flight_assert(is_string($code));
         test_flight_assert('assert(__FILE__, (new File(__FILE__))->getPath());' === $code);
+    }
+
+    /**
+     * @test
+     */
+    protected function getCodeFromDocumentationTest()
+    {
+        $documentation = '
+Documentation
+=============
+
+```php
+assert(true);
+```
+
+```php
+assert(true);
+
+assert(1 < 2);
+```
+';
+        $codeSamples = $this->getCodeFromDocumentation($documentation);
+        test_flight_assert_type('array', $codeSamples);
+        test_flight_assert_type('string', $codeSamples[0]);
+        test_flight_assert_same('assert(true);', $codeSamples[0]);
+        test_flight_assert_same('assert(true);
+
+assert(1 < 2);', $codeSamples[1]);
     }
 }
