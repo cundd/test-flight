@@ -10,7 +10,7 @@ namespace Cundd\TestFlight\TestRunner;
 
 
 use Cundd\TestFlight\Definition\DefinitionInterface;
-use Cundd\TestFlight\Definition\MethodDefinition;
+use Cundd\TestFlight\Definition\StaticMethodDefinition;
 
 /**
  * Test Runner for static test methods
@@ -18,7 +18,7 @@ use Cundd\TestFlight\Definition\MethodDefinition;
 class StaticMethodTestRunner extends AbstractTestRunner
 {
     /**
-     * @param MethodDefinition|DefinitionInterface $definition
+     * @param StaticMethodDefinition|DefinitionInterface $definition
      * @return void
      */
     protected function performTest(DefinitionInterface $definition)

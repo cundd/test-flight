@@ -12,6 +12,7 @@ namespace Cundd\TestFlight;
 use Cundd\TestFlight\Definition\CodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\MethodDefinition;
+use Cundd\TestFlight\Definition\StaticMethodDefinition;
 use Cundd\TestFlight\Output\PrinterInterface;
 use Cundd\TestFlight\TestRunner\CodeTestRunner;
 use Cundd\TestFlight\TestRunner\MethodTestRunner;
@@ -102,21 +103,26 @@ class TestDispatcher
      */
     protected function runTestDefinition(DefinitionInterface $definition): bool
     {
-        if ($definition instanceof CodeDefinition) {
-            $testRunnerClass = CodeTestRunner::class;
-        } elseif ($definition instanceof MethodDefinition) {
-            if ($definition->getMethodIsStatic()) {
+        switch (true) {
+            case $definition instanceof CodeDefinition:
+                $testRunnerClass = CodeTestRunner::class;
+                break;
+
+            case $definition instanceof StaticMethodDefinition:
                 $testRunnerClass = StaticMethodTestRunner::class;
-            } else {
+                break;
+
+            case $definition instanceof MethodDefinition:
                 $testRunnerClass = MethodTestRunner::class;
-            }
-        } else {
-            throw new \Exception(
-                sprintf(
-                    'No test runner found for definition type %s',
-                    get_class($definition)
-                )
-            );
+                break;
+
+            default:
+                throw new \Exception(
+                    sprintf(
+                        'No test runner found for definition type %s',
+                        get_class($definition)
+                    )
+                );
         }
         $this->printTestInfo($definition);
 

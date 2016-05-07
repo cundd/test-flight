@@ -9,6 +9,7 @@
 namespace Cundd\TestFlight\Output;
 
 
+use Cundd\TestFlight\Definition\AbstractMethodDefinition;
 use Cundd\TestFlight\Definition\CodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\MethodDefinition;
@@ -50,7 +51,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     private function getTestDescriptionForDefinition(
         DefinitionInterface $definition
     ) {
-        if ($definition instanceof MethodDefinition) {
+        if ($definition instanceof AbstractMethodDefinition) {
             return sprintf(
                 '%s%s%s()',
                 $definition->getClassName(),
@@ -173,7 +174,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $filePath = $previousStep['file'] ?? '';
 
-        if ($definition instanceof MethodDefinition) {
+        if ($definition instanceof AbstractMethodDefinition) {
             $functionName = $definition->getMethodName();
         } elseif ($definition instanceof CodeDefinition) {
             $functionName = $definition->getRelatedMethodName();
@@ -197,7 +198,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $prophet = new \Prophecy\Prophet();
         /** @var MethodDefinition $testDefinition */
-        /** @var MethodDefinition|object $prophecy */
+        /** @var MethodDefinition|\Prophecy\Prophecy\ObjectProphecy $prophecy */
         $prophecy = $prophet->prophesize(MethodDefinition::class);
         $prophecy->getClassName()->willReturn(__CLASS__);
         $prophecy->getMethodIsStatic()->willReturn(false);

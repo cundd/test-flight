@@ -12,7 +12,10 @@ use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\CodeExtractor;
 use Cundd\TestFlight\Constants;
 use Cundd\TestFlight\Definition\CodeDefinition;
+use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\MethodDefinition;
+use Cundd\TestFlight\Definition\StaticMethodDefinition;
+use ReflectionMethod;
 
 /**
  * Provider for test definitions of classes containing test methods
@@ -49,7 +52,7 @@ class DefinitionProvider
     /**
      * @param array $classNameToFiles
      * @param array $types
-     * @return array|\Cundd\TestFlight\Definition\MethodDefinition[]
+     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
      * @throws \Exception
      */
     public function createForClasses(array $classNameToFiles, array $types = array()): array
@@ -67,7 +70,7 @@ class DefinitionProvider
     /**
      * @param string        $className
      * @param FileInterface $file
-     * @return MethodDefinition[]
+     * @return DefinitionInterface[]
      */
     private function collectDefinitionsForClass(string $className, FileInterface $file): array
     {
@@ -104,9 +107,15 @@ class DefinitionProvider
         $reflectionClass = new \ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
             if (false !== strpos($method->getDocComment(), Constants::TEST_KEYWORD)) {
-                $testMethods[] = new MethodDefinition(
-                    $className, $method->getName(), $file, $method
-                );
+                if ($this->getMethodIsStatic($method)) {
+                    $testMethods[] = new StaticMethodDefinition(
+                        $className, $method->getName(), $file, $method
+                    );
+                } else {
+                    $testMethods[] = new MethodDefinition(
+                        $className, $method->getName(), $file, $method
+                    );
+                }
             }
         }
 
@@ -139,6 +148,15 @@ class DefinitionProvider
     }
 
     /**
+     * @param ReflectionMethod $reflectionMethod
+     * @return bool
+     */
+    private function getMethodIsStatic(ReflectionMethod $reflectionMethod)
+    {
+        return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_STATIC);
+    }
+
+    /**
      * @test
      */
     protected static function createForThisClassTest()
@@ -153,7 +171,12 @@ class DefinitionProvider
         $definitions = $provider->createForClasses([__CLASS__ => new File(__FILE__)]);
         test_flight_assert(key($definitions) === __CLASS__);
         test_flight_assert(is_array($definitions[__CLASS__]));
-        test_flight_assert(current($definitions[__CLASS__]) instanceof MethodDefinition);
+        test_flight_assert(
+            current($definitions[__CLASS__]) instanceof \Cundd\TestFlight\Definition\AbstractMethodDefinition
+        );
+        test_flight_assert(
+            current($definitions[__CLASS__]) instanceof \Cundd\TestFlight\Definition\StaticMethodDefinition
+        );
 
         test_flight_throws(
             function () use ($provider) {

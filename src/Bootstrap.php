@@ -82,7 +82,7 @@ class Bootstrap
 
     /**
      * @param array $options
-     * @return Definition\MethodDefinition[]
+     * @return Definition\DefinitionInterface[]
      */
     private function collectTestDefinitions(array $options)
     {
