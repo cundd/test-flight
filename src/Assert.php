@@ -207,16 +207,16 @@ abstract class Assert
      * Test if the given object is an instance of the given class
      *
      * @example
-     *  \Cundd\TestFlight\Assert::assertInstanceOf(new stdClass(), stdClass::class);
-     *  \Cundd\TestFlight\Assert::assertInstanceOf(new stdClass(), 'stdClass');
-     *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertInstanceOf(new Exception(), 'stdClass'); });
+     *  \Cundd\TestFlight\Assert::assertInstanceOf(stdClass::class, new stdClass());
+     *  \Cundd\TestFlight\Assert::assertInstanceOf('stdClass', new stdClass());
+     *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertInstanceOf('stdClass', new Exception()); });
      *
-     * @param mixed  $actual
      * @param string $className
+     * @param mixed  $actual
      * @param string $message
      * @throws AssertionError
      */
-    public static function assertInstanceOf($actual, string $className, string $message = '')
+    public static function assertInstanceOf(string $className, $actual, string $message = '')
     {
         self::$count += 1;
 
@@ -238,29 +238,29 @@ abstract class Assert
      * Test if the given value is an instance of the given type
      *
      * @example
-     *  \Cundd\TestFlight\Assert::assertTypeOf([],                          'array');
-     *  \Cundd\TestFlight\Assert::assertTypeOf([],                          'Array');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(new stdClass(),              'object');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(0,                           'int');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(1,                           'integer');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(1,                           'long');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(0.1,                         'float');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(0.1,                         'double');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(1,                           'numeric');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(0.1,                         'numeric');
-     *  \Cundd\TestFlight\Assert::assertTypeOf('1',                         'numeric');
-     *  \Cundd\TestFlight\Assert::assertTypeOf('0.1',                       'numeric');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(null,                        'null');
-     *  \Cundd\TestFlight\Assert::assertTypeOf('a string',                  'string');
-     *  \Cundd\TestFlight\Assert::assertTypeOf('null',                      'string');
-     *  \Cundd\TestFlight\Assert::assertTypeOf(fopen('php://temp', 'a+'),   'resource');
+     *  \Cundd\TestFlight\Assert::assertTypeOf('array', []);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('Array', []);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('object', new stdClass());
+     *  \Cundd\TestFlight\Assert::assertTypeOf('int', 0);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('integer', 1);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('long', 1);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('float', 0.1);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('double', 0.1);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('numeric', 1);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('numeric', 0.1);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('numeric', '1');
+     *  \Cundd\TestFlight\Assert::assertTypeOf('numeric', '0.1');
+     *  \Cundd\TestFlight\Assert::assertTypeOf('null', null);
+     *  \Cundd\TestFlight\Assert::assertTypeOf('string', 'a string');
+     *  \Cundd\TestFlight\Assert::assertTypeOf('string', 'null');
+     *  \Cundd\TestFlight\Assert::assertTypeOf('resource', fopen('php://temp', 'a+'));
      *
-     * @param mixed  $actual
      * @param string $type
+     * @param mixed  $actual
      * @param string $message
      * @throws AssertionError
      */
-    public static function assertTypeOf($actual, string $type, string $message = '')
+    public static function assertTypeOf(string $type, $actual, string $message = '')
     {
         self::$count += 1;
 

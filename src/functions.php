@@ -69,25 +69,25 @@ function test_flight_assert_false($actual, string $message = '')
 /**
  * Test if the given object is an instance of the given class
  *
- * @param mixed  $actual
  * @param string $className
+ * @param mixed  $actual
  * @param string $message
- * @throws AssertionError
+ * @throws \Cundd\TestFlight\Exception\AssertionError
  */
-function test_flight_assert_instance_of($actual, string $className, string $message = '')
+function test_flight_assert_instance_of(string $className, $actual, string $message = '')
 {
-    \Cundd\TestFlight\Assert::assertInstanceOf($actual, $className, $message);
+    \Cundd\TestFlight\Assert::assertInstanceOf($className, $actual, $message);
 }
 
 /**
  * Test if the given value is an instance of the given type
  *
- * @param mixed  $actual
  * @param string $type
+ * @param mixed  $actual
  * @param string $message
- * @throws AssertionError
+ * @throws \Cundd\TestFlight\Exception\AssertionError
  */
-function test_flight_assert_type($actual, string $type, string $message = '')
+function test_flight_assert_type(string $type, $actual, string $message = '')
 {
-    \Cundd\TestFlight\Assert::assertTypeOf($actual, $type, $message);
+    \Cundd\TestFlight\Assert::assertTypeOf($type, $actual, $message);
 }
