@@ -10,7 +10,8 @@ namespace Cundd\TestFlight\Output;
 
 
 use Cundd\TestFlight\Definition\AbstractMethodDefinition;
-use Cundd\TestFlight\Definition\CodeDefinition;
+use Cundd\TestFlight\Definition\CodeDefinitionInterface;
+use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\MethodDefinition;
 
@@ -58,7 +59,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
                 $definition->getMethodIsStatic() ? '::' : '->',
                 $definition->getMethodName()
             );
-        } elseif ($definition instanceof CodeDefinition) {
+        } elseif ($definition instanceof CodeDefinitionInterface) {
             return $definition->getDescription();
         }
 
@@ -176,7 +177,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
 
         if ($definition instanceof AbstractMethodDefinition) {
             $functionName = $definition->getMethodName();
-        } elseif ($definition instanceof CodeDefinition) {
+        } elseif ($definition instanceof DocCommentCodeDefinition) {
             $functionName = $definition->getRelatedMethodName();
         } else {
             return false;
@@ -189,6 +190,20 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param DefinitionInterface $definition
+     * @param \Throwable          $exception
+     * @return string
+     */
+    private function getTestLocationForDefinitionAndException(DefinitionInterface $definition, $exception): string
+    {
+        if ($definition instanceof DocCommentCodeDefinition) {
+            return $definition->getFilePath();
+        }
+
+        return $exception->getFile().' at '.$exception->getLine();
     }
 
     /**
@@ -227,19 +242,5 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         test_flight_assert(
             $testString === substr($output, 0, strlen($testString))
         );
-    }
-
-    /**
-     * @param DefinitionInterface $definition
-     * @param \Throwable          $exception
-     * @return string
-     */
-    private function getTestLocationForDefinitionAndException(DefinitionInterface $definition, $exception): string
-    {
-        if ($definition instanceof CodeDefinition) {
-            return $definition->getFilePath();
-        }
-
-        return $exception->getFile().' at '.$exception->getLine();
     }
 }

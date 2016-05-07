@@ -24,6 +24,12 @@ use RegexIterator;
  */
 class FileProvider
 {
+    private $fileSuffix = [
+        'php',
+        'md',
+        'markdown',
+    ];
+
     /**
      * Returns the matching files containing the test doc comment
      *
@@ -49,9 +55,7 @@ class FileProvider
         $fileIncludingTests = [];
         foreach ($pathCollection as $path) {
             $file = new File($path);
-            if ($file->containsKeyword(Constants::TEST_KEYWORD)
-                || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
-            ) {
+            if ($this->getFileIncludesTest($file)) {
                 $fileIncludingTests[] = $file;
             }
         }
@@ -66,13 +70,20 @@ class FileProvider
     private function findMatchingFilesInDirectory(string $path): array
     {
         $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-        $regexIterator = new RegexIterator($directoryIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+        $regexIterator = new RegexIterator(
+            $directoryIterator,
+            sprintf('/^.+\.(%s)$/i', implode('|', $this->fileSuffix)),
+            RecursiveRegexIterator::GET_MATCH
+        );
 
-        return array_map(
-            function ($pathCollection) {
-                return $pathCollection[0];
-            },
-            iterator_to_array($regexIterator)
+        return array_filter(
+            array_map(
+                function ($pathCollection) {
+                    return $pathCollection[0];
+                },
+                iterator_to_array($regexIterator)
+            ),
+            'is_file'
         );
     }
 
@@ -99,7 +110,7 @@ class FileProvider
      */
     protected function findMatchingFilesTest()
     {
-        $expectedNumberOfFiles = 11;
+        $expectedNumberOfFiles = 12;
         // x <= y files with @test + 1 constants interface
         $files = $this->findMatchingFiles(__DIR__.'/../');
         assert(
@@ -112,5 +123,16 @@ class FileProvider
             return $file->getPath() === __FILE__;
         };
         assert(1 === count(array_filter($files, $oneFileIsThisFileClosure)));
+    }
+
+    /**
+     * @param FileInterface $file
+     * @return bool
+     */
+    private function getFileIncludesTest(FileInterface $file)
+    {
+        return $file->containsKeyword(Constants::TEST_KEYWORD)
+            || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
+            || $file->containsKeyword(Constants::MARKDOWN_PHP_CODE_KEYWORD);
     }
 }

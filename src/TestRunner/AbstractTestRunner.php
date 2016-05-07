@@ -57,10 +57,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      */
     public function runTestDefinition(DefinitionInterface $definition): bool
     {
-        $this->classLoader->loadClass(
-            $definition->getClassName(),
-            $definition->getFile()
-        );
+        $this->prepareTestRunnerForDefinition($definition);
 
         error_clear_last();
         try {
@@ -156,5 +153,18 @@ abstract class AbstractTestRunner implements TestRunnerInterface
             $error['file'],
             $error['line']
         );
+    }
+
+    /**
+     * @param DefinitionInterface $definition
+     */
+    private function prepareTestRunnerForDefinition(DefinitionInterface $definition)
+    {
+        if ($definition->getClassName()) {
+            $this->classLoader->loadClass(
+                $definition->getClassName(),
+                $definition->getFile()
+            );
+        }
     }
 }

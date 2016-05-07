@@ -51,6 +51,16 @@ class File implements FileInterface
     }
 
     /**
+     * Returns the file name
+     *
+     * @return string
+     */
+    public function getName() : string
+    {
+        return basename($this->path);
+    }
+
+    /**
      * @return string
      */
     public function getContents(): string

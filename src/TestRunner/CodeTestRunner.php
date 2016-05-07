@@ -9,7 +9,7 @@
 namespace Cundd\TestFlight\TestRunner;
 
 
-use Cundd\TestFlight\Definition\CodeDefinition;
+use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 
 
@@ -19,7 +19,7 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
 class CodeTestRunner extends AbstractTestRunner
 {
     /**
-     * @param CodeDefinition|DefinitionInterface $definition
+     * @param CodeDefinitionInterface|DefinitionInterface $definition
      * @return void
      */
     protected function performTest(DefinitionInterface $definition)
@@ -41,10 +41,10 @@ class CodeTestRunner extends AbstractTestRunner
     }
 
     /**
-     * @param CodeDefinition $definition
+     * @param CodeDefinitionInterface $definition
      * @return string
      */
-    private function preprocessCode(CodeDefinition $definition): string
+    private function preprocessCode(CodeDefinitionInterface $definition): string
     {
         $code = $definition->getCode();
 

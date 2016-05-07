@@ -11,8 +11,12 @@ declare(strict_types = 1);
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\Cli\OptionParser;
+use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
 use Cundd\TestFlight\FileAnalysis\ClassProvider;
-use Cundd\TestFlight\FileAnalysis\DefinitionProvider;
+use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
+use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
+use Cundd\TestFlight\FileAnalysis\FileInterface;
 use Cundd\TestFlight\FileAnalysis\FileProvider;
 use Cundd\TestFlight\Output\PrinterInterface;
 
@@ -87,20 +91,34 @@ class Bootstrap
     private function collectTestDefinitions(array $options)
     {
         $testPath = $options['path'];
-        $types = $options['types'];
 
-        $codeExtractor = $this->objectManager->get(CodeExtractor::class);
+        /** @var FileProvider $fileProvider */
         $fileProvider = $this->objectManager->get(FileProvider::class);
-        $classProvider = $this->objectManager->get(ClassProvider::class);
-        $classes = $classProvider->findClassesInFiles($fileProvider->findMatchingFiles($testPath));
 
-        /** @var DefinitionProvider $provider */
+        $allFiles = $fileProvider->findMatchingFiles($testPath);
+        $codeExtractor = $this->objectManager->get(CodeExtractor::class);
+
+        /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
         $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
+        $provider->setTypes($options['types']);
 
-        $testDefinitions = $provider->createForClasses($classes, $types);
-
-        return $testDefinitions;
+        return array_merge(
+            $this->collectTestDefinitionsForClasses($provider, $allFiles),
+            $this->collectTestDefinitionsForDocumentation($provider, $allFiles)
+        );
     }
+
+//    public function fffTest()
+//    {
+//        $codeExtractor = new \Cundd\TestFlight\CodeExtractor();
+//
+//        $testPath = __DIR__;
+//        $fileProvider = new \Cundd\TestFlight\FileAnalysis\FileProvider();
+//        $classProvider = new \Cundd\TestFlight\FileAnalysis\ClassProvider();
+//        $classes = $classProvider->findClassesInFiles($fileProvider->findMatchingFiles($testPath));
+//
+//        assert(is_array($classes));
+//    }
 
     /**
      *
@@ -174,5 +192,32 @@ class Bootstrap
     {
         $this->printer->printError($message);
         exit($status);
+    }
+
+    /**
+     * @param DefinitionProviderInterface $provider
+     * @param FileInterface[]             $allFiles
+     * @return DefinitionInterface[]
+     */
+    private function collectTestDefinitionsForDocumentation(DefinitionProviderInterface $provider, array $allFiles)
+    {
+        /** @var DocumentationFileProvider $documentationFileProvider */
+        $documentationFileProvider = $this->objectManager->get(DocumentationFileProvider::class);
+        $documentationFiles = $documentationFileProvider->findDocumentationFiles($allFiles);
+
+        return $provider->createForDocumentation($documentationFiles);
+    }
+
+    /**
+     * @param DefinitionProviderInterface $provider
+     * @param FileInterface[]             $allFiles
+     * @return DefinitionInterface[]
+     */
+    private function collectTestDefinitionsForClasses(DefinitionProviderInterface $provider, array $allFiles)
+    {
+        $classProvider = $this->objectManager->get(ClassProvider::class);
+        $classes = $classProvider->findClassesInFiles($allFiles);
+
+        return $provider->createForClasses($classes);
     }
 }

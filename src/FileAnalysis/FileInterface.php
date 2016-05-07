@@ -20,6 +20,13 @@ interface FileInterface
     public function getPath() : string;
 
     /**
+     * Returns the file name
+     *
+     * @return string
+     */
+    public function getName() : string;
+
+    /**
      * Returns the file contents
      *
      * @return string

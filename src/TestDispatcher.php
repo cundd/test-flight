@@ -9,8 +9,9 @@
 namespace Cundd\TestFlight;
 
 
-use Cundd\TestFlight\Definition\CodeDefinition;
+use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
 use Cundd\TestFlight\Output\PrinterInterface;
@@ -104,7 +105,11 @@ class TestDispatcher
     protected function runTestDefinition(DefinitionInterface $definition): bool
     {
         switch (true) {
-            case $definition instanceof CodeDefinition:
+            case $definition instanceof DocCommentCodeDefinition:
+                $testRunnerClass = CodeTestRunner::class;
+                break;
+            
+            case $definition instanceof DocumentationCodeDefinition:
                 $testRunnerClass = CodeTestRunner::class;
                 break;
 

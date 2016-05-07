@@ -6,21 +6,24 @@
  * Time: 13:05
  */
 
-namespace Cundd\TestFlight\FileAnalysis;
+namespace Cundd\TestFlight\DefinitionProvider;
 
 use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\CodeExtractor;
 use Cundd\TestFlight\Constants;
-use Cundd\TestFlight\Definition\CodeDefinition;
+use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
+use Cundd\TestFlight\FileAnalysis\File;
+use Cundd\TestFlight\FileAnalysis\FileInterface;
 use ReflectionMethod;
 
 /**
  * Provider for test definitions of classes containing test methods
  */
-class DefinitionProvider
+class DefinitionProvider implements DefinitionProviderInterface
 {
     /**
      * @var ClassLoader
@@ -50,21 +53,41 @@ class DefinitionProvider
     }
 
     /**
-     * @param array $classNameToFiles
-     * @param array $types
-     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
-     * @throws \Exception
+     * Set the types of tests to run
+     *
+     * @param string[] $types
+     * @return $this
      */
-    public function createForClasses(array $classNameToFiles, array $types = array()): array
+    public function setTypes(array $types)
     {
         $this->types = $types;
+    }
 
+    /**
+     * Create the test definitions for the given classes
+     *
+     * @param array $classNameToFiles
+     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
+     */
+    public function createForClasses(array $classNameToFiles): array
+    {
         $definitionCollection = [];
         foreach ($classNameToFiles as $className => $file) {
             $definitionCollection[$className] = $this->collectDefinitionsForClass($className, $file);
         }
 
         return $definitionCollection;
+    }
+
+    /**
+     * Create the test definitions for the given documentation files
+     *
+     * @param FileInterface[] $files
+     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
+     */
+    public function createForDocumentation(array $files): array
+    {
+        return array_map([$this, 'collectDefinitionsForFile'], $files);
     }
 
     /**
@@ -135,7 +158,7 @@ class DefinitionProvider
         $reflectionClass = new \ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
             if (false !== strpos($method->getDocComment(), Constants::EXAMPLE_KEYWORD)) {
-                $testMethods[] = new CodeDefinition(
+                $testMethods[] = new DocCommentCodeDefinition(
                     $className,
                     $this->codeExtractor->getCodeFromDocComment($method->getDocComment()),
                     $file,
@@ -145,6 +168,20 @@ class DefinitionProvider
         }
 
         return $testMethods;
+    }
+
+    /**
+     * @param FileInterface $file
+     * @return DefinitionInterface[]
+     */
+    private function collectDefinitionsForFile(FileInterface $file)
+    {
+        return array_map(
+            function ($code) use ($file) {
+                return new DocumentationCodeDefinition($code, $file);
+            },
+            $this->codeExtractor->getCodeFromDocumentation($file->getContents())
+        );
     }
 
     /**

@@ -12,26 +12,15 @@ namespace Cundd\TestFlight\Definition;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 
 /**
- * Definition of a test defined as a block of code
- *
- * @package Cundd\TestFlight
+ * Definition of a test defined as Doc Comment
  */
-class CodeDefinition implements DefinitionInterface
+class DocCommentCodeDefinition extends AbstractCodeDefinition
 {
     /**
      * @var string
      */
     private $className;
 
-    /**
-     * @var string
-     */
-    private $code;
-
-    /**
-     * @var FileInterface
-     */
-    private $file;
     /**
      * @var string
      */
@@ -64,25 +53,9 @@ class CodeDefinition implements DefinitionInterface
     /**
      * @return string
      */
-    public function getCode(): string
+    public function getRelatedMethodName(): string
     {
-        return $this->code;
-    }
-
-    /**
-     * @return FileInterface
-     */
-    public function getFile(): FileInterface
-    {
-        return $this->file;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilePath(): string
-    {
-        return $this->getFile()->getPath();
+        return $this->relatedMethodName;
     }
 
     /**
@@ -98,13 +71,5 @@ class CodeDefinition implements DefinitionInterface
                 ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getRelatedMethodName())))
             )
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getRelatedMethodName(): string
-    {
-        return $this->relatedMethodName;
     }
 }
