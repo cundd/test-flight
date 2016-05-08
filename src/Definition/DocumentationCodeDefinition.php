@@ -42,17 +42,21 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
     public function getDescription(): string
     {
         $fileName = pathinfo($this->getFilePath(), PATHINFO_FILENAME);
-        if ($fileName === 'README') {
-            $testName = 'Readme';
-        } else {
-            $testName = ucwords(
-                ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $fileName)))
-            );
+        $testName = $fileName;
+
+        if ($testName === 'README') {
+            $testName = basename(dirname($this->getFilePath())).' - Readme';
         }
 
         return sprintf(
             'Documentation test "%s"',
-            $testName
+            str_replace(
+                '  ',
+                ' ',
+                ucwords(
+                    ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $testName)))
+                )
+            )
         );
     }
 }
