@@ -106,11 +106,22 @@ class FileProvider
     }
 
     /**
+     * @param FileInterface $file
+     * @return bool
+     */
+    private function getFileIncludesTest(FileInterface $file)
+    {
+        return $file->containsKeyword(Constants::TEST_KEYWORD)
+        || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
+        || $file->containsKeyword(Constants::MARKDOWN_PHP_CODE_KEYWORD);
+    }
+
+    /**
      * @test
      */
     protected function findMatchingFilesTest()
     {
-        $expectedNumberOfFiles = 12;
+        $expectedNumberOfFiles = 14;
         // x <= y files with @test + 1 constants interface
         $files = $this->findMatchingFiles(__DIR__.'/../');
         assert(
@@ -123,16 +134,5 @@ class FileProvider
             return $file->getPath() === __FILE__;
         };
         assert(1 === count(array_filter($files, $oneFileIsThisFileClosure)));
-    }
-
-    /**
-     * @param FileInterface $file
-     * @return bool
-     */
-    private function getFileIncludesTest(FileInterface $file)
-    {
-        return $file->containsKeyword(Constants::TEST_KEYWORD)
-            || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
-            || $file->containsKeyword(Constants::MARKDOWN_PHP_CODE_KEYWORD);
     }
 }

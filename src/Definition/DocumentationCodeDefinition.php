@@ -59,4 +59,43 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
             )
         );
     }
+
+    /**
+     * @test
+     */
+    protected static function getPreProcessedCodeTest()
+    {
+        $file = new \Cundd\TestFlight\FileAnalysis\File('some/path');
+        $originalCode = '';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same('', $definition->getPreProcessedCode());
+
+        $originalCode = '__FILE__';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same("'some/path'", $definition->getPreProcessedCode());
+
+        $originalCode = '__DIR__';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same("'some'", $definition->getPreProcessedCode());
+
+        $originalCode = 'assert(true)';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same('test_flight_assert(true)', $definition->getPreProcessedCode());
+
+        $originalCode = '//assert(true)';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same('//test_flight_assert(true)', $definition->getPreProcessedCode());
+
+        $originalCode = '
+$someValue = true;
+assert($someValue)';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same('
+$someValue = true;
+test_flight_assert($someValue)', $definition->getPreProcessedCode());
+
+        $originalCode = '\Cundd\TestFlight\Assert::assertSame(true)';
+        $definition = new DocumentationCodeDefinition($originalCode, $file);
+        test_flight_assert_same('\Cundd\TestFlight\Assert::assertSame(true)', $definition->getPreProcessedCode());
+    }
 }

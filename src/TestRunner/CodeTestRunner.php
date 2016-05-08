@@ -24,7 +24,7 @@ class CodeTestRunner extends AbstractTestRunner
      */
     protected function performTest(DefinitionInterface $definition)
     {
-        $this->evaluate($this->preprocessCode($definition));
+        $this->evaluate($definition->getPreProcessedCode());
     }
 
     /**
@@ -38,39 +38,6 @@ class CodeTestRunner extends AbstractTestRunner
                 return eval($code);
             }
         );
-    }
-
-    /**
-     * @param CodeDefinitionInterface $definition
-     * @return string
-     */
-    private function preprocessCode(CodeDefinitionInterface $definition): string
-    {
-        $code = $definition->getCode();
-
-        $filePath = $definition->getFilePath();
-        $code = str_replace(
-            '__FILE__',
-            "'".$filePath."'",
-            $code
-        );
-        $code = str_replace(
-            '__DIR__',
-            "'".dirname($filePath)."'",
-            $code
-        );
-        $code = str_replace(
-            '__CLASS__',
-            "'".$definition->getClassName()."'",
-            $code
-        );
-        $code = preg_replace(
-            '/[^\w:]assert\(/',
-            'test_flight_assert(',
-            $code
-        );
-
-        return $code;
     }
 
 //    private function checkSyntax(CodeDefinition $definition)
