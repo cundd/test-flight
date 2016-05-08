@@ -13,7 +13,7 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
 /**
  * Special printer interface for exception output
  */
-interface ExceptionPrinterInterface
+interface ExceptionPrinterInterface extends PrinterInterface
 {
     /**
      * Prints the exception for the given test definition

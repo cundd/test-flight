@@ -8,6 +8,8 @@
 
 namespace Cundd\TestFlight\Output;
 
+use Cundd\TestFlight\Cli\WindowHelper;
+
 /**
  * Printer implementation
  */
@@ -34,15 +36,22 @@ class Printer implements PrinterInterface
     private $verbose = false;
 
     /**
+     * @var WindowHelper
+     */
+    protected $cliWindowHelper;
+
+    /**
      * Printer constructor.
      *
+     * @param          $cliWindowHelper
      * @param resource $outputStream
      * @param resource $errorStream
      */
-    public function __construct($outputStream, $errorStream)
+    public function __construct($cliWindowHelper, $outputStream, $errorStream)
     {
         $this->outputStream = $outputStream;
         $this->errorStream = $errorStream;
+        $this->cliWindowHelper = $cliWindowHelper;
     }
 
     /**

@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\Cli\OptionParser;
+use Cundd\TestFlight\Cli\WindowHelper;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
 use Cundd\TestFlight\FileAnalysis\ClassProvider;
@@ -18,6 +19,7 @@ use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
 use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 use Cundd\TestFlight\FileAnalysis\FileProvider;
+use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
 
 /**
@@ -46,6 +48,11 @@ class Bootstrap
     private $printer;
 
     /**
+     * @var ExceptionPrinterInterface
+     */
+    private $exceptionPrinter;
+
+    /**
      * @return $this
      */
     public function init()
@@ -53,9 +60,18 @@ class Bootstrap
         $this->objectManager = new ObjectManager();
         $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
-        // Prepare the printer
+
+        // Prepare the printers
+        $windowHelper = $this->objectManager->get(WindowHelper::class);
         $this->printer = $this->objectManager->get(
             PrinterInterface::class,
+            $windowHelper,
+            STDOUT,
+            STDERR
+        );
+        $this->exceptionPrinter = $this->objectManager->get(
+            ExceptionPrinterInterface::class,
+            $windowHelper,
             STDOUT,
             STDERR
         );
@@ -76,6 +92,7 @@ class Bootstrap
         $options = $this->prepareArguments($arguments);
 
         $this->printer->setVerbose($options['verbose']);
+        $this->exceptionPrinter->setVerbose($options['verbose']);
 
         $testDefinitions = $this->collectTestDefinitions($options);
         /** @var TestDispatcher $testRunner */

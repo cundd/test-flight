@@ -9,6 +9,7 @@
 namespace Cundd\TestFlight\Output;
 
 
+use Cundd\TestFlight\Cli\WindowHelper;
 use Cundd\TestFlight\Definition\AbstractMethodDefinition;
 use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
@@ -60,7 +61,12 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
                 $definition->getMethodName()
             );
         } elseif ($definition instanceof CodeDefinitionInterface) {
-            return $definition->getDescription();
+            $description = $definition->getDescription();
+            if ($this->getVerbose()) {
+                $description .= "\nCode:\n".$this->getCodeBlock($definition)."\n";
+            }
+
+            return $description;
         }
 
         return '';
@@ -207,11 +213,50 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     }
 
     /**
+     * @param CodeDefinitionInterface $definition
+     * @return string
+     */
+    private function getCodeBlock(CodeDefinitionInterface $definition): string
+    {
+        $codeLines = explode("\n", $definition->getPreProcessedCode());
+        $block = [];
+        foreach ($codeLines as $lineNumber => $line) {
+            $this->prepareCodeLine($line, $block);
+        }
+
+        return "\n".self::NORMAL.self::LIGHT_GRAY_BACKGROUND.self::WHITE
+        .implode("\n", $block)
+        .self::RED;
+    }
+
+    /**
+     * @param string   $line
+     * @param string[] $block
+     */
+    private function prepareCodeLine($line, &$block)
+    {
+        $width = $this->cliWindowHelper->getWidth();
+
+        $line = str_replace("\t", '    ', $line);
+
+        foreach (str_split($line, $width) as $lineChunk) {
+            if (strlen($lineChunk) <= $width) {
+                $block[] = str_pad($lineChunk, $width, ' ');
+            } else {
+                $block[] = $lineChunk;
+            }
+        }
+    }
+
+    /**
      * @test
      */
     protected static function printExceptionTest()
     {
         $prophet = new \Prophecy\Prophet();
+
+        $windowHelper = $prophet->prophesize(WindowHelper::class);
+
         /** @var MethodDefinition $testDefinition */
         /** @var MethodDefinition|\Prophecy\Prophecy\ObjectProphecy $prophecy */
         $prophecy = $prophet->prophesize(MethodDefinition::class);
@@ -225,7 +270,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
 
         $tempOutputStream = fopen('php://memory', 'r+');
 
-        $printer = new static($tempOutputStream, $tempOutputStream);
+        $printer = new static($windowHelper, $tempOutputStream, $tempOutputStream);
         $printer->setEnableColoredOutput(false);
         $printer->printException(
             $testDefinition,
