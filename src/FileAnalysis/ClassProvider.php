@@ -21,19 +21,30 @@ class ClassProvider
     {
         $classes = [];
         foreach ($files as $file) {
-            // TODO: Check for duplicate class names
-            $classesInFile = $this->getClassFromFile($file);
-            $classes = array_merge(
-                $classes,
-                $this->buildDictionaryWithClassesAndFile($classesInFile, $file)
-            );
+            if ($this->isPhpFile($file)) {
+                // TODO: Check for duplicate class names
+                $classesInFile = $this->getClassFromFile($file);
+                $classes = array_merge(
+                    $classes,
+                    $this->buildDictionaryWithClassesAndFile($classesInFile, $file)
+                );
+            }
         }
 
         return $classes;
     }
 
     /**
-     * @param string[]      $classes
+     * @param FileInterface $file
+     * @return bool
+     */
+    private function isPhpFile(FileInterface $file): bool
+    {
+        return pathinfo($file->getPath(), PATHINFO_EXTENSION) === 'php';
+    }
+
+    /**
+     * @param string[] $classes
      * @param FileInterface $file
      * @return array
      */
@@ -102,7 +113,7 @@ class ClassProvider
         test_flight_assert(1 === count($classes));
         test_flight_assert(__CLASS__ === key($classes));
 
-        $classes = $this->findClassesInFiles([new File(__DIR__.'/../functions.php')]);
+        $classes = $this->findClassesInFiles([new File(__DIR__ . '/../functions.php')]);
         test_flight_assert(0 === count($classes));
     }
 }
