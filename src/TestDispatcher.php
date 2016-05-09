@@ -108,7 +108,7 @@ class TestDispatcher
             case $definition instanceof DocCommentCodeDefinition:
                 $testRunnerClass = CodeTestRunner::class;
                 break;
-            
+
             case $definition instanceof DocumentationCodeDefinition:
                 $testRunnerClass = CodeTestRunner::class;
                 break;
@@ -169,7 +169,6 @@ class TestDispatcher
      */
     private function printHeader()
     {
-        $this->getPrinter()->println('Test-Flight %s', Constants::VERSION);
     }
 
     /**

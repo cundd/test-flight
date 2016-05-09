@@ -77,6 +77,7 @@ class Bootstrap
         );
 
         $this->initEnvironment();
+        $this->printHeader();
 
         return $this;
     }
@@ -124,18 +125,6 @@ class Bootstrap
             $this->collectTestDefinitionsForDocumentation($provider, $allFiles)
         );
     }
-
-//    public function fffTest()
-//    {
-//        $codeExtractor = new \Cundd\TestFlight\CodeExtractor();
-//
-//        $testPath = __DIR__;
-//        $fileProvider = new \Cundd\TestFlight\FileAnalysis\FileProvider();
-//        $classProvider = new \Cundd\TestFlight\FileAnalysis\ClassProvider();
-//        $classes = $classProvider->findClassesInFiles($fileProvider->findMatchingFiles($testPath));
-//
-//        assert(is_array($classes));
-//    }
 
     /**
      *
@@ -197,6 +186,14 @@ class Bootstrap
         }
 
         return $options;
+    }
+
+    /**
+     * Print the test header output
+     */
+    private function printHeader()
+    {
+        $this->printer->println('Test-Flight %s', Constants::VERSION);
     }
 
     /**
