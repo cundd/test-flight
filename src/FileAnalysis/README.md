@@ -1,7 +1,24 @@
 File Analysis
 =============
 
-This directory contains the classes to scan the filesystem for tests and extract test definitions.
+This directory contains the classes to scan the filesystem for tests.
+
+
+### Find files that may contain tests
+
+Possible files are '.php', '.md', or '.markdown' files.
+
+```php
+$testPath = __DIR__;
+
+$fileProvider = new \Cundd\TestFlight\FileAnalysis\FileProvider();
+$files = $fileProvider->findMatchingFiles($testPath);
+assert(is_array($files));
+assert('ClassProvider.php' === $files[0]->getName());
+```
+
+
+### Retrieve the classes from PHP test files
 
 ```php
 $testPath = __DIR__ . '/FileProvider.php';
