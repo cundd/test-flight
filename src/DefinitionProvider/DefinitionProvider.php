@@ -33,7 +33,11 @@ class DefinitionProvider implements DefinitionProviderInterface
     /**
      * @var string[]
      */
-    private $types;
+    private $types = [
+        Constants::TEST_TYPE_METHOD,
+        Constants::TEST_TYPE_DOC_COMMENT,
+        Constants::TEST_TYPE_DOCUMENTATION,
+    ];
 
     /**
      * @var CodeExtractor
@@ -87,7 +91,11 @@ class DefinitionProvider implements DefinitionProviderInterface
      */
     public function createForDocumentation(array $files): array
     {
-        return array_map([$this, 'collectDefinitionsForFile'], $files);
+        if (in_array(Constants::TEST_TYPE_DOCUMENTATION, $this->types)) {
+            return array_map([$this, 'collectDefinitionsForFile'], $files);
+        }
+
+        return [];
     }
 
     /**

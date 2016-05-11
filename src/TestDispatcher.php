@@ -67,9 +67,9 @@ class TestDispatcher
     {
         $this->printHeader();
         foreach ($testCollection as $className => $definitionCollection) {
-            $this->runTestDefinitionsForClass(
-                $className,
-                $definitionCollection
+            $this->runTestDefinitionsForCollection(
+                $definitionCollection,
+                $className
             );
         }
         $this->printFooter();
@@ -78,15 +78,19 @@ class TestDispatcher
     }
 
     /**
-     * @param string                $className
      * @param DefinitionInterface[] $definitionCollection
+     * @param string                $classOrCollectionName
+     * @throws \Exception
      */
-    protected function runTestDefinitionsForClass(
-        string $className,
-        array $definitionCollection
+    protected function runTestDefinitionsForCollection(
+        array $definitionCollection,
+        $classOrCollectionName
     ) {
         if (count($definitionCollection) > 0) {
-            $this->printClassInfo($className);
+            if (is_string($classOrCollectionName)) {
+                $this->printClassInfo($classOrCollectionName);
+            }
+
             foreach ($definitionCollection as $definition) {
                 if ($this->runTestDefinition($definition)) {
                     $this->successes += 1;

@@ -19,6 +19,7 @@ use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
 use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 use Cundd\TestFlight\FileAnalysis\FileProvider;
+use Cundd\TestFlight\Output\CodeFormatter;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
 
@@ -63,17 +64,18 @@ class Bootstrap
 
         // Prepare the printers
         $windowHelper = $this->objectManager->get(WindowHelper::class);
+        $codeFormatter = $this->objectManager->get(CodeFormatter::class, $windowHelper);
         $this->printer = $this->objectManager->get(
             PrinterInterface::class,
-            $windowHelper,
             STDOUT,
             STDERR
         );
         $this->exceptionPrinter = $this->objectManager->get(
             ExceptionPrinterInterface::class,
-            $windowHelper,
             STDOUT,
-            STDERR
+            STDERR,
+            $windowHelper,
+            $codeFormatter
         );
 
         $this->initEnvironment();
@@ -118,7 +120,9 @@ class Bootstrap
 
         /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
         $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
-        $provider->setTypes($options['types']);
+        if (0 !== count($options['types'])) {
+            $provider->setTypes($options['types']);
+        }
 
         return array_merge(
             $this->collectTestDefinitionsForClasses($provider, $allFiles),
