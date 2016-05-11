@@ -3,6 +3,7 @@ language: php
 php:
   - 7
   - hhvm
+  - nightly
 
 matrix:
   allow_failures:
