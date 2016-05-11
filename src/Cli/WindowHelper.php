@@ -24,6 +24,20 @@ class WindowHelper
     private $height;
 
     /**
+     * Returns if the window supports colors
+     * 
+     * @return bool
+     */
+    public function hasColorSupport()
+    {
+        if (isset($_SERVER['TERM'])) {
+            return in_array($_SERVER['TERM'], ['xterm-256color']);
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the window's width
      *
      * @example
