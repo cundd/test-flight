@@ -24,7 +24,11 @@ class CodeTestRunner extends AbstractTestRunner
      */
     protected function performTest(DefinitionInterface $definition)
     {
-        $this->evaluate($definition->getPreProcessedCode());
+        $preprocessedCode = $definition->getPreProcessedCode();
+        if (!$preprocessedCode || $preprocessedCode === ';') {
+            $this->printer->warn('No test code given');
+        }
+        $this->evaluate($preprocessedCode);
     }
 
     /**
