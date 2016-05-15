@@ -14,6 +14,7 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
+use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
 use Cundd\TestFlight\TestRunner\CodeTestRunner;
 use Cundd\TestFlight\TestRunner\MethodTestRunner;
@@ -46,17 +47,46 @@ class TestDispatcher
     private $failures = 0;
 
     /**
+     * @var int
+     */
+    private $numberOfTests = 0;
+
+    /**
+     * @var PrinterInterface
+     */
+    private $printer;
+
+    /**
+     * @var ExceptionPrinterInterface
+     */
+    private $exceptionPrinter;
+
+    /**
+     * @var Environment
+     */
+    private $environment;
+
+    /**
      * TestRunner
      *
-     * @param ClassLoader   $classLoader
-     * @param ObjectManager $objectManager
+     * @param ClassLoader               $classLoader
+     * @param ObjectManager             $objectManager
+     * @param Environment               $environment
+     * @param PrinterInterface          $printer
+     * @param ExceptionPrinterInterface $exceptionPrinter
      */
     public function __construct(
         ClassLoader $classLoader,
-        ObjectManager $objectManager
+        ObjectManager $objectManager,
+        Environment $environment,
+        PrinterInterface $printer,
+        ExceptionPrinterInterface $exceptionPrinter
     ) {
         $this->classLoader = $classLoader;
         $this->objectManager = $objectManager;
+        $this->environment = $environment;
+        $this->printer = $printer;
+        $this->exceptionPrinter = $exceptionPrinter;
     }
 
     /**
@@ -97,6 +127,8 @@ class TestDispatcher
                 } else {
                     $this->failures += 1;
                 }
+
+                $this->environment->reset();
             }
         }
     }
@@ -133,11 +165,12 @@ class TestDispatcher
                     )
                 );
         }
+        $this->numberOfTests += 1;
         $this->printTestInfo($definition);
 
         /** @var TestRunnerInterface $testRunner */
         $testRunner = $this->objectManager
-            ->get($testRunnerClass, $this->classLoader, $this->objectManager);
+            ->get($testRunnerClass, $this->classLoader, $this->objectManager, $this->environment, $this->printer, $this->exceptionPrinter);
 
         return $testRunner->runTestDefinition($definition);
     }
@@ -147,11 +180,7 @@ class TestDispatcher
      */
     private function getPrinter()
     {
-        return $this->objectManager->get(
-            PrinterInterface::class,
-            STDOUT,
-            STDERR
-        );
+        return $this->printer;
     }
 
     /**
@@ -161,7 +190,8 @@ class TestDispatcher
     {
         $this->getPrinter()->println('');
         $this->getPrinter()->println(
-            '%d Assertions | Successful: %d | Failures: %d',
+            'Tests: %d | Assertions: %d | Successful: %d | Failures: %d',
+            $this->numberOfTests,
             Assert::getCount(),
             $this->successes,
             $this->failures

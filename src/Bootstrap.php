@@ -68,7 +68,8 @@ class Bootstrap
         $this->printer = $this->objectManager->get(
             PrinterInterface::class,
             STDOUT,
-            STDERR
+            STDERR,
+            $windowHelper
         );
         $this->exceptionPrinter = $this->objectManager->get(
             ExceptionPrinterInterface::class,
@@ -99,9 +100,19 @@ class Bootstrap
 
         $testDefinitions = $this->collectTestDefinitions($options);
         /** @var TestDispatcher $testRunner */
-        $testRunner = $this->objectManager->get(TestDispatcher::class, $this->classLoader, $this->objectManager);
+        $testRunner = $this->objectManager->get(
+            TestDispatcher::class,
+            $this->classLoader,
+            $this->objectManager,
+            $this->environment,
+            $this->printer,
+            $this->exceptionPrinter
+        );
 
-        return $testRunner->runTestDefinitions($testDefinitions);
+        $result = $testRunner->runTestDefinitions($testDefinitions);
+        $this->printFooter();
+
+        return $result;
     }
 
     /**
@@ -148,11 +159,18 @@ class Bootstrap
 
             $this->environment = $this->objectManager->get(Environment::class);
             $this->environment->store(
-                $_ENV,
                 date_default_timezone_get(),
                 $locales,
                 error_reporting(null),
-                $GLOBALS
+                $GLOBALS,
+                $_ENV,
+                $_GET,
+                $_POST,
+                $_COOKIE,
+                $_SERVER,
+                $_SESSION,
+                $_FILES,
+                $_REQUEST
             );
             $this->environment->reset();
         } catch (\TypeError $error) {
@@ -198,6 +216,14 @@ class Bootstrap
     private function printHeader()
     {
         $this->printer->println('Test-Flight %s', Constants::VERSION);
+    }
+
+    /**
+     * Print the test footer output
+     */
+    private function printFooter()
+    {
+        // Nothing to do at the moment
     }
 
     /**

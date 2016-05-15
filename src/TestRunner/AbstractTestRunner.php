@@ -10,9 +10,9 @@ namespace Cundd\TestFlight\TestRunner;
 
 use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Environment;
 use Cundd\TestFlight\ObjectManager;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
-use Cundd\TestFlight\Output\Printer;
 use Cundd\TestFlight\Output\PrinterInterface;
 use ErrorException;
 
@@ -32,17 +32,41 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     protected $objectManager;
 
     /**
+     * @var PrinterInterface
+     */
+    protected $printer;
+
+    /**
+     * @var ExceptionPrinterInterface
+     */
+    protected $exceptionPrinter;
+
+    /**
+     * @var Environment
+     */
+    protected $environment;
+
+    /**
      * TestRunner
      *
-     * @param ClassLoader   $classLoader
-     * @param ObjectManager $objectManager
+     * @param ClassLoader               $classLoader
+     * @param ObjectManager             $objectManager
+     * @param Environment               $environment
+     * @param PrinterInterface          $printer
+     * @param ExceptionPrinterInterface $exceptionPrinter
      */
     public function __construct(
         ClassLoader $classLoader,
-        ObjectManager $objectManager
+        ObjectManager $objectManager,
+        Environment $environment,
+        PrinterInterface $printer,
+        ExceptionPrinterInterface $exceptionPrinter
     ) {
         $this->classLoader = $classLoader;
         $this->objectManager = $objectManager;
+        $this->printer = $printer;
+        $this->exceptionPrinter = $exceptionPrinter;
+        $this->environment = $environment;
     }
 
     /**
@@ -58,23 +82,19 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     public function runTestDefinition(DefinitionInterface $definition): bool
     {
         $this->prepareTestRunnerForDefinition($definition);
+        $exception = null;
 
         error_clear_last();
         try {
             $this->performTest($definition);
-
-            $result = true;
         } catch (\Error $exception) {
-            $this->printException($definition, $exception);
-
-            $result = false;
         } catch (\Exception $exception) {
+        }
+        $this->environment->reset();
+
+        if ($exception !== null) {
             $this->printException($definition, $exception);
 
-            $result = false;
-        }
-
-        if (!$result) {
             return false;
         }
 
@@ -99,7 +119,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      */
     private function printException(DefinitionInterface $definition, $exception)
     {
-        $this->getExceptionPrinter()->printException($definition, $exception);
+        $this->exceptionPrinter->printException($definition, $exception);
     }
 
     /**
@@ -107,36 +127,11 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      */
     private function printSuccess(DefinitionInterface $definition)
     {
-        $printer = $this->getPrinter();
-        if ($printer->getVerbose()) {
-            $printer->info('Successfully ran %s', $definition->getDescription());
+        if ($this->printer->getVerbose()) {
+            $this->printer->info('Successfully ran %s', $definition->getDescription());
         } else {
-            $printer->printf('.');
+            $this->printer->printf('.');
         }
-    }
-
-    /**
-     * @return Printer
-     */
-    private function getPrinter()
-    {
-        return $this->objectManager->get(
-            PrinterInterface::class,
-            STDOUT,
-            STDERR
-        );
-    }
-
-    /**
-     * @return ExceptionPrinterInterface
-     */
-    private function getExceptionPrinter()
-    {
-        return $this->objectManager->get(
-            ExceptionPrinterInterface::class,
-            STDOUT,
-            STDERR
-        );
     }
 
     /**
