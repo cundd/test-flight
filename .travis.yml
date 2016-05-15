@@ -13,6 +13,8 @@ sudo: false
 
 before_script:
   - composer install --prefer-source
+  - curl -OL test-flight.cundd.net/data/_Home.md
 
 script:
   bin/test-flight src/
+  bin/test-flight _Home.md
