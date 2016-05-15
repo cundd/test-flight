@@ -8,6 +8,8 @@
 
 namespace Cundd\TestFlight\Output;
 
+use Cundd\TestFlight\Cli\WindowHelper;
+
 /**
  * Abstract printer base class
  */
@@ -34,15 +36,22 @@ abstract class AbstractPrinter implements PrinterInterface
     private $verbose = false;
 
     /**
+     * @var WindowHelper
+     */
+    private $cliWindowHelper;
+
+    /**
      * Printer constructor.
      *
-     * @param resource $outputStream
-     * @param resource $errorStream
+     * @param resource     $outputStream
+     * @param resource     $errorStream
+     * @param WindowHelper $cliWindowHelper
      */
-    public function __construct($outputStream, $errorStream)
+    public function __construct($outputStream, $errorStream, WindowHelper $cliWindowHelper)
     {
         $this->outputStream = $outputStream;
         $this->errorStream = $errorStream;
+        $this->cliWindowHelper = $cliWindowHelper;
     }
 
     /**
@@ -72,11 +81,7 @@ abstract class AbstractPrinter implements PrinterInterface
      */
     public function printError(string $format, ...$arguments)
     {
-        if ($this->getEnableColoredOutput()) {
-            $format = self::RED.$format.self::NORMAL.PHP_EOL;
-        } else {
-            $format .= PHP_EOL;
-        }
+        $format = $this->colorize(self::RED, $format).PHP_EOL;
         fwrite($this->errorStream, vsprintf($format, $arguments));
 
         return $this;
@@ -90,7 +95,7 @@ abstract class AbstractPrinter implements PrinterInterface
     public function debug(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($format . PHP_EOL, $arguments);
+            $this->printWithArray($format.PHP_EOL, $arguments);
         }
 
         return $this;
@@ -104,10 +109,21 @@ abstract class AbstractPrinter implements PrinterInterface
     public function info(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            if ($this->getEnableColoredOutput()) {
-                $format = self::BLUE.$format.self::NORMAL;
-            }
-            $this->printWithArray($format.PHP_EOL, $arguments);
+            $this->printWithArray($this->colorize(self::BLUE, $format).PHP_EOL, $arguments);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $format
+     * @param array  ...$arguments
+     * @return $this
+     */
+    public function warn(string $format, ...$arguments)
+    {
+        if ($this->getVerbose()) {
+            $this->printWithArray($this->colorize(self::YELLOW, $format).PHP_EOL, $arguments);
         }
 
         return $this;
@@ -139,37 +155,37 @@ abstract class AbstractPrinter implements PrinterInterface
      */
     public function getEnableColoredOutput(): bool
     {
-        if (!$this->getCliHasColorSupport()) {
-            return false;
-        }
-
-        return $this->enableColoredOutput;
+        return $this->enableColoredOutput && $this->cliWindowHelper->hasColorSupport();
     }
 
     /**
      * Set if colored output should be enabled
      *
      * @param boolean $enableColoredOutput
-     * @return Printer
+     * @return PrinterInterface
      */
-    public function setEnableColoredOutput(bool $enableColoredOutput)
+    public function setEnableColoredOutput(bool $enableColoredOutput): PrinterInterface
     {
-        $this->enableColoredOutput = (bool)$enableColoredOutput;
+        $this->enableColoredOutput = $enableColoredOutput;
 
         return $this;
     }
 
     /**
-     * @return bool
+     * Wrap the text in colors
+     *
+     * @param string $startColor
+     * @param string $text
+     * @param string $endColor
+     * @return string
      */
-    protected function getCliHasColorSupport()
+    public function colorize(string $startColor, string $text, string $endColor = self::NORMAL): string
     {
-        // TODO: Use the window helper
-        if (isset($_SERVER['TERM'])) {
-            return in_array($_SERVER['TERM'], ['xterm-256color']);
+        if ($this->getEnableColoredOutput()) {
+            return $startColor.$text.$endColor;
         }
 
-        return false;
+        return $text;
     }
 
     /**

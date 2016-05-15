@@ -24,11 +24,6 @@ use Cundd\TestFlight\Definition\MethodDefinition;
 class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
 {
     /**
-     * @var WindowHelper
-     */
-    private $cliWindowHelper;
-
-    /**
      * @var CodeFormatter
      */
     private $codeFormatter;
@@ -47,8 +42,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         WindowHelper $cliWindowHelper,
         CodeFormatter $codeFormatter
     ) {
-        parent::__construct($outputStream, $errorStream);
-        $this->cliWindowHelper = $cliWindowHelper;
+        parent::__construct($outputStream, $errorStream, $cliWindowHelper);
         $this->codeFormatter = $codeFormatter;
     }
 
