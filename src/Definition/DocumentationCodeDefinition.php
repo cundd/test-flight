@@ -44,6 +44,9 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
         $fileName = pathinfo($this->getFilePath(), PATHINFO_FILENAME);
         $testName = $fileName;
 
+        if ($testName[0] === '_') {
+            $testName = substr($testName, 1);
+        }
         if ($testName === 'README') {
             $testName = basename(dirname($this->getFilePath())).' - Readme';
         }
