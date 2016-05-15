@@ -23,6 +23,7 @@
         "ext-json": "*",
         "ext-pcre": "*",
         "ext-reflection": "*",
+        "ext-tokenizer": "*",
         "ext-spl": "*"
     },
     "autoload": {
