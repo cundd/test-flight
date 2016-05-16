@@ -204,6 +204,31 @@ class DefinitionProvider implements DefinitionProviderInterface
     }
 
     /**
+     * @param string          $className
+     * @param FileInterface   $file
+     * @param ReflectionClass $reflectionClass
+     * @return DocCommentCodeDefinition
+     */
+    private function buildCodeDefinitionForClass(
+        string $className,
+        FileInterface $file,
+        ReflectionClass $reflectionClass
+    ) {
+        if (false !== strpos($reflectionClass->getDocComment(), Constants::EXAMPLE_KEYWORD)
+            || false !== strpos($reflectionClass->getDocComment(), Constants::CODE_KEYWORD)
+        ) {
+            return new DocCommentCodeDefinition(
+                $className,
+                $this->codeExtractor->getCodeFromDocComment($reflectionClass->getDocComment()),
+                $file,
+                $className
+            );
+        }
+
+        return null;
+    }
+
+    /**
      * @param FileInterface $file
      * @return DefinitionInterface[]
      */
@@ -254,30 +279,5 @@ class DefinitionProvider implements DefinitionProviderInterface
             },
             \ReflectionException::class
         );
-    }
-
-    /**
-     * @param string          $className
-     * @param FileInterface   $file
-     * @param ReflectionClass $reflectionClass
-     * @return DocCommentCodeDefinition
-     */
-    private function buildCodeDefinitionForClass(
-        string $className,
-        FileInterface $file,
-        ReflectionClass $reflectionClass
-    ) {
-        if (false !== strpos($reflectionClass->getDocComment(), Constants::EXAMPLE_KEYWORD)
-            || false !== strpos($reflectionClass->getDocComment(), Constants::CODE_KEYWORD)
-        ) {
-            return new DocCommentCodeDefinition(
-                $className,
-                $this->codeExtractor->getCodeFromDocComment($reflectionClass->getDocComment()),
-                $file,
-                $className
-            );
-        }
-
-        return null;
     }
 }
