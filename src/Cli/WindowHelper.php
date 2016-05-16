@@ -75,7 +75,7 @@ class WindowHelper
      * @param string $command
      * @return string
      */
-    private function systemCall(string $command)
+    private function systemCall($command)
     {
         if (is_callable('exec')) {
             return exec($command);

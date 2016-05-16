@@ -12,6 +12,6 @@ namespace Cundd\TestFlight\Exception;
 /**
  * Class AssertionError
  */
-class AssertionError extends \AssertionError
+class AssertionError extends \Exception
 {
 }

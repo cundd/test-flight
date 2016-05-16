@@ -108,7 +108,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     private function getTraceAsString(
         DefinitionInterface $definition,
         $exception
-    ): string
+    )
     {
         $stringParts = [];
         $previousStep = [];
@@ -136,7 +136,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
      * @param int   $stepNumber
      * @return string
      */
-    private function getTraceStepAsString(array $step, int $stepNumber)
+    private function getTraceStepAsString(array $step, $stepNumber)
     {
         if (isset($step['class'])) {
             return sprintf(
@@ -145,7 +145,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
                 $step['class'],
                 $step['type'],
                 $step['function'],
-                $this->argumentsToString($step['args'] ?? []),
+                $this->argumentsToString(isset($step['args']) ? $step['args'] : []),
                 $this->pathFromStep($step)
             );
         }
@@ -154,7 +154,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             '#%d %s(%s)%s',
             $stepNumber,
             $step['function'],
-            $this->argumentsToString($step['args'] ?? []),
+            $this->argumentsToString(isset($step['args']) ? $step['args'] : []),
             $this->pathFromStep($step)
         );
     }
@@ -163,7 +163,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
      * @param array $step
      * @return string
      */
-    private function pathFromStep(array $step): string
+    private function pathFromStep(array $step)
     {
         if (!isset($step['file'])) {
             return '';
@@ -205,9 +205,9 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         DefinitionInterface $definition,
         array $step,
         array $previousStep
-    ): bool
+    )
     {
-        $filePath = $previousStep['file'] ?? '';
+        $filePath = isset($previousStep['file']) ? $previousStep['file'] : '';
 
         if ($definition instanceof AbstractMethodDefinition) {
             $functionName = $definition->getMethodName();
@@ -231,7 +231,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
      * @param \Throwable          $exception
      * @return string
      */
-    private function getTestLocationForDefinitionAndException(DefinitionInterface $definition, $exception): string
+    private function getTestLocationForDefinitionAndException(DefinitionInterface $definition, $exception)
     {
         if ($definition instanceof DocCommentCodeDefinition) {
             return $definition->getFilePath();

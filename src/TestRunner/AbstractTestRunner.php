@@ -79,12 +79,12 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      * @param DefinitionInterface $definition
      * @return bool
      */
-    public function runTestDefinition(DefinitionInterface $definition): bool
+    public function runTestDefinition(DefinitionInterface $definition)
     {
         $this->prepareTestRunnerForDefinition($definition);
         $exception = null;
 
-        error_clear_last();
+        self::error_clear_last();
         try {
             $this->performTest($definition);
         } catch (\Error $exception) {
@@ -98,7 +98,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
             return false;
         }
 
-        $lastError = error_get_last();
+        $lastError = self::error_get_last();
         if (!$lastError) {
             $this->printSuccess($definition);
 
@@ -161,5 +161,42 @@ abstract class AbstractTestRunner implements TestRunnerInterface
                 $definition->getFile()
             );
         }
+    }
+    
+    /**
+     * Clear the most recent error.
+     * 
+     * @see http://php.net/error_clear_last
+     */
+    private static function error_clear_last()
+    {
+        if (function_exists("error_clear_last")) {
+            error_clear_last();
+            return;
+        }
+        
+        // See http://php.net/manual/de/function.error-get-last.php#113518
+        set_error_handler('var_dump', 0);
+        @$eMuMA2fS;
+        restore_error_handler();
+    }
+    
+    /**
+     * Gets the last error.
+     * 
+     * @see http://php.net/error_get_last
+     */
+    private static function error_get_last()
+    {
+        $lastError = error_get_last();
+        
+        if (function_exists("error_clear_last")) {
+            return $lastError;
+        }
+        
+        if (!empty($lastError) && strpos($lastError["message"], "eMuMA2fS") !== false) {
+            return null;
+        }
+        return $lastError;
     }
 }

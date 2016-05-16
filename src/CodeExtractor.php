@@ -24,7 +24,7 @@ class CodeExtractor
      * @param string $docComment
      * @return string
      */
-    public function getCodeFromDocComment(string $docComment): string
+    public function getCodeFromDocComment($docComment)
     {
         $start = strpos($docComment, Constants::EXAMPLE_KEYWORD);
         $code = substr($docComment, $start);
@@ -52,7 +52,7 @@ class CodeExtractor
      * @param string $fileContent
      * @return string[]
      */
-    public function getCodeFromDocumentation(string $fileContent): array
+    public function getCodeFromDocumentation($fileContent)
     {
         $start = strpos($fileContent, Constants::MARKDOWN_PHP_CODE_KEYWORD);
         $code = substr($fileContent, $start);
