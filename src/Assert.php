@@ -50,7 +50,7 @@ abstract class Assert
      *  $object = new stdClass(); \Cundd\TestFlight\Assert::assertSame($object, $object);
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertSame(true, false); });
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertSame([], [1]); });
-     *  test_flight_throws(function() use($object) { \Cundd\TestFlight\Assert::assertSame($object, new stdClas()); });
+     *  test_flight_throws(function() use($object) { \Cundd\TestFlight\Assert::assertSame($object, new stdClass()); });
      *
      * @param mixed  $expected
      * @param mixed  $actual
@@ -194,11 +194,11 @@ abstract class Assert
             throw new AssertionError($message ?: 'No exception thrown');
         } elseif ($expectedException && !is_a($exception, $expectedException)) {
             throw new AssertionError(
-                sprintf(
+                $message ?: sprintf(
                     'Expected %s got %s',
                     $expectedException,
                     get_class($exception)
-                ) ?? $message
+                )
             );
         }
     }
