@@ -84,7 +84,7 @@ class CodeExtractor
      * @param int    $start
      * @return array
      */
-    private function getCodeWithExampleKeyword(string $docComment, int $start)
+    private function getCodeWithExampleKeyword($docComment, $start)
     {
         $code = substr($docComment, $start);
 
@@ -101,7 +101,7 @@ class CodeExtractor
      * @param int    $start
      * @return array
      */
-    private function getCodeWithCodeKeyword(string $docComment, int $start)
+    private function getCodeWithCodeKeyword($docComment, $start)
     {
         $code = substr($docComment, $start);
 
