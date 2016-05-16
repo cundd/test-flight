@@ -296,7 +296,7 @@ class Bootstrap
      *
      * @param string $bootstrapFile
      */
-    private function prepareCustomBootstrapAndAutoloading(string $bootstrapFile)
+    private function prepareCustomBootstrapAndAutoloading($bootstrapFile)
     {
         if ($bootstrapFile) {
             require_once $bootstrapFile;
