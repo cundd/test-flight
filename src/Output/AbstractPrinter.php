@@ -59,7 +59,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function printf(string $format, ...$arguments)
+    public function printf($format, ...$arguments)
     {
         return $this->printWithArray($format, $arguments);
     }
@@ -69,7 +69,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function println(string $format, ...$arguments)
+    public function println($format, ...$arguments)
     {
         return $this->printWithArray($format.PHP_EOL, $arguments);
     }
@@ -79,7 +79,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function printError(string $format, ...$arguments)
+    public function printError($format, ...$arguments)
     {
         $format = $this->colorize(self::RED, $format).PHP_EOL;
         fwrite($this->errorStream, vsprintf($format, $arguments));
@@ -92,7 +92,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function debug(string $format, ...$arguments)
+    public function debug($format, ...$arguments)
     {
         if ($this->getVerbose()) {
             $this->printWithArray($format.PHP_EOL, $arguments);
@@ -106,7 +106,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function info(string $format, ...$arguments)
+    public function info($format, ...$arguments)
     {
         if ($this->getVerbose()) {
             $this->printWithArray($this->colorize(self::BLUE, $format).PHP_EOL, $arguments);
@@ -120,7 +120,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function warn(string $format, ...$arguments)
+    public function warn($format, ...$arguments)
     {
         if ($this->getVerbose()) {
             $this->printWithArray($this->colorize(self::YELLOW, $format).PHP_EOL, $arguments);
@@ -133,7 +133,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param bool $flag
      * @return $this
      */
-    public function setVerbose(bool $flag = false)
+    public function setVerbose($flag = false)
     {
         $this->verbose = $flag;
 
@@ -143,7 +143,7 @@ abstract class AbstractPrinter implements PrinterInterface
     /**
      * @return bool
      */
-    public function getVerbose(): bool
+    public function getVerbose()
     {
         return $this->verbose;
     }
@@ -153,7 +153,7 @@ abstract class AbstractPrinter implements PrinterInterface
      *
      * @return boolean
      */
-    public function getEnableColoredOutput(): bool
+    public function getEnableColoredOutput()
     {
         return $this->enableColoredOutput && $this->cliWindowHelper->hasColorSupport();
     }
@@ -164,7 +164,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param boolean $enableColoredOutput
      * @return PrinterInterface
      */
-    public function setEnableColoredOutput(bool $enableColoredOutput): PrinterInterface
+    public function setEnableColoredOutput($enableColoredOutput)
     {
         $this->enableColoredOutput = $enableColoredOutput;
 
@@ -179,7 +179,7 @@ abstract class AbstractPrinter implements PrinterInterface
      * @param string $endColor
      * @return string
      */
-    public function colorize(string $startColor, string $text, string $endColor = self::NORMAL): string
+    public function colorize($startColor, $text, $endColor = self::NORMAL)
     {
         if ($this->getEnableColoredOutput()) {
             return $startColor.$text.$endColor;

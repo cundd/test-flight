@@ -73,7 +73,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @param array $classNameToFiles
      * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
      */
-    public function createForClasses(array $classNameToFiles): array
+    public function createForClasses(array $classNameToFiles)
     {
         $definitionCollection = [];
         foreach ($classNameToFiles as $className => $file) {
@@ -89,7 +89,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @param FileInterface[] $files
      * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
      */
-    public function createForDocumentation(array $files): array
+    public function createForDocumentation(array $files)
     {
         if (in_array(Constants::TEST_TYPE_DOCUMENTATION, $this->types)) {
             return array_map([$this, 'collectDefinitionsForFile'], $files);
@@ -103,7 +103,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @param FileInterface $file
      * @return DefinitionInterface[]
      */
-    private function collectDefinitionsForClass(string $className, FileInterface $file): array
+    private function collectDefinitionsForClass($className, FileInterface $file)
     {
         $this->classLoader->loadClass($className, $file);
 
@@ -131,7 +131,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @return array
      */
     private function collectMethodDefinitionsForClass(
-        string $className,
+        $className,
         FileInterface $file
     ) {
         $testMethods = [];
@@ -159,7 +159,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @return array
      */
     private function collectCodeDefinitionsForClass(
-        string $className,
+        $className,
         FileInterface $file
     ) {
         $testMethods = [];

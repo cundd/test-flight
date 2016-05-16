@@ -5,8 +5,6 @@
  * Date: 07/05/16
  * Time: 11:49
  */
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight\Definition;
 
 /**

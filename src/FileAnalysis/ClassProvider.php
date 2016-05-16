@@ -17,7 +17,7 @@ class ClassProvider
      * @param FileInterface[] $files
      * @return array
      */
-    public function findClassesInFiles(array $files): array
+    public function findClassesInFiles(array $files)
     {
         $classes = [];
         foreach ($files as $file) {
@@ -38,7 +38,7 @@ class ClassProvider
      * @param FileInterface $file
      * @return bool
      */
-    private function isPhpFile(FileInterface $file): bool
+    private function isPhpFile(FileInterface $file)
     {
         return pathinfo($file->getPath(), PATHINFO_EXTENSION) === 'php';
     }
@@ -48,7 +48,7 @@ class ClassProvider
      * @param FileInterface $file
      * @return array
      */
-    private function buildDictionaryWithClassesAndFile(array $classes, FileInterface $file): array
+    private function buildDictionaryWithClassesAndFile(array $classes, FileInterface $file)
     {
         $dictionary = array_flip($classes);
         array_walk(
@@ -65,7 +65,7 @@ class ClassProvider
      * @param FileInterface $file
      * @return string[]
      */
-    private function getClassFromFile(FileInterface $file): array
+    private function getClassFromFile(FileInterface $file)
     {
         $classes = [];
         $tokens = token_get_all($file->getContents());

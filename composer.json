@@ -19,7 +19,7 @@
     "bin": ["bin/test-flight"],
     "minimum-stability": "dev",
     "require": {
-        "php" : "^7.0",
+        "php" : ">=5.6",
         "ext-json": "*",
         "ext-pcre": "*",
         "ext-reflection": "*",

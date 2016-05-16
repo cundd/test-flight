@@ -5,7 +5,6 @@
  * Date: 16/04/16
  * Time: 22:34
  */
-declare(strict_types = 1);
 
 namespace Cundd\TestFlight\Definition;
 
@@ -46,8 +45,8 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
      * @param ReflectionMethod $reflectionMethod
      */
     public function __construct(
-        string $className,
-        string $methodName,
+        $className,
+        $methodName,
         FileInterface $file,
         ReflectionMethod $reflectionMethod = null
     ) {
@@ -60,7 +59,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return string
      */
-    public function getClassName(): string
+    public function getClassName()
     {
         return $this->className;
     }
@@ -68,7 +67,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return string
      */
-    public function getMethodName(): string
+    public function getMethodName()
     {
         return $this->methodName;
     }
@@ -76,7 +75,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return FileInterface
      */
-    public function getFile(): FileInterface
+    public function getFile()
     {
         return $this->file;
     }
@@ -84,7 +83,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return string
      */
-    public function getFilePath(): string
+    public function getFilePath()
     {
         return $this->getFile()->getPath();
     }
@@ -94,7 +93,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
      *
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription()
     {
         return ucwords(
             ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getMethodName())))
@@ -104,7 +103,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return boolean
      */
-    public function getMethodIsStatic(): bool
+    public function getMethodIsStatic()
     {
         $reflectionMethod = $this->getReflectionMethod();
         if (!$reflectionMethod) {
@@ -117,7 +116,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return boolean
      */
-    public function getMethodIsPublic(): bool
+    public function getMethodIsPublic()
     {
         $reflectionMethod = $this->getReflectionMethod();
         if (!$reflectionMethod) {
@@ -130,7 +129,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     /**
      * @return ReflectionMethod
      */
-    public function getReflectionMethod(): ReflectionMethod
+    public function getReflectionMethod()
     {
         return $this->reflectionMethod;
     }

@@ -12,7 +12,7 @@
  * @param mixed  $assertion
  * @param string $message
  */
-function test_flight_assert($assertion, string $message = '')
+function test_flight_assert($assertion, $message = '')
 {
     \Cundd\TestFlight\Assert::assert($assertion, $message);
 }
@@ -24,7 +24,7 @@ function test_flight_assert($assertion, string $message = '')
  * @param string   $expectedException
  * @param string   $message
  */
-function test_flight_throws(callable $callback, string $expectedException = '', string $message = '')
+function test_flight_throws(callable $callback, $expectedException = '', $message = '')
 {
     \Cundd\TestFlight\Assert::throws($callback, $expectedException, $message);
 }
@@ -37,7 +37,7 @@ function test_flight_throws(callable $callback, string $expectedException = '', 
  * @param string $message
  * @throws AssertionError if the values are not equal
  */
-function test_flight_assert_same($expected, $actual, string $message = '')
+function test_flight_assert_same($expected, $actual, $message = '')
 {
     \Cundd\TestFlight\Assert::assertSame($expected, $actual, $message);
 }
@@ -49,7 +49,7 @@ function test_flight_assert_same($expected, $actual, string $message = '')
  * @param string $message
  * @throws AssertionError if the value is false, null, 0, '', '0', ...
  */
-function test_flight_assert_true($actual, string $message = '')
+function test_flight_assert_true($actual, $message = '')
 {
     \Cundd\TestFlight\Assert::assertTrue($actual, $message);
 }
@@ -61,7 +61,7 @@ function test_flight_assert_true($actual, string $message = '')
  * @param string $message
  * @throws AssertionError if the value is not false, null, 0, '', '0', ...
  */
-function test_flight_assert_false($actual, string $message = '')
+function test_flight_assert_false($actual, $message = '')
 {
     \Cundd\TestFlight\Assert::assertFalse($actual, $message);
 }
@@ -74,7 +74,7 @@ function test_flight_assert_false($actual, string $message = '')
  * @param string $message
  * @throws \Cundd\TestFlight\Exception\AssertionError
  */
-function test_flight_assert_instance_of(string $className, $actual, string $message = '')
+function test_flight_assert_instance_of($className, $actual, $message = '')
 {
     \Cundd\TestFlight\Assert::assertInstanceOf($className, $actual, $message);
 }
@@ -87,7 +87,7 @@ function test_flight_assert_instance_of(string $className, $actual, string $mess
  * @param string $message
  * @throws \Cundd\TestFlight\Exception\AssertionError
  */
-function test_flight_assert_type(string $type, $actual, string $message = '')
+function test_flight_assert_type($type, $actual, $message = '')
 {
     \Cundd\TestFlight\Assert::assertTypeOf($type, $actual, $message);
 }
