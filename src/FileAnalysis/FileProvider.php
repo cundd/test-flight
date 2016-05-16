@@ -113,6 +113,7 @@ class FileProvider
     {
         return $file->containsKeyword(Constants::TEST_KEYWORD)
         || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
+        || $file->containsKeyword(Constants::CODE_KEYWORD)
         || $file->containsKeyword(Constants::MARKDOWN_PHP_CODE_KEYWORD);
     }
 

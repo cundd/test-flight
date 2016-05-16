@@ -15,7 +15,8 @@ namespace Cundd\TestFlight;
  */
 class CodeExtractor
 {
-    const DOC_COMMENT_REGEX = '\s+([^@]*)[.\s@]+';
+    const DOC_COMMENT_EXAMPLE_REGEX = '\s+([^@]*)[.\s@]+';
+    const DOC_COMMENT_CODE_REGEX = '<code\b[^>]*>(.*?)</code>';
     const DOCUMENTATION_REGEX = '\n([^`]*)```';
 
     /**
@@ -26,11 +27,19 @@ class CodeExtractor
      */
     public function getCodeFromDocComment(string $docComment): string
     {
-        $start = strpos($docComment, Constants::EXAMPLE_KEYWORD);
-        $code = substr($docComment, $start);
+        $startExampleKeyword = strpos($docComment, Constants::EXAMPLE_KEYWORD);
+        $startCodeKeyword = strpos($docComment, Constants::CODE_KEYWORD);
 
-        $regularExpression = '!'.Constants::EXAMPLE_KEYWORD.self::DOC_COMMENT_REGEX.'!';
-        if (!preg_match($regularExpression, $code, $matches)) {
+        if ($startExampleKeyword !== false) {
+            $matches = $this->getCodeWithExampleKeyword($docComment, $startExampleKeyword);
+        } elseif ($startCodeKeyword !== false) {
+            $matches = $this->getCodeWithCodeKeyword($docComment, $startCodeKeyword);
+        } else {
+            // None of the keywords was found
+            return '';
+        }
+
+        if (!$matches) {
             return '';
         }
 
@@ -39,7 +48,7 @@ class CodeExtractor
                 function ($line) {
                     return ltrim($line, " \t\n\r\0\x0B*");
                 },
-                explode("\n", $matches[1])
+                explode("\n", $matches)
             )
         );
 
@@ -71,9 +80,43 @@ class CodeExtractor
     }
 
     /**
+     * @param string $docComment
+     * @param int    $start
+     * @return array
+     */
+    private function getCodeWithExampleKeyword(string $docComment, $start)
+    {
+        $code = substr($docComment, $start);
+
+        $regularExpression = '!'.Constants::EXAMPLE_KEYWORD.self::DOC_COMMENT_EXAMPLE_REGEX.'!';
+        if (!preg_match($regularExpression, $code, $matches)) {
+            return [];
+        }
+
+        return $matches[1];
+    }
+
+    /**
+     * @param string $docComment
+     * @param int    $start
+     * @return array
+     */
+    private function getCodeWithCodeKeyword(string $docComment, $start)
+    {
+        $code = substr($docComment, $start);
+
+        $regularExpression = '!'.self::DOC_COMMENT_CODE_REGEX.'!s';
+        if (!preg_match($regularExpression, $code, $matches)) {
+            return [];
+        }
+
+        return $matches[1];
+    }
+
+    /**
      * @test
      */
-    protected function getCodeFromDocCommentTest()
+    protected function getCodeFromDocCommentWithExampleTest()
     {
         $docComment = '/**
      * Returns the file\'s path
@@ -84,7 +127,7 @@ class CodeExtractor
      */';
         $code = $this->getCodeFromDocComment($docComment);
         test_flight_assert(is_string($code));
-        test_flight_assert('assert(__FILE__, (new File(__FILE__))->getPath());' === $code);
+        test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
      * Returns the file\'s path
@@ -94,7 +137,8 @@ class CodeExtractor
      */';
         $code = $this->getCodeFromDocComment($docComment);
         test_flight_assert(is_string($code));
-        test_flight_assert('assert(__FILE__, (new File(__FILE__))->getPath());' === $code);
+        test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
+
         $docComment = '/**
      * Returns the file\'s path
      *
@@ -104,7 +148,80 @@ class CodeExtractor
      */';
         $code = $this->getCodeFromDocComment($docComment);
         test_flight_assert(is_string($code));
-        test_flight_assert('assert(__FILE__, (new File(__FILE__))->getPath());' === $code);
+        test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
+
+        $docComment = '/**
+     * Returns the file\'s path
+     *
+     * @example 
+     *  assert(__FILE__, (new File(__FILE__))->getPath());
+     *  assert(__FILE__, (new File(__FILE__))->getPath())
+     * @param string $xy
+     * @return string
+     */';
+        $code = $this->getCodeFromDocComment($docComment);
+        test_flight_assert(is_string($code));
+        test_flight_assert_same(
+            'assert(__FILE__, (new File(__FILE__))->getPath());
+assert(__FILE__, (new File(__FILE__))->getPath());',
+            $code
+        );
+    }
+
+    /**
+     * @test
+     */
+    protected function getCodeFromDocCommentWithCodeTest()
+    {
+        $docComment = '/**
+     * Returns the file\'s path
+     *
+     * <code>assert(__FILE__, (new File(__FILE__))->getPath())</code>
+     *
+     * @return string
+     */';
+        $code = $this->getCodeFromDocComment($docComment);
+        test_flight_assert(is_string($code));
+        test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
+
+        $docComment = '/**
+     * Returns the file\'s path
+     *
+     * <code>assert(__FILE__, (new File(__FILE__))->getPath())</code>
+     * @return string
+     */';
+        $code = $this->getCodeFromDocComment($docComment);
+        test_flight_assert(is_string($code));
+        test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
+
+        $docComment = '/**
+     * Returns the file\'s path
+     *
+     * <code>assert(__FILE__, (new File(__FILE__))->getPath())</code>
+     * @param string $xy
+     * @return string
+     */';
+        $code = $this->getCodeFromDocComment($docComment);
+        test_flight_assert(is_string($code));
+        test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
+
+        $docComment = '/**
+     * Returns the file\'s path
+     *
+     * <code>
+     *  assert(__FILE__, (new File(__FILE__))->getPath());
+     *  assert(__FILE__, (new File(__FILE__))->getPath())
+     * </code>
+     * @param string $xy
+     * @return string
+     */';
+        $code = $this->getCodeFromDocComment($docComment);
+        test_flight_assert(is_string($code));
+        test_flight_assert_same(
+            'assert(__FILE__, (new File(__FILE__))->getPath());
+assert(__FILE__, (new File(__FILE__))->getPath());',
+            $code
+        );
     }
 
     /**
@@ -130,8 +247,11 @@ assert(1 < 2);
         test_flight_assert_type('array', $codeSamples);
         test_flight_assert_type('string', $codeSamples[0]);
         test_flight_assert_same('assert(true);', $codeSamples[0]);
-        test_flight_assert_same('assert(true);
+        test_flight_assert_same(
+            'assert(true);
 
-assert(1 < 2);', $codeSamples[1]);
+assert(1 < 2);',
+            $codeSamples[1]
+        );
     }
 }

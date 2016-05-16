@@ -15,6 +15,7 @@ interface Constants
 
     const TEST_KEYWORD = '@test';
     const EXAMPLE_KEYWORD = '@example';
+    const CODE_KEYWORD = '<code>';
     const MARKDOWN_PHP_CODE_KEYWORD = '```php';
 
     const TEST_TYPE_DOCUMENTATION = 'documentation';

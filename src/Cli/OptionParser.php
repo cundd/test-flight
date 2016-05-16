@@ -16,12 +16,13 @@ class OptionParser
     /**
      * Parse CLI arguments
      *
-     * @example
+     * <code>
      *  $arguments = ['path/to/cli-script', 'the/path', '--type', 'doccomment', '-v'];
      *  $parser = new \Cundd\TestFlight\Cli\OptionParser();
      *  $parsedArguments = $parser->parse($arguments);
      *  test_flight_assert(is_array($parsedArguments));
      *  test_flight_assert($parsedArguments === ['path' => 'the/path', 'type' => 'doccomment', 'v' => true]);
+     * </code>
      *
      * @param string[] $arguments
      * @return array

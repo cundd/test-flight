@@ -165,7 +165,9 @@ class DefinitionProvider implements DefinitionProviderInterface
         $testMethods = [];
         $reflectionClass = new \ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
-            if (false !== strpos($method->getDocComment(), Constants::EXAMPLE_KEYWORD)) {
+            if (false !== strpos($method->getDocComment(), Constants::EXAMPLE_KEYWORD)
+                || false !== strpos($method->getDocComment(), Constants::CODE_KEYWORD)
+            ) {
                 $testMethods[] = new DocCommentCodeDefinition(
                     $className,
                     $this->codeExtractor->getCodeFromDocComment($method->getDocComment()),
