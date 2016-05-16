@@ -15,49 +15,49 @@ interface PrinterInterface extends ColorInterface
      * @param array  ...$arguments
      * @return $this
      */
-    public function printf(string $format, ...$arguments);
+    public function printf($format, ...$arguments);
 
     /**
      * @param string $format
      * @param array  ...$arguments
      * @return $this
      */
-    public function println(string $format, ...$arguments);
+    public function println($format, ...$arguments);
 
     /**
      * @param string $format
      * @param array  ...$arguments
      * @return $this
      */
-    public function printError(string $format, ...$arguments);
+    public function printError($format, ...$arguments);
 
     /**
      * @param string $format
      * @param array  ...$arguments
      * @return $this
      */
-    public function info(string $format, ...$arguments);
+    public function info($format, ...$arguments);
 
     /**
      * @param string $format
      * @param array  ...$arguments
      * @return $this
      */
-    public function warn(string $format, ...$arguments);
+    public function warn($format, ...$arguments);
 
     /**
      * @param string $format
      * @param array  ...$arguments
      * @return $this
      */
-    public function debug(string $format, ...$arguments);
+    public function debug($format, ...$arguments);
 
     /**
      * Returns if colors should be enabled
      *
      * @return boolean
      */
-    public function getEnableColoredOutput(): bool;
+    public function getEnableColoredOutput();
 
     /**
      * Set if colored output should be enabled
@@ -65,7 +65,7 @@ interface PrinterInterface extends ColorInterface
      * @param boolean $enableColoredOutput
      * @return PrinterInterface
      */
-    public function setEnableColoredOutput(bool $enableColoredOutput): PrinterInterface;
+    public function setEnableColoredOutput($enableColoredOutput);
 
     /**
      * Wrap the text in colors
@@ -75,16 +75,16 @@ interface PrinterInterface extends ColorInterface
      * @param string $endColor
      * @return string
      */
-    public function colorize(string $startColor, string $text, string $endColor = self::NORMAL): string;
+    public function colorize($startColor, $text, $endColor = self::NORMAL);
 
     /**
      * @param bool $flag
      * @return $this
      */
-    public function setVerbose(bool $flag = false);
+    public function setVerbose($flag = false);
 
     /**
      * @return bool
      */
-    public function getVerbose(): bool;
+    public function getVerbose();
 }

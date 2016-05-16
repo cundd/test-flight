@@ -93,7 +93,7 @@ class TestDispatcher
      * @param DefinitionInterface[] $testCollection
      * @return bool Return if all tests succeeded
      */
-    public function runTestDefinitions(array $testCollection): bool
+    public function runTestDefinitions(array $testCollection)
     {
         $this->printHeader();
         foreach ($testCollection as $className => $definitionCollection) {
@@ -138,7 +138,7 @@ class TestDispatcher
      * @return bool
      * @throws \Exception
      */
-    protected function runTestDefinition(DefinitionInterface $definition): bool
+    protected function runTestDefinition(DefinitionInterface $definition)
     {
         switch (true) {
             case $definition instanceof DocCommentCodeDefinition:
@@ -210,7 +210,7 @@ class TestDispatcher
      *
      * @param string $className
      */
-    private function printClassInfo(string $className)
+    private function printClassInfo($className)
     {
         $this->getPrinter()->info('Run tests: %s', $className);
     }

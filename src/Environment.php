@@ -5,7 +5,6 @@
  * Date: 18/04/16
  * Time: 21:20
  */
-declare(strict_types = 1);
 namespace Cundd\TestFlight;
 
 
@@ -88,9 +87,9 @@ class Environment
      * @param array  $request
      */
     public function __construct(
-        string $timeZone = '',
+        $timeZone = '',
         array $locale = [],
-        int $errorReporting = 0,
+        $errorReporting = 0,
         array $globals = [],
         array $env = [],
         array $get = [],
@@ -134,9 +133,9 @@ class Environment
      * @param array  $request
      */
     public function store(
-        string $timeZone,
+        $timeZone,
         array $locale,
-        int $errorReporting,
+        $errorReporting,
         $globals,
         $env,
         $get,
@@ -189,7 +188,7 @@ class Environment
     /**
      * @return string
      */
-    public function getTimeZone(): string
+    public function getTimeZone()
     {
         return $this->timeZone;
     }
@@ -197,7 +196,7 @@ class Environment
     /**
      * @return string
      */
-    public function getLocale(): string
+    public function getLocale()
     {
         return $this->locale;
     }
@@ -205,7 +204,7 @@ class Environment
     /**
      * @return int
      */
-    public function getErrorReporting(): int
+    public function getErrorReporting()
     {
         return $this->errorReporting;
     }

@@ -19,5 +19,5 @@ interface TestRunnerInterface
      * @param DefinitionInterface $definition
      * @return bool
      */
-    public function runTestDefinition(DefinitionInterface $definition) : bool;
+    public function runTestDefinition(DefinitionInterface $definition);
 }

@@ -17,21 +17,21 @@ interface FileInterface
      *
      * @return string
      */
-    public function getPath() : string;
+    public function getPath();
 
     /**
      * Returns the file name
      *
      * @return string
      */
-    public function getName() : string;
+    public function getName();
 
     /**
      * Returns the file contents
      *
      * @return string
      */
-    public function getContents() : string;
+    public function getContents();
 
     /**
      * Returns if the file contents contain the given keyword
@@ -39,5 +39,5 @@ interface FileInterface
      * @param string $keyword
      * @return bool
      */
-    public function containsKeyword(string $keyword) : bool;
+    public function containsKeyword($keyword);
 }

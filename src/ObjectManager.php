@@ -5,8 +5,6 @@
  * Date: 18/04/16
  * Time: 21:03
  */
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\Exception\ClassDoesNotExistException;
@@ -55,7 +53,7 @@ class ObjectManager implements ObjectManagerInterface
      * @param array  $constructorArguments
      * @return object
      */
-    public function get(string $className, ...$constructorArguments)
+    public function get($className, ...$constructorArguments)
     {
         if (!isset($this->container[$className])) {
             $instance = $this->createWithArguments(
@@ -80,7 +78,7 @@ class ObjectManager implements ObjectManagerInterface
      * @param array  $constructorArguments
      * @return object
      */
-    public function create(string $className, ...$constructorArguments)
+    public function create($className, ...$constructorArguments)
     {
         return $this->createWithArguments($className, $constructorArguments);
     }
@@ -94,7 +92,7 @@ class ObjectManager implements ObjectManagerInterface
      * @return object
      */
     private function createWithArguments(
-        string $className,
+        $className,
         array $constructorArguments,
         &$implementationClassName = null
     ) {
@@ -119,7 +117,7 @@ class ObjectManager implements ObjectManagerInterface
      * @param string $interfaceName
      * @return string
      */
-    private function getClassForInterface(string $interfaceName)
+    private function getClassForInterface($interfaceName)
     {
         $implementationName = '';
         if (strtolower(substr($interfaceName, -9)) === 'interface') {
