@@ -14,6 +14,7 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
+use Cundd\TestFlight\Output\ColorInterface;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
 use Cundd\TestFlight\TestRunner\CodeTestRunner;
@@ -170,7 +171,14 @@ class TestDispatcher
 
         /** @var TestRunnerInterface $testRunner */
         $testRunner = $this->objectManager
-            ->get($testRunnerClass, $this->classLoader, $this->objectManager, $this->environment, $this->printer, $this->exceptionPrinter);
+            ->get(
+                $testRunnerClass,
+                $this->classLoader,
+                $this->objectManager,
+                $this->environment,
+                $this->printer,
+                $this->exceptionPrinter
+            );
 
         return $testRunner->runTestDefinition($definition);
     }
@@ -188,13 +196,24 @@ class TestDispatcher
      */
     private function printFooter()
     {
-        $this->getPrinter()->println('');
-        $this->getPrinter()->println(
+        $footerContent = sprintf(
             'Tests: %d | Assertions: %d | Successful: %d | Failures: %d',
             $this->numberOfTests,
             Assert::getCount(),
             $this->successes,
             $this->failures
+        );
+
+        $color = $this->failures > 0
+            ? (ColorInterface::RED_BACKGROUND.ColorInterface::WHITE)
+            : (ColorInterface::GREEN_BACKGROUND.ColorInterface::WHITE);
+        $printer = $this->getPrinter();
+        $printer->println('');
+        $printer->println(
+            $printer->colorize(
+                $color,
+                $footerContent
+            )
         );
     }
 
