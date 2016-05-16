@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace Cundd\TestFlight;
 
+use Cundd\TestFlight\Autoload\Finder;
 use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\Cli\WindowHelper;
 use Cundd\TestFlight\Definition\DefinitionInterface;
@@ -94,6 +95,8 @@ class Bootstrap
     public function run(array $arguments)
     {
         $options = $this->prepareArguments($arguments);
+
+        $this->prepareCustomBootstrapAndAutoloading($options['bootstrap']);
 
         $this->printer->setVerbose($options['verbose']);
         $this->exceptionPrinter->setVerbose($options['verbose']);
@@ -207,6 +210,14 @@ class Bootstrap
             $options['verbose'] = false;
         }
 
+        if (isset($options['bootstrap'])) {
+            // Bootstrap is properly set
+        } elseif (isset($options['classloader'])) {
+            $options['bootstrap'] = $options['classloader'];
+        } else {
+            $options['bootstrap'] = '';
+        }
+
         return $options;
     }
 
@@ -266,7 +277,7 @@ class Bootstrap
     }
 
     /**
-     * 
+     *
      */
     private function checkDependencies()
     {
@@ -279,6 +290,25 @@ class Bootstrap
         }
         if (!is_callable('token_get_all')) {
             $this->error('Tokenizer must be enabled and callable (http://php.net/manual/en/book.tokenizer.php)');
+        }
+    }
+
+    /**
+     * Include the custom bootstrap file
+     *
+     * @param string $bootstrapFile
+     */
+    private function prepareCustomBootstrapAndAutoloading(string $bootstrapFile)
+    {
+        if ($bootstrapFile) {
+            require_once $bootstrapFile;
+        } else {
+            /** @var Finder $autoloadFinder */
+            $autoloadFinder = $this->objectManager->get(Finder::class);
+            $projectAutoloaderPath = $autoloadFinder->find(getcwd());
+            if ($projectAutoloaderPath !== '') {
+                require_once $projectAutoloaderPath;
+            }
         }
     }
 }
