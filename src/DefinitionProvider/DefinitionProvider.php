@@ -18,6 +18,7 @@ use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
 use Cundd\TestFlight\FileAnalysis\File;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
+use ReflectionClass;
 use ReflectionMethod;
 
 /**
@@ -135,7 +136,7 @@ class DefinitionProvider implements DefinitionProviderInterface
         FileInterface $file
     ) {
         $testMethods = [];
-        $reflectionClass = new \ReflectionClass($className);
+        $reflectionClass = new ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
             if (false !== strpos($method->getDocComment(), Constants::TEST_KEYWORD)) {
                 if ($this->getMethodIsStatic($method)) {
@@ -162,8 +163,30 @@ class DefinitionProvider implements DefinitionProviderInterface
         string $className,
         FileInterface $file
     ) {
+        $reflectionClass = new ReflectionClass($className);
+
+        $testMethods = $this->collectCodeDefinitionsForClassMethods($className, $file, $reflectionClass);
+
+        $definitionForClass = $this->buildCodeDefinitionForClass($className, $file, $reflectionClass);
+        if ($definitionForClass) {
+            $testMethods[] = $definitionForClass;
+        }
+
+        return $testMethods;
+    }
+
+    /**
+     * @param string          $className
+     * @param FileInterface   $file
+     * @param ReflectionClass $reflectionClass
+     * @return array
+     */
+    private function collectCodeDefinitionsForClassMethods(
+        string $className,
+        FileInterface $file,
+        $reflectionClass
+    ) {
         $testMethods = [];
-        $reflectionClass = new \ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
             if (false !== strpos($method->getDocComment(), Constants::EXAMPLE_KEYWORD)
                 || false !== strpos($method->getDocComment(), Constants::CODE_KEYWORD)
@@ -231,5 +254,30 @@ class DefinitionProvider implements DefinitionProviderInterface
             },
             \ReflectionException::class
         );
+    }
+
+    /**
+     * @param string          $className
+     * @param FileInterface   $file
+     * @param ReflectionClass $reflectionClass
+     * @return DocCommentCodeDefinition
+     */
+    private function buildCodeDefinitionForClass(
+        string $className,
+        FileInterface $file,
+        ReflectionClass $reflectionClass
+    ) {
+        if (false !== strpos($reflectionClass->getDocComment(), Constants::EXAMPLE_KEYWORD)
+            || false !== strpos($reflectionClass->getDocComment(), Constants::CODE_KEYWORD)
+        ) {
+            return new DocCommentCodeDefinition(
+                $className,
+                $this->codeExtractor->getCodeFromDocComment($reflectionClass->getDocComment()),
+                $file,
+                $className
+            );
+        }
+
+        return null;
     }
 }
