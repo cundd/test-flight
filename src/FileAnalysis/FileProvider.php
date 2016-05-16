@@ -19,6 +19,11 @@ use RegexIterator;
 
 /**
  * Class that scans for matching files
+ *
+ * <code>
+ *  $files = (new \Cundd\TestFlight\FileAnalysis\FileProvider())->findMatchingFiles(__DIR__.'/../');
+ *  assert($files[0] instanceof \Cundd\TestFlight\FileAnalysis\FileInterface);
+ * </code>
  */
 class FileProvider
 {
