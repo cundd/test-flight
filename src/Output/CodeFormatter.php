@@ -57,14 +57,14 @@ class CodeFormatter implements ColorInterface
      * @param bool   $enableColors
      * @return string
      */
-    public function formatCode(string $code, $enableColors): string
+    public function formatCode($code, $enableColors)
     {
         $block = [];
         $codeLines = explode("\n", $code);
 
         $this->enableColors = (bool)$enableColors;
         $this->numberOfLines = count($codeLines);
-        $this->gutterWidth = strlen((string)$this->numberOfLines) + 1;
+        $this->gutterWidth = strlen($this->numberOfLines) + 1;
 
         $i = 0;
         foreach ($codeLines as $lineNumber => $line) {
@@ -84,7 +84,7 @@ class CodeFormatter implements ColorInterface
      * @param string[] $block
      * @param int      $lineNumber
      */
-    private function prepareCodeLine(string $line, array &$block, int $lineNumber)
+    private function prepareCodeLine($line, array &$block, $lineNumber)
     {
         $width = $this->cliWindowHelper->getWidth() - $this->gutterWidth;
         $line = str_replace("\t", '    ', $line);
@@ -111,7 +111,7 @@ class CodeFormatter implements ColorInterface
      * @param string $endColor
      * @return string
      */
-    private function colorize(string $startColor, string $text, string $endColor = ''): string
+    private function colorize($startColor, $text, $endColor = '')
     {
         if ($this->enableColors) {
             return $startColor.$text.$endColor;
@@ -124,7 +124,7 @@ class CodeFormatter implements ColorInterface
      * @param $line
      * @return string
      */
-    private function colorizeLine(string $line): string
+    private function colorizeLine($line)
     {
         return $this->colorize(self::NORMAL.self::LIGHT_GRAY_BACKGROUND.self::DARK_GRAY, $line);
     }
@@ -133,7 +133,7 @@ class CodeFormatter implements ColorInterface
      * @param $line
      * @return string
      */
-    private function colorizeGutter(string $line): string
+    private function colorizeGutter($line)
     {
         return $this->colorize(self::NORMAL.self::LIGHT_GRAY_BACKGROUND.self::WHITE, $line);
     }

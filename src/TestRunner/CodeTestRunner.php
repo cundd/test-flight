@@ -35,7 +35,7 @@ class CodeTestRunner extends AbstractTestRunner
      * @param string $code
      * @return mixed
      */
-    private function evaluate(string $code)
+    private function evaluate($code)
     {
         return call_user_func(
             function () use ($code) {

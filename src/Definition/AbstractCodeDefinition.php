@@ -29,7 +29,7 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
     /**
      * @return string
      */
-    public function getCode(): string
+    public function getCode()
     {
         return $this->code;
     }
@@ -37,7 +37,7 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
     /**
      * @return FileInterface
      */
-    public function getFile(): FileInterface
+    public function getFile()
     {
         return $this->file;
     }
@@ -45,7 +45,7 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
     /**
      * @return string
      */
-    public function getFilePath(): string
+    public function getFilePath()
     {
         return $this->getFile()->getPath();
     }
@@ -55,7 +55,7 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
      *
      * @return string
      */
-    public function getPreProcessedCode(): string
+    public function getPreProcessedCode()
     {
         $code = $this->getCode();
 

@@ -19,7 +19,7 @@ class DocumentationFileProvider
      * @param FileInterface[] $files
      * @return array
      */
-    public function findDocumentationFiles(array $files): array
+    public function findDocumentationFiles(array $files)
     {
         return array_filter($files, function(FileInterface $file) {
             return substr($file->getPath(), -4) !== '.php';

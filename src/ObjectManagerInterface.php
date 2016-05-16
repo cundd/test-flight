@@ -5,8 +5,6 @@
  * Date: 18/04/16
  * Time: 21:03
  */
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight;
 
 
@@ -28,7 +26,7 @@ interface ObjectManagerInterface
      * @param array  $constructorArguments
      * @return object
      */
-    public function get(string $className, ...$constructorArguments);
+    public function get($className, ...$constructorArguments);
 
     /**
      * Returns a new instance of the given class
@@ -37,5 +35,5 @@ interface ObjectManagerInterface
      * @param array  $constructorArguments
      * @return object
      */
-    public function create(string $className, ...$constructorArguments);
+    public function create($className, ...$constructorArguments);
 }

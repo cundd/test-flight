@@ -18,12 +18,12 @@ interface CodeDefinitionInterface extends DefinitionInterface
      * 
      * @return string
      */
-    public function getCode() : string;
+    public function getCode();
 
     /**
      * Returns the pre-processed code
      *
      * @return string
      */
-    public function getPreProcessedCode(): string;
+    public function getPreProcessedCode();
 }

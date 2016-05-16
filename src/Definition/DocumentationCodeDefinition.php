@@ -5,8 +5,6 @@
  * Date: 16/04/16
  * Time: 22:34
  */
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight\Definition;
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
@@ -20,7 +18,7 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
      * @param string        $code
      * @param FileInterface $file
      */
-    public function __construct(string $code, FileInterface $file)
+    public function __construct($code, FileInterface $file)
     {
         $this->code = $code;
         $this->file = $file;
@@ -29,7 +27,7 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
     /**
      * @return string
      */
-    public function getClassName(): string
+    public function getClassName()
     {
         return '';
     }
@@ -39,7 +37,7 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
      *
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription()
     {
         $fileName = pathinfo($this->getFilePath(), PATHINFO_FILENAME);
         $testName = $fileName;
