@@ -61,7 +61,6 @@ class Bootstrap
         $this->objectManager = new ObjectManager();
         $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
-
         // Prepare the printers
         $windowHelper = $this->objectManager->get(WindowHelper::class);
         $codeFormatter = $this->objectManager->get(CodeFormatter::class, $windowHelper);
@@ -79,6 +78,7 @@ class Bootstrap
             $codeFormatter
         );
 
+        $this->checkDependencies();
         $this->initEnvironment();
         $this->printHeader();
 
@@ -263,5 +263,22 @@ class Bootstrap
         $classes = $classProvider->findClassesInFiles($allFiles);
 
         return $provider->createForClasses($classes);
+    }
+
+    /**
+     * 
+     */
+    private function checkDependencies()
+    {
+        if (php_sapi_name() !== 'cli') {
+            $this->error('Test-Flight must be run as CLI');
+        }
+        if (!class_exists('RecursiveDirectoryIterator')) {
+            // This must not happen
+            $this->error('SPL must be enabled');
+        }
+        if (!is_callable('token_get_all')) {
+            $this->error('Tokenizer must be enabled and callable (http://php.net/manual/en/book.tokenizer.php)');
+        }
     }
 }
