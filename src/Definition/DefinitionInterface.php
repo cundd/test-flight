@@ -22,26 +22,26 @@ interface DefinitionInterface
      *
      * @return string
      */
-    public function getClassName() : string;
+    public function getClassName();
 
     /**
      * Returns the file containing the test
      *
      * @return FileInterface
      */
-    public function getFile() : FileInterface;
+    public function getFile();
 
     /**
      * Returns the path to the file
      *
      * @return string
      */
-    public function getFilePath() : string;
+    public function getFilePath();
 
     /**
      * Returns a description for the output
      * 
      * @return string
      */
-    public function getDescription(): string;
+    public function getDescription();
 }

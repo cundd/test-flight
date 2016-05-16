@@ -29,7 +29,7 @@ interface DefinitionProviderInterface
      * @param array $classNameToFiles
      * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
      */
-    public function createForClasses(array $classNameToFiles) : array;
+    public function createForClasses(array $classNameToFiles);
 
     /**
      * Create the test definitions for the given documentation files
@@ -37,5 +37,5 @@ interface DefinitionProviderInterface
      * @param FileInterface[] $files
      * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
      */
-    public function createForDocumentation(array $files): array;
+    public function createForDocumentation(array $files);
 }

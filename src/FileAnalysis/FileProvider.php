@@ -5,8 +5,6 @@
  * Date: 16/04/16
  * Time: 13:05
  */
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight\FileAnalysis;
 
 
@@ -40,7 +38,7 @@ class FileProvider
      * @param string $path
      * @return FileInterface[]
      */
-    public function findMatchingFiles(string $path): array
+    public function findMatchingFiles($path)
     {
         $path = $this->validatePath($path);
 
@@ -67,7 +65,7 @@ class FileProvider
      * @param string $path
      * @return array
      */
-    private function findMatchingFilesInDirectory(string $path): array
+    private function findMatchingFilesInDirectory($path)
     {
         $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
         $regexIterator = new RegexIterator(
@@ -91,7 +89,7 @@ class FileProvider
      * @param string $path
      * @return string
      */
-    private function validatePath(string $path): string
+    private function validatePath($path)
     {
         $path = realpath($path) ?: $path;
 

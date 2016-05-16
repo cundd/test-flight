@@ -32,7 +32,7 @@ class File implements FileInterface
      *
      * @param string $path
      */
-    public function __construct(string $path)
+    public function __construct($path)
     {
         $this->path = $path;
     }
@@ -45,7 +45,7 @@ class File implements FileInterface
      *  assert(__FILE__ === $file->getPath())
      * @return string
      */
-    public function getPath(): string
+    public function getPath()
     {
         return $this->path;
     }
@@ -55,7 +55,7 @@ class File implements FileInterface
      *
      * @return string
      */
-    public function getName() : string
+    public function getName() 
     {
         return basename($this->path);
     }
@@ -63,7 +63,7 @@ class File implements FileInterface
     /**
      * @return string
      */
-    public function getContents(): string
+    public function getContents()
     {
         if (!$this->contents) {
             if (!file_exists($this->path)) {
@@ -83,7 +83,7 @@ class File implements FileInterface
      * @param string $keyword
      * @return bool
      */
-    public function containsKeyword(string $keyword): bool
+    public function containsKeyword($keyword)
     {
         return false !== strpos($this->getContents(), $keyword);
     }

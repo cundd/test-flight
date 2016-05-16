@@ -34,10 +34,13 @@ abstract class Assert
      * @param mixed  $assertion
      * @param string $message
      */
-    public static function assert($assertion, string $message = '')
+    public static function assert($assertion, $message = '')
     {
         self::$count += 1;
-        assert($assertion, new AssertionError($message));
+        
+        if (!$assertion) {
+            throw new AssertionError($message);
+        }
     }
 
     /**
@@ -57,7 +60,7 @@ abstract class Assert
      * @param string $message
      * @throws AssertionError if the values are not equal
      */
-    public static function assertSame($expected, $actual, string $message = '')
+    public static function assertSame($expected, $actual, $message = '')
     {
         self::$count += 1;
 
@@ -94,7 +97,7 @@ abstract class Assert
      * @param string $message
      * @throws AssertionError if the value is false, null, 0, '', '0', ...
      */
-    public static function assertTrue($actual, string $message = '')
+    public static function assertTrue($actual, $message = '')
     {
         self::$count += 1;
 
@@ -131,7 +134,7 @@ abstract class Assert
      * @param string $message
      * @throws AssertionError if the value is false, null, 0, '', '0', ...
      */
-    public static function assertFalse($actual, string $message = '')
+    public static function assertFalse($actual, $message = '')
     {
         self::$count += 1;
 
@@ -177,7 +180,7 @@ abstract class Assert
      * @param string   $message
      * @throws AssertionError
      */
-    public static function throws(callable $callback, string $expectedException = '', string $message = '')
+    public static function throws(callable $callback, $expectedException = '', $message = '')
     {
         self::$count += 1;
 
@@ -216,7 +219,7 @@ abstract class Assert
      * @param string $message
      * @throws AssertionError
      */
-    public static function assertInstanceOf(string $className, $actual, string $message = '')
+    public static function assertInstanceOf($className, $actual, $message = '')
     {
         self::$count += 1;
 
@@ -260,7 +263,7 @@ abstract class Assert
      * @param string $message
      * @throws AssertionError
      */
-    public static function assertTypeOf(string $type, $actual, string $message = '')
+    public static function assertTypeOf($type, $actual, $message = '')
     {
         self::$count += 1;
 
@@ -348,7 +351,7 @@ abstract class Assert
      *
      * @return int
      */
-    public static function getCount():int
+    public static function getCount()
     {
         return self::$count;
     }

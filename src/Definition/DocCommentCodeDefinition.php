@@ -5,8 +5,6 @@
  * Date: 16/04/16
  * Time: 22:34
  */
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight\Definition;
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
@@ -34,7 +32,7 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
      * @param FileInterface $file
      * @param string        $relatedMethodName
      */
-    public function __construct(string $className, string $code, FileInterface $file, string $relatedMethodName)
+    public function __construct($className, $code, FileInterface $file, $relatedMethodName)
     {
         $this->className = $className;
         $this->code = $code;
@@ -45,7 +43,7 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
     /**
      * @return string
      */
-    public function getClassName(): string
+    public function getClassName()
     {
         return $this->className;
     }
@@ -53,7 +51,7 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
     /**
      * @return string
      */
-    public function getRelatedMethodName(): string
+    public function getRelatedMethodName()
     {
         return $this->relatedMethodName;
     }
@@ -63,7 +61,7 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
      *
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription()
     {
         return sprintf(
             'DocComment test "%s"',

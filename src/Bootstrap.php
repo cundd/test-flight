@@ -6,8 +6,6 @@
  * Time: 22:16
  */
 
-declare(strict_types = 1);
-
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\Autoload\Finder;
@@ -243,7 +241,7 @@ class Bootstrap
      * @param string $message
      * @param int    $status
      */
-    private function error(string $message, $status = 1)
+    private function error($message, $status = 1)
     {
         $this->printer->printError($message);
         exit($status);
