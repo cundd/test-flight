@@ -182,7 +182,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @return array
      */
     private function collectCodeDefinitionsForClassMethods(
-        string $className,
+        $className,
         FileInterface $file,
         $reflectionClass
     ) {
@@ -263,7 +263,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @return DocCommentCodeDefinition
      */
     private function buildCodeDefinitionForClass(
-        string $className,
+        $className,
         FileInterface $file,
         ReflectionClass $reflectionClass
     ) {
