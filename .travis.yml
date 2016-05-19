@@ -16,5 +16,5 @@ before_script:
   - curl -OL test-flight.cundd.net/data/_Home.md
 
 script:
-  bin/test-flight src/
-  bin/test-flight _Home.md
+  bin/test-flight --bootstrap tests/resources/test-bootstrap.php src/
+  bin/test-flight --bootstrap tests/resources/test-bootstrap.php _Home.md

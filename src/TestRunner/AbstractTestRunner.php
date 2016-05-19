@@ -10,6 +10,7 @@ namespace Cundd\TestFlight\TestRunner;
 
 use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\Context\Context;
+use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Environment;
 use Cundd\TestFlight\Event\Event;
@@ -82,9 +83,10 @@ abstract class AbstractTestRunner implements TestRunnerInterface
 
     /**
      * @param DefinitionInterface $definition
-     * @return void
+     * @param ContextInterface    $context
+     * @return
      */
-    abstract protected function performTest(DefinitionInterface $definition);
+    abstract protected function performTest(DefinitionInterface $definition, ContextInterface $context);
 
     /**
      * @param DefinitionInterface $definition
@@ -99,7 +101,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
 
         error_clear_last();
         try {
-            $this->performTest($definition);
+            $this->performTest($definition, $context);
         } catch (\Error $exception) {
         } catch (\Exception $exception) {
         }
