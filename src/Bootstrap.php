@@ -313,13 +313,12 @@ class Bootstrap
     {
         if ($bootstrapFile) {
             require_once $bootstrapFile;
-        } else {
-            /** @var Finder $autoloadFinder */
-            $autoloadFinder = $this->objectManager->get(Finder::class);
-            $projectAutoloaderPath = $autoloadFinder->find(getcwd());
-            if ($projectAutoloaderPath !== '') {
-                require_once $projectAutoloaderPath;
-            }
+        }
+        /** @var Finder $autoloadFinder */
+        $autoloadFinder = $this->objectManager->get(Finder::class);
+        $projectAutoloaderPath = $autoloadFinder->find(getcwd());
+        if ($projectAutoloaderPath !== '') {
+            require_once $projectAutoloaderPath;
         }
     }
 }
