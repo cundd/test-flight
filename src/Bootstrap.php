@@ -47,6 +47,11 @@ class Bootstrap
     private $classLoader;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var PrinterInterface
      */
     private $printer;
@@ -80,6 +85,7 @@ class Bootstrap
             $windowHelper,
             $codeFormatter
         );
+        $this->eventDispatcher = $this->objectManager->get(EventDispatcherInterface::class);
 
         $this->checkDependencies();
         $this->initEnvironment();
@@ -113,7 +119,7 @@ class Bootstrap
             $this->environment,
             $this->printer,
             $this->exceptionPrinter,
-            $this->objectManager->get(EventDispatcherInterface::class)
+            $this->eventDispatcher
         );
 
         /** @var TestDispatcher $testDispatcher */
@@ -311,14 +317,18 @@ class Bootstrap
      */
     private function prepareCustomBootstrapAndAutoloading(string $bootstrapFile)
     {
-        if ($bootstrapFile) {
-            require_once $bootstrapFile;
-        }
         /** @var Finder $autoloadFinder */
         $autoloadFinder = $this->objectManager->get(Finder::class);
         $projectAutoloaderPath = $autoloadFinder->find(getcwd());
         if ($projectAutoloaderPath !== '') {
             require_once $projectAutoloaderPath;
         }
+
+        // The variable will be exported to the bootstrap file
+        $eventDispatcher = $this->eventDispatcher;
+        if ($bootstrapFile) {
+            require_once $bootstrapFile;
+        }
+        unset($eventDispatcher);
     }
 }
