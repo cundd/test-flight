@@ -15,6 +15,7 @@ use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\Cli\WindowHelper;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
+use Cundd\TestFlight\Event\EventDispatcherInterface;
 use Cundd\TestFlight\FileAnalysis\ClassProvider;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
 use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
@@ -23,6 +24,7 @@ use Cundd\TestFlight\FileAnalysis\FileProvider;
 use Cundd\TestFlight\Output\CodeFormatter;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
+use Cundd\TestFlight\TestRunner\TestRunnerFactory;
 
 /**
  * Bootstrap the test environment
@@ -102,17 +104,26 @@ class Bootstrap
         $this->exceptionPrinter->setVerbose($options['verbose']);
 
         $testDefinitions = $this->collectTestDefinitions($options);
-        /** @var TestDispatcher $testRunner */
-        $testRunner = $this->objectManager->get(
-            TestDispatcher::class,
+
+        /** @var TestRunnerFactory $testRunnerFactory */
+        $testRunnerFactory = $this->objectManager->get(
+            TestRunnerFactory::class,
             $this->classLoader,
             $this->objectManager,
             $this->environment,
             $this->printer,
-            $this->exceptionPrinter
+            $this->exceptionPrinter,
+            $this->objectManager->get(EventDispatcherInterface::class)
         );
 
-        $result = $testRunner->runTestDefinitions($testDefinitions);
+        /** @var TestDispatcher $testDispatcher */
+        $testDispatcher = $this->objectManager->get(
+            TestDispatcher::class,
+            $testRunnerFactory,
+            $this->printer
+        );
+
+        $result = $testDispatcher->runTestDefinitions($testDefinitions);
         $this->printFooter();
 
         return $result;

@@ -9,8 +9,11 @@
 namespace Cundd\TestFlight\TestRunner;
 
 use Cundd\TestFlight\ClassLoader;
+use Cundd\TestFlight\Context\Context;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Environment;
+use Cundd\TestFlight\Event\Event;
+use Cundd\TestFlight\Event\EventDispatcherInterface;
 use Cundd\TestFlight\ObjectManager;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
@@ -47,6 +50,11 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     protected $environment;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * TestRunner
      *
      * @param ClassLoader               $classLoader
@@ -54,19 +62,22 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      * @param Environment               $environment
      * @param PrinterInterface          $printer
      * @param ExceptionPrinterInterface $exceptionPrinter
+     * @param EventDispatcherInterface  $eventDispatcher
      */
     public function __construct(
         ClassLoader $classLoader,
         ObjectManager $objectManager,
         Environment $environment,
         PrinterInterface $printer,
-        ExceptionPrinterInterface $exceptionPrinter
+        ExceptionPrinterInterface $exceptionPrinter,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->classLoader = $classLoader;
         $this->objectManager = $objectManager;
         $this->printer = $printer;
         $this->exceptionPrinter = $exceptionPrinter;
         $this->environment = $environment;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -81,6 +92,8 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      */
     public function runTestDefinition(DefinitionInterface $definition): bool
     {
+        $context = new Context();
+        $this->eventDispatcher->dispatch(self::EVENT_TEST_WILL_RUN, new Event($definition, $context));
         $this->prepareTestRunnerForDefinition($definition);
         $exception = null;
 
@@ -91,6 +104,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         } catch (\Exception $exception) {
         }
         $this->environment->reset();
+        $this->eventDispatcher->dispatch(self::EVENT_TEST_DID_RUN, new Event($definition, $context));
 
         if ($exception !== null) {
             $this->printException($definition, $exception);

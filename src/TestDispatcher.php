@@ -15,28 +15,17 @@ use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
 use Cundd\TestFlight\Output\ColorInterface;
-use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
 use Cundd\TestFlight\TestRunner\CodeTestRunner;
 use Cundd\TestFlight\TestRunner\MethodTestRunner;
 use Cundd\TestFlight\TestRunner\StaticMethodTestRunner;
-use Cundd\TestFlight\TestRunner\TestRunnerInterface;
+use Cundd\TestFlight\TestRunner\TestRunnerFactory;
 
 /**
  * Class to forward the test definitions to the matching test runner
  */
 class TestDispatcher
 {
-    /**
-     * @var ClassLoader
-     */
-    protected $classLoader;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
     /**
      * @var int
      */
@@ -58,38 +47,24 @@ class TestDispatcher
     private $printer;
 
     /**
-     * @var ExceptionPrinterInterface
+     * @var TestRunnerFactory
      */
-    private $exceptionPrinter;
+    private $testRunnerFactory;
 
     /**
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * TestRunner
+     * TestDispatcher constructor
      *
-     * @param ClassLoader               $classLoader
-     * @param ObjectManager             $objectManager
-     * @param Environment               $environment
-     * @param PrinterInterface          $printer
-     * @param ExceptionPrinterInterface $exceptionPrinter
+     * @param TestRunnerFactory $testRunnerFactory
+     * @param PrinterInterface  $printer
      */
     public function __construct(
-        ClassLoader $classLoader,
-        ObjectManager $objectManager,
-        Environment $environment,
-        PrinterInterface $printer,
-        ExceptionPrinterInterface $exceptionPrinter
+        TestRunnerFactory $testRunnerFactory,
+        PrinterInterface $printer
     ) {
-        $this->classLoader = $classLoader;
-        $this->objectManager = $objectManager;
-        $this->environment = $environment;
+        $this->testRunnerFactory = $testRunnerFactory;
         $this->printer = $printer;
-        $this->exceptionPrinter = $exceptionPrinter;
     }
-
+    
     /**
      * @param DefinitionInterface[] $testCollection
      * @return bool Return if all tests succeeded
@@ -128,8 +103,6 @@ class TestDispatcher
                 } else {
                     $this->failures += 1;
                 }
-
-                $this->environment->reset();
             }
         }
     }
@@ -169,18 +142,9 @@ class TestDispatcher
         $this->numberOfTests += 1;
         $this->printTestInfo($definition);
 
-        /** @var TestRunnerInterface $testRunner */
-        $testRunner = $this->objectManager
-            ->get(
-                $testRunnerClass,
-                $this->classLoader,
-                $this->objectManager,
-                $this->environment,
-                $this->printer,
-                $this->exceptionPrinter
-            );
-
-        return $testRunner->runTestDefinition($definition);
+        return $this->testRunnerFactory
+            ->create($testRunnerClass)
+            ->runTestDefinition($definition);
     }
 
     /**
