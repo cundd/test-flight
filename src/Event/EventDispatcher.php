@@ -9,7 +9,6 @@
 namespace Cundd\TestFlight\Event;
 
 
-use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Event\Exception\InvalidEventCodeException;
 
 /**
@@ -40,16 +39,16 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Invoke all event listeners for the given event code
      *
-     * @param string              $eventCode
-     * @param DefinitionInterface $definition
+     * @param string         $eventCode
+     * @param EventInterface $event
      * @return $this
      */
-    public function dispatch(string $eventCode, DefinitionInterface $definition)
+    public function dispatch(string $eventCode, EventInterface $event)
     {
         $this->assertValidEventCode($eventCode);
         if (true === isset($this->eventListeners[$eventCode])) {
             foreach ($this->eventListeners[$eventCode] as $listener) {
-                $listener($definition);
+                $listener($event);
             }
         }
 

@@ -7,9 +7,6 @@
  */
 namespace Cundd\TestFlight\Event;
 
-use Cundd\TestFlight\Definition\DefinitionInterface;
-
-
 /**
  * Dispatcher for builtin events
  */
@@ -27,9 +24,9 @@ interface EventDispatcherInterface
     /**
      * Invoke all event listeners for the given event code
      *
-     * @param string              $eventCode
-     * @param DefinitionInterface $definition
+     * @param string         $eventCode
+     * @param EventInterface $definition
      * @return $this
      */
-    public function dispatch(string $eventCode, DefinitionInterface $definition);
+    public function dispatch(string $eventCode, EventInterface $definition);
 }

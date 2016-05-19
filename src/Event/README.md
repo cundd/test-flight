@@ -11,33 +11,32 @@ Register listeners
 $dispatcher = new \Cundd\TestFlight\Event\EventDispatcher();
 
 // Functions
-function increaseCounter() {}
+function increaseCounter(\Cundd\TestFlight\Event\EventInterface $event) {}
 $dispatcher->register('my.event', 'increaseCounter');
 
 // Static methods
 class StaticMethodClass
 {
-    public static function method() {}
+    public static function method(\Cundd\TestFlight\Event\EventInterface $event) {}
 }
 $dispatcher->register('my.event', [StaticMethodClass::class, 'method']);
 
 // Member methods
 class MemberFunctionClass
 {
-    public function method() {}
+    public function method(\Cundd\TestFlight\Event\EventInterface $event) {}
 }
 $dispatcher->register('my.event', [(new MemberFunctionClass()), 'method']);
 
 // Callable classes
 class CallableClass
 {
-    public function __invoke() {}
+    public function __invoke(\Cundd\TestFlight\Event\EventInterface $event) {}
 }
 $dispatcher->register('my.event', (new CallableClass()));
 
 // Closures
-$listenerClosure = function (\Cundd\TestFlight\Definition\DefinitionInterface $definition) {
-};
+$listenerClosure = function (\Cundd\TestFlight\Event\EventInterface $event) {};
 $dispatcher->register('my.event', $listenerClosure);
 ```
 
@@ -45,12 +44,13 @@ Dispatch an event
 -----------------
 
 ```php
-$dispatcher = new \Cundd\TestFlight\Event\EventDispatcher();
+class MyEvent implements \Cundd\TestFlight\Event\EventInterface {}
 
-$dummyFile = new \Cundd\TestFlight\FileAnalysis\File(__FILE__);
+$dispatcher = new \Cundd\TestFlight\Event\EventDispatcher();
+$event = new MyEvent();
 $dispatcher->dispatch(
     'my.event',
-    new Cundd\TestFlight\Definition\MethodDefinition('', '', $dummyFile)
+    $event
 );
 ```
 
@@ -59,7 +59,10 @@ Example
 -------
 
 ```php
+
 namespace Cundd\TestFlight\Event\Test;
+
+class MyEvent implements \Cundd\TestFlight\Event\EventInterface {}
 
 class Counter
 {
@@ -70,14 +73,14 @@ class Counter
     public static $invokeMember = false;
 }
 
-function increaseCounter()
+function increaseCounter(\Cundd\TestFlight\Event\EventInterface $event)
 {
     Counter::$function = true;
 }
 
 class StaticMethodClass
 {
-    public static function method()
+    public static function method(\Cundd\TestFlight\Event\EventInterface $event)
     {
         Counter::$invokeStatic = true;
     }
@@ -85,7 +88,7 @@ class StaticMethodClass
 
 class MemberFunctionClass
 {
-    public function method()
+    public function method(\Cundd\TestFlight\Event\EventInterface $event)
     {
         Counter::$invokeMember = true;
     }
@@ -93,14 +96,14 @@ class MemberFunctionClass
 
 class CallableClass
 {
-    public function __invoke()
+    public function __invoke(\Cundd\TestFlight\Event\EventInterface $event)
     {
         Counter::$invokeClass = true;
     }
 }
 
 $dispatcher = new \Cundd\TestFlight\Event\EventDispatcher();
-$listenerClosure = function (\Cundd\TestFlight\Definition\DefinitionInterface $definition) {
+$listenerClosure = function () {
     Counter::$closure = true;
 };
 $dispatcher
@@ -110,10 +113,11 @@ $dispatcher
     ->register('my.event', (new CallableClass()))
     ->register('my.event', [StaticMethodClass::class, 'method']);
 
-$dummyFile = new \Cundd\TestFlight\FileAnalysis\File(__FILE__);
+
+$event = new MyEvent();
 $dispatcher->dispatch(
     'my.event',
-    new \Cundd\TestFlight\Definition\MethodDefinition('f', 'b', $dummyFile)
+    $event
 );
 
 test_flight_assert(Counter::$closure, 'Closure not executed');
