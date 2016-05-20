@@ -130,6 +130,22 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     }
 
     /**
+     * @param array $error
+     * @param int   $code
+     * @return ErrorException
+     */
+    protected function createExceptionFromError(array $error, $code = 0)
+    {
+        return new ErrorException(
+            $error['message'],
+            $code,
+            $error['type'],
+            $error['file'],
+            $error['line']
+        );
+    }
+
+    /**
      * @param DefinitionInterface $definition
      * @param \Throwable          $exception
      */
@@ -148,22 +164,6 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         } else {
             $this->printer->printf('.');
         }
-    }
-
-    /**
-     * @param array $error
-     * @param int   $code
-     * @return ErrorException
-     */
-    private function createExceptionFromError(array $error, $code = 0)
-    {
-        return new ErrorException(
-            $error['message'],
-            $code,
-            $error['type'],
-            $error['file'],
-            $error['line']
-        );
     }
 
     /**

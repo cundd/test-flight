@@ -39,11 +39,40 @@ class CodeTestRunner extends AbstractTestRunner
      */
     private function evaluate(string $code, ContextInterface $context)
     {
+        set_error_handler([$this, 'handleError']);
+
         return call_user_func(
             function () use ($code, $context) {
                 extract($context->getVariables());
+
                 return eval($code);
             }
+        );
+    }
+
+    /**
+     * @param int    $errorNo
+     * @param string $errorMessage
+     * @param string $errorFile
+     * @param int    $errorLine
+     * @param array  $errorContext
+     * @throws \ErrorException
+     */
+    private function handleError(
+        int $errorNo,
+        string $errorMessage,
+        string $errorFile,
+        int $errorLine,
+        array $errorContext
+    ) {
+        // TODO: Allow to configure the error types that should be transformed to exceptions
+        throw $this->createExceptionFromError(
+            [
+                'message' => $errorMessage,
+                'type'    => $errorNo,
+                'file'    => $errorFile,
+                'line'    => $errorLine,
+            ]
         );
     }
 
