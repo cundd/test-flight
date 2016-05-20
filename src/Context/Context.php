@@ -73,12 +73,39 @@ class Context implements ContextInterface
      *  $variables = $ctx->getVariables();
      *  test_flight_assert(!isset($variables['a']));
      * </code>
+     *
      * @param string $key
      * @return ContextInterface
      */
     public function unsetVariable(string $key): ContextInterface
     {
         unset($this->variables[$key]);
+
+        return $this;
+    }
+
+    /**
+     * Set all variables from the given dictionary
+     *
+     * <code>
+     *  $ctx = new \Cundd\TestFlight\Context\Context();
+     *  $ctx->addVariables([
+     *      'a' => 'b',
+     *      'c' => 100,
+     *  ]);
+     *  $variables = $ctx->getVariables();
+     *  test_flight_assert(isset($variables['a']), 'Variable "a" not defined');
+     *  test_flight_assert_same('b', $variables['a']);
+     *  test_flight_assert(isset($variables['c']), 'Variable "c" not defined');
+     *  test_flight_assert_same(100, $variables['c']);
+     * </code>
+     *
+     * @param array $variables
+     * @return ContextInterface
+     */
+    public function addVariables(array $variables): ContextInterface
+    {
+        $this->variables = array_merge($this->variables, $variables);
 
         return $this;
     }

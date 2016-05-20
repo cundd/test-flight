@@ -36,4 +36,12 @@ interface ContextInterface
      * @return ContextInterface
      */
     public function unsetVariable(string $key): ContextInterface;
+
+    /**
+     * Set all variables from the given dictionary
+     *
+     * @param array $variables
+     * @return ContextInterface
+     */
+    public function addVariables(array $variables): ContextInterface;
 }
