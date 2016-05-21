@@ -14,6 +14,7 @@ use Cundd\TestFlight\Autoload\Finder;
 use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\Cli\WindowHelper;
 use Cundd\TestFlight\Configuration\ConfigurationProviderInterface;
+use Cundd\TestFlight\Configuration\Exception\ConfigurationException;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
 use Cundd\TestFlight\Event\EventDispatcherInterface;
@@ -110,35 +111,44 @@ class Bootstrap
      */
     public function run(array $arguments)
     {
-        $this->prepareConfigurationProvider($arguments);
-        $this->prepareCustomBootstrapAndAutoloading($this->configurationProvider->get('bootstrap'));
-        $this->printer->setVerbose($this->configurationProvider->get('verbose'));
-        $this->exceptionPrinter->setVerbose($this->configurationProvider->get('verbose'));
+        $exception = null;
+        try {
+            $this->prepareConfigurationProvider($arguments);
+            $this->prepareCustomBootstrapAndAutoloading($this->configurationProvider->get('bootstrap'));
+            $this->printer->setVerbose($this->configurationProvider->get('verbose'));
+            $this->exceptionPrinter->setVerbose($this->configurationProvider->get('verbose'));
 
-        $testDefinitions = $this->collectTestDefinitions();
+            $testDefinitions = $this->collectTestDefinitions();
 
-        /** @var TestRunnerFactory $testRunnerFactory */
-        $testRunnerFactory = $this->objectManager->get(
-            TestRunnerFactory::class,
-            $this->classLoader,
-            $this->objectManager,
-            $this->environment,
-            $this->printer,
-            $this->exceptionPrinter,
-            $this->eventDispatcher
-        );
+            /** @var TestRunnerFactory $testRunnerFactory */
+            $testRunnerFactory = $this->objectManager->get(
+                TestRunnerFactory::class,
+                $this->classLoader,
+                $this->objectManager,
+                $this->environment,
+                $this->printer,
+                $this->exceptionPrinter,
+                $this->eventDispatcher
+            );
 
-        /** @var TestDispatcher $testDispatcher */
-        $testDispatcher = $this->objectManager->get(
-            TestDispatcher::class,
-            $testRunnerFactory,
-            $this->printer
-        );
+            /** @var TestDispatcher $testDispatcher */
+            $testDispatcher = $this->objectManager->get(
+                TestDispatcher::class,
+                $testRunnerFactory,
+                $this->printer
+            );
 
-        $result = $testDispatcher->runTestDefinitions($testDefinitions);
-        $this->printFooter();
+            $result = $testDispatcher->runTestDefinitions($testDefinitions);
+            $this->printFooter();
 
-        return $result;
+            return $result;
+        } catch (ConfigurationException $exception) {
+        } catch (FileNotExistsException $exception) {
+        }
+        
+        $this->error($exception->getMessage());
+
+        return null;
     }
 
     /**
@@ -150,12 +160,7 @@ class Bootstrap
 
         /** @var FileProvider $fileProvider */
         $fileProvider = $this->objectManager->get(FileProvider::class);
-        try {
-            $allFiles = $fileProvider->findMatchingFiles($testPath);
-        } catch (FileNotExistsException $exception) {
-            $this->error($exception->getMessage());
-            return [];
-        }
+        $allFiles = $fileProvider->findMatchingFiles($testPath);
         $codeExtractor = $this->objectManager->get(CodeExtractor::class);
 
         /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
@@ -240,7 +245,7 @@ class Bootstrap
         }
 
         // Check for a configuration file
-        if (!isset($options['configuration']) ) {
+        if (!isset($options['configuration'])) {
             $localConfigurationFilePath = getcwd().'/'.ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
             if (file_exists($localConfigurationFilePath)) {
                 $options['configuration'] = $localConfigurationFilePath;
