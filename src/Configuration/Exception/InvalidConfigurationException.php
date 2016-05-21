@@ -11,6 +11,6 @@ namespace Cundd\TestFlight\Configuration\Exception;
 /**
  * Exception thrown for invalid configuration
  */
-class InvalidConfigurationException extends \RuntimeException
+class InvalidConfigurationException extends ConfigurationException
 {
 }
