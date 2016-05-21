@@ -234,7 +234,13 @@ class Bootstrap
             $options['bootstrap'] = '';
         }
 
-        $options['configuration'] = isset($options['configuration']) ? $options['configuration'] : '';
+        // Check for a configuration file
+        if (!isset($options['configuration']) ) {
+            $localConfigurationFilePath = getcwd().'/'.ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
+            if (file_exists($localConfigurationFilePath)) {
+                $options['configuration'] = $localConfigurationFilePath;
+            }
+        }
 
         $this->configurationProvider->setConfiguration($options);
 

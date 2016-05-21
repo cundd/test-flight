@@ -13,6 +13,8 @@ namespace Cundd\TestFlight\Configuration;
  */
 interface ConfigurationProviderInterface
 {
+    const LOCAL_CONFIGURATION_FILE_NAME = '.test-flight.json';
+    
     /**
      * Returns the configuration for the given key
      *
