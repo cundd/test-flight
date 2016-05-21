@@ -32,15 +32,28 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function __construct(array $coreConfiguration = [])
     {
-        if (isset($coreConfiguration['configuration'])) {
-            $coreConfiguration = array_merge(
-                $this->load($coreConfiguration['configuration']),
-                $coreConfiguration
-            );
-        }
-        $this->configuration = $coreConfiguration;
+        $this->setConfiguration($coreConfiguration);
     }
 
+    /**
+     * Sets the underlying configuration
+     *
+     * @param array $configuration
+     * @return ConfigurationProviderInterface
+     */
+    public function setConfiguration(array $configuration): ConfigurationProviderInterface
+    {
+        if (isset($configuration['configuration']) && $configuration['configuration']) {
+            $configuration = array_merge(
+                $this->load($configuration['configuration']),
+                $configuration
+            );
+        }
+
+        $this->configuration = $configuration;
+
+        return $this;
+    }
 
     /**
      * Returns the configuration for the given key
@@ -49,6 +62,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      *  $cp = new \Cundd\TestFlight\Configuration\ConfigurationProvider(
      *      ['configuration' => __DIR__ . '/../../tests/resources/test-configuration.json']
      *  );
+     *  test_flight_assert_same('/tests/resources/test-bootstrap.php', substr($cp->get('bootstrap'), -35));
+     *
+     *  $cp = new \Cundd\TestFlight\Configuration\ConfigurationProvider();
+     *  $cp->setConfiguration(['configuration' => __DIR__ . '/../../tests/resources/test-configuration.json']);
      *  test_flight_assert_same('/tests/resources/test-bootstrap.php', substr($cp->get('bootstrap'), -35));
      * </code>
      *

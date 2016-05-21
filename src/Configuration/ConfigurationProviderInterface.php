@@ -27,4 +27,12 @@ interface ConfigurationProviderInterface
      * @return mixed
      */
     public function get(string $key);
+
+    /**
+     * Sets the underlying configuration
+     *
+     * @param array $configuration
+     * @return ConfigurationProviderInterface
+     */
+    public function setConfiguration(array $configuration): ConfigurationProviderInterface;
 }
