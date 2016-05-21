@@ -93,9 +93,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             );
         }
 
-        $data = json_decode($file->getContents(), true);
+        $data = json_decode($this->prepareJsonContent($file), true);
         if (json_last_error() > 0) {
-            throw new InvalidJsonException(json_last_error_msg(), 1463827638);
+            throw new InvalidJsonException('Invalid JSON configuration: '.json_last_error_msg(), 1463827638);
         }
         if (!is_array($data)) {
             throw new InvalidConfigurationException('JSON configuration data must be an array', 1463827639);
@@ -127,6 +127,15 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         }
 
         $configuration[$key] = realpath($path) ?: $path;
+    }
+
+    /**
+     * @param $file
+     * @return string
+     */
+    private function prepareJsonContent(FileInterface $file): string
+    {
+        return preg_replace('!//.*!', '', $file->getContents());
     }
 
     /**

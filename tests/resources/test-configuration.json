@@ -1,4 +1,4 @@
 {
-    "bootstrap": "test-bootstrap.php",
-    "path": "../../src/"
+    "path": "../../src/", // Comments are supported
+    "bootstrap": "test-bootstrap.php"
 }
