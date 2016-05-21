@@ -127,9 +127,8 @@ class FileProvider
      */
     protected function findMatchingFilesTest()
     {
-        $expectedNumberOfFiles = 19;
-        // x <= y files with @test + 1 constants interface
-        $files = $this->findMatchingFiles(__DIR__.'/../');
+        $expectedNumberOfFiles = 4;
+        $files = $this->findMatchingFiles(__DIR__);
         assert(
             count($files) === $expectedNumberOfFiles,
             sprintf('Expected %d test files, found %d', $expectedNumberOfFiles, count($files))
