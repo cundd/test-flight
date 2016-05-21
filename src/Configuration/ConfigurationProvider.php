@@ -45,8 +45,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     {
         if (isset($configuration['configuration']) && $configuration['configuration']) {
             $configuration = array_merge(
+                $configuration,
                 $this->load($configuration['configuration']),
-                $configuration
+                array_filter($configuration)
             );
         }
 
@@ -100,28 +101,32 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             throw new InvalidConfigurationException('JSON configuration data must be an array', 1463827639);
         }
 
-        if (isset($data['bootstrap'])) {
-            $data['bootstrap'] = $this->preparePath($data['bootstrap'], $file);
-        }
+        $this->preparePathInConfiguration($data, 'bootstrap', $file);
+        $this->preparePathInConfiguration($data, 'path', $file);
 
         return $data;
     }
 
     /**
-     * @param string        $inputPath
+     * @param array         $configuration
+     * @param string        $key
      * @param FileInterface $file
-     * @return string
      */
-    private function preparePath(string $inputPath, FileInterface $file): string
+    private function preparePathInConfiguration(array &$configuration, string $key, FileInterface $file)
     {
-        if (!$inputPath) {
-            return '';
-        }
-        if ($inputPath[0] !== '/') {
-            $inputPath = $file->getParent().'/'.$inputPath;
+        if (!isset($configuration[$key])) {
+            return;
         }
 
-        return realpath($inputPath) ?: $inputPath;
+        $path = $configuration[$key];
+        if (!$path) {
+            return;
+        }
+        if ($path[0] !== '/') {
+            $path = $file->getParent().'/'.$path;
+        }
+
+        $configuration[$key] = realpath($path) ?: $path;
     }
 
     /**

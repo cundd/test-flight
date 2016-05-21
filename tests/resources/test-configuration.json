@@ -1,3 +1,4 @@
 {
-    "bootstrap": "test-bootstrap.php"
+    "bootstrap": "test-bootstrap.php",
+    "path": "../../src/"
 }

@@ -13,6 +13,7 @@ namespace Cundd\TestFlight;
 use Cundd\TestFlight\Autoload\Finder;
 use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\Cli\WindowHelper;
+use Cundd\TestFlight\Configuration\ConfigurationProviderInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
 use Cundd\TestFlight\Event\EventDispatcherInterface;
@@ -52,6 +53,11 @@ class Bootstrap
     private $eventDispatcher;
 
     /**
+     * @var ConfigurationProviderInterface
+     */
+    private $configurationProvider;
+
+    /**
      * @var PrinterInterface
      */
     private $printer;
@@ -67,6 +73,7 @@ class Bootstrap
     public function init()
     {
         $this->objectManager = new ObjectManager();
+        $this->configurationProvider = $this->objectManager->get(ConfigurationProviderInterface::class);
         $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
         // Prepare the printers
@@ -102,14 +109,12 @@ class Bootstrap
      */
     public function run(array $arguments)
     {
-        $options = $this->prepareArguments($arguments);
+        $this->prepareConfigurationProvider($arguments);
+        $this->prepareCustomBootstrapAndAutoloading($this->configurationProvider->get('bootstrap'));
+        $this->printer->setVerbose($this->configurationProvider->get('verbose'));
+        $this->exceptionPrinter->setVerbose($this->configurationProvider->get('verbose'));
 
-        $this->prepareCustomBootstrapAndAutoloading($options['bootstrap']);
-
-        $this->printer->setVerbose($options['verbose']);
-        $this->exceptionPrinter->setVerbose($options['verbose']);
-
-        $testDefinitions = $this->collectTestDefinitions($options);
+        $testDefinitions = $this->collectTestDefinitions();
 
         /** @var TestRunnerFactory $testRunnerFactory */
         $testRunnerFactory = $this->objectManager->get(
@@ -136,12 +141,11 @@ class Bootstrap
     }
 
     /**
-     * @param array $options
      * @return Definition\DefinitionInterface[]
      */
-    private function collectTestDefinitions(array $options)
+    private function collectTestDefinitions()
     {
-        $testPath = $options['path'];
+        $testPath = $this->configurationProvider->get('path');
 
         /** @var FileProvider $fileProvider */
         $fileProvider = $this->objectManager->get(FileProvider::class);
@@ -151,8 +155,8 @@ class Bootstrap
 
         /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
         $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
-        if (0 !== count($options['types'])) {
-            $provider->setTypes($options['types']);
+        if (0 !== count($this->configurationProvider->get('types'))) {
+            $provider->setTypes($this->configurationProvider->get('types'));
         }
 
         return array_merge(
@@ -200,17 +204,12 @@ class Bootstrap
 
     /**
      * @param string[] $arguments
-     * @return array
      * @throws \Exception
      */
-    private function prepareArguments(array $arguments)
+    private function prepareConfigurationProvider(array $arguments)
     {
         $options = $this->objectManager->get(OptionParser::class)->parse($arguments);
 
-        if (!isset($options['path'])) {
-            // TODO: Read the composer.json and scan the sources?
-            $this->error('Please specify a path to look for tests');
-        }
         if (isset($options['types'])) {
             $options['types'] = explode(',', $options['types']);
         } elseif (isset($options['type'])) {
@@ -235,7 +234,14 @@ class Bootstrap
             $options['bootstrap'] = '';
         }
 
-        return $options;
+        $options['configuration'] = isset($options['configuration']) ? $options['configuration'] : '';
+
+        $this->configurationProvider->setConfiguration($options);
+
+        if (!$this->configurationProvider->get('path')) {
+            // TODO: Read the composer.json and scan the sources?
+            $this->error('Please specify a path to look for tests');
+        }
     }
 
     /**
