@@ -27,6 +27,20 @@ interface FileInterface
     public function getName() : string;
 
     /**
+     * Returns the file extension
+     *
+     * @return string
+     */
+    public function getExtension(): string;
+
+    /**
+     * Returns the file parent (dirname)
+     *
+     * @return string
+     */
+    public function getParent(): string;
+
+    /**
      * Returns the file contents
      *
      * @return string
