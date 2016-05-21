@@ -1,0 +1,4 @@
+{
+    "path": "src/", // Equivalent to `vendor/bin/test-flight src`
+    "bootstrap": "tests/resources/test-bootstrap.php" // Equivalent to `vendor/bin/test-flight --bootstrap tests/resources/test-bootstrap.php`
+}
