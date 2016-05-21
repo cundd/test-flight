@@ -95,10 +95,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
         $data = json_decode($this->prepareJsonContent($file), true);
         if (json_last_error() > 0) {
-            throw new InvalidJsonException('Invalid JSON configuration: '.json_last_error_msg(), 1463827638);
+            throw new InvalidJsonException(
+                sprintf('Invalid JSON configuration in file %s: %s', $file->getPath(), json_last_error_msg()),
+                1463827638
+            );
         }
         if (!is_array($data)) {
-            throw new InvalidConfigurationException('JSON configuration data must be an array', 1463827639);
+            throw new InvalidConfigurationException(
+                sprintf('JSON configuration data must be an array in file %s', $file->getPath()),
+                1463827639
+            );
         }
 
         $this->preparePathInConfiguration($data, 'bootstrap', $file);
