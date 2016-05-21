@@ -99,6 +99,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         $this->prepareTestRunnerForDefinition($definition);
         $exception = null;
 
+        set_error_handler([$this, 'handleError']);
         error_clear_last();
         try {
             $this->performTest($definition, $context);
@@ -127,6 +128,32 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         );
 
         return false;
+    }
+
+    /**
+     * @param int    $errorNo
+     * @param string $errorMessage
+     * @param string $errorFile
+     * @param int    $errorLine
+     * @param array  $errorContext
+     * @throws \ErrorException
+     */
+    public function handleError(
+        int $errorNo,
+        string $errorMessage,
+        string $errorFile,
+        int $errorLine,
+        array $errorContext
+    ) {
+        // TODO: Allow to configure the error types that should be transformed to exceptions
+        throw $this->createExceptionFromError(
+            [
+                'message' => $errorMessage,
+                'type'    => $errorNo,
+                'file'    => $errorFile,
+                'line'    => $errorLine,
+            ]
+        );
     }
 
     /**
