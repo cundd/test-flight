@@ -5,6 +5,15 @@ php:
   - hhvm
   - nightly
 
+env:
+  - BOOTSTRAP_ARGUMENT=yes  CONFIGURATION_ARGUMENT=yes  CONFIGURATION_FILE=yes
+  - BOOTSTRAP_ARGUMENT=yes  CONFIGURATION_ARGUMENT=yes  CONFIGURATION_FILE=no
+  - BOOTSTRAP_ARGUMENT=yes  CONFIGURATION_ARGUMENT=no   CONFIGURATION_FILE=yes
+  - BOOTSTRAP_ARGUMENT=no   CONFIGURATION_ARGUMENT=yes  CONFIGURATION_FILE=yes
+  - BOOTSTRAP_ARGUMENT=yes  CONFIGURATION_ARGUMENT=no   CONFIGURATION_FILE=no
+  - BOOTSTRAP_ARGUMENT=no   CONFIGURATION_ARGUMENT=yes  CONFIGURATION_FILE=no
+  - BOOTSTRAP_ARGUMENT=no   CONFIGURATION_ARGUMENT=no   CONFIGURATION_FILE=yes
+
 matrix:
   allow_failures:
     - php: hhvm
@@ -16,5 +25,19 @@ before_script:
   - curl -OL test-flight.cundd.net/data/_Home.md
 
 script:
-  bin/test-flight --bootstrap tests/resources/test-bootstrap.php src/
-  bin/test-flight --bootstrap tests/resources/test-bootstrap.php _Home.md
+  - >
+    local arguments="";
+    if [[ "$BOOTSTRAP_ARGUMENT" == "yes" ]]; then
+      arguments="--bootstrap tests/resources/test-bootstrap.php $arguments";
+    fi
+
+    if [[ "$CONFIGURATION_ARGUMENT" == "yes" ]]; then
+      arguments="--configuration tests/resources/test-configuration.json $arguments";
+    fi
+
+    if [[ "$CONFIGURATION_FILE" == "no" ]]; then
+      rm .test-flight.json
+    fi
+
+    bin/test-flight $arguments src/
+    bin/test-flight $arguments _Home.md
