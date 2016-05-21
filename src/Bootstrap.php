@@ -17,6 +17,7 @@ use Cundd\TestFlight\Configuration\ConfigurationProviderInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
 use Cundd\TestFlight\Event\EventDispatcherInterface;
+use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\FileAnalysis\ClassProvider;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
 use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
@@ -149,8 +150,12 @@ class Bootstrap
 
         /** @var FileProvider $fileProvider */
         $fileProvider = $this->objectManager->get(FileProvider::class);
-
-        $allFiles = $fileProvider->findMatchingFiles($testPath);
+        try {
+            $allFiles = $fileProvider->findMatchingFiles($testPath);
+        } catch (FileNotExistsException $exception) {
+            $this->error($exception->getMessage());
+            return [];
+        }
         $codeExtractor = $this->objectManager->get(CodeExtractor::class);
 
         /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
