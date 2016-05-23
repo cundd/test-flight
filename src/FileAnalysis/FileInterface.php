@@ -31,14 +31,14 @@ interface FileInterface
      *
      * @return string
      */
-    public function getExtension(): string;
+    public function getExtension();
 
     /**
      * Returns the file parent (dirname)
      *
      * @return string
      */
-    public function getParent(): string;
+    public function getParent();
 
     /**
      * Returns the file contents

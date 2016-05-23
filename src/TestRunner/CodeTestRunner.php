@@ -37,7 +37,7 @@ class CodeTestRunner extends AbstractTestRunner
      * @param ContextInterface $context
      * @return mixed
      */
-    private function evaluate(string $code, ContextInterface $context)
+    private function evaluate($code, ContextInterface $context)
     {
         return call_user_func(
             function () use ($code, $context) {

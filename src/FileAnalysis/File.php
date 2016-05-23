@@ -65,7 +65,7 @@ class File implements FileInterface
      *
      * @return string
      */
-    public function getExtension(): string
+    public function getExtension()
     {
         return pathinfo($this->path, PATHINFO_EXTENSION);
     }
@@ -75,7 +75,7 @@ class File implements FileInterface
      *
      * @return string
      */
-    public function getParent(): string
+    public function getParent()
     {
         return dirname($this->path);
     }

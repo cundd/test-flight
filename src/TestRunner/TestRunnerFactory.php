@@ -83,7 +83,7 @@ class TestRunnerFactory
      * @param string $testRunnerClass
      * @return TestRunnerInterface
      */
-    public function create(string $testRunnerClass)
+    public function create($testRunnerClass)
     {
         $testRunner = $this->objectManager->get(
             $testRunnerClass,

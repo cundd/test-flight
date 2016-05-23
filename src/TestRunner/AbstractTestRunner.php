@@ -100,7 +100,6 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         $exception = null;
 
         set_error_handler([$this, 'handleError']);
-        error_clear_last();
         self::error_clear_last();
         try {
             $this->performTest($definition, $context);
@@ -140,10 +139,10 @@ abstract class AbstractTestRunner implements TestRunnerInterface
      * @throws \ErrorException
      */
     public function handleError(
-        int $errorNo,
-        string $errorMessage,
-        string $errorFile,
-        int $errorLine,
+        $errorNo,
+        $errorMessage,
+        $errorFile,
+        $errorLine,
         array $errorContext
     ) {
         // TODO: Allow to configure the error types that should be transformed to exceptions

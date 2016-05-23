@@ -31,7 +31,7 @@ class Context implements ContextInterface
      *
      * @return array
      */
-    public function getVariables(): array
+    public function getVariables()
     {
         return $this->variables;
     }
@@ -55,7 +55,7 @@ class Context implements ContextInterface
      * @param mixed  $value
      * @return ContextInterface
      */
-    public function setVariable(string $key, $value): ContextInterface
+    public function setVariable($key, $value)
     {
         $this->variables[$key] = $value;
 
@@ -77,7 +77,7 @@ class Context implements ContextInterface
      * @param string $key
      * @return ContextInterface
      */
-    public function unsetVariable(string $key): ContextInterface
+    public function unsetVariable($key)
     {
         unset($this->variables[$key]);
 
@@ -103,7 +103,7 @@ class Context implements ContextInterface
      * @param array $variables
      * @return ContextInterface
      */
-    public function addVariables(array $variables): ContextInterface
+    public function addVariables(array $variables)
     {
         $this->variables = array_merge($this->variables, $variables);
 

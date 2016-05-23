@@ -19,7 +19,7 @@ interface EventDispatcherInterface
      * @param callable $listener
      * @return $this
      */
-    public function register(string $eventCode, callable $listener);
+    public function register($eventCode, callable $listener);
 
     /**
      * Invoke all event listeners for the given event code
@@ -28,5 +28,5 @@ interface EventDispatcherInterface
      * @param EventInterface $definition
      * @return $this
      */
-    public function dispatch(string $eventCode, EventInterface $definition);
+    public function dispatch($eventCode, EventInterface $definition);
 }

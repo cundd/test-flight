@@ -25,7 +25,7 @@ class EventDispatcher implements EventDispatcherInterface
      * @param callable $listener
      * @return $this
      */
-    public function register(string $eventCode, callable $listener)
+    public function register($eventCode, callable $listener)
     {
         $this->assertValidEventCode($eventCode);
         if (false === isset($this->eventListeners[$eventCode])) {
@@ -43,7 +43,7 @@ class EventDispatcher implements EventDispatcherInterface
      * @param EventInterface $event
      * @return $this
      */
-    public function dispatch(string $eventCode, EventInterface $event)
+    public function dispatch($eventCode, EventInterface $event)
     {
         $this->assertValidEventCode($eventCode);
         if (true === isset($this->eventListeners[$eventCode])) {
@@ -58,7 +58,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * @param string $eventCode
      */
-    private function assertValidEventCode(string $eventCode)
+    private function assertValidEventCode($eventCode)
     {
         if (!ctype_alnum(str_replace(['.', '_'], '', $eventCode))) {
             throw new InvalidEventCodeException(sprintf('Invalid event code "%s"', $eventCode));

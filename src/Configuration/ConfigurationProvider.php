@@ -41,7 +41,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      * @param array $configuration
      * @return ConfigurationProviderInterface
      */
-    public function setConfiguration(array $configuration): ConfigurationProviderInterface
+    public function setConfiguration(array $configuration)
     {
         if (isset($configuration['configuration']) && $configuration['configuration']) {
             $configuration = array_merge(
@@ -73,16 +73,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      * @param string $key
      * @return mixed
      */
-    public function get(string $key)
+    public function get($key)
     {
-        return $this->configuration[$key] ?? null;
+        return isset($this->configuration[$key]) ? $this->configuration[$key] : null;
     }
 
     /**
      * @param string $path
      * @return array
      */
-    private function load($path): array
+    private function load($path)
     {
         $file = new File($path);
 
@@ -118,7 +118,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      * @param string        $key
      * @param FileInterface $file
      */
-    private function preparePathInConfiguration(array &$configuration, string $key, FileInterface $file)
+    private function preparePathInConfiguration(array &$configuration, $key, FileInterface $file)
     {
         if (!isset($configuration[$key])) {
             return;
@@ -139,7 +139,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      * @param $file
      * @return string
      */
-    private function prepareJsonContent(FileInterface $file): string
+    private function prepareJsonContent(FileInterface $file)
     {
         return preg_replace('!//.*!', '', $file->getContents());
     }

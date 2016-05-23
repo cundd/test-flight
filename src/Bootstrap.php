@@ -72,6 +72,7 @@ class Bootstrap
      */
     public function init()
     {
+        ini_set('display_errors', '1');
         $this->objectManager = new ObjectManager();
         $this->configurationProvider = $this->objectManager->get(ConfigurationProviderInterface::class);
         $this->classLoader = $this->objectManager->get(ClassLoader::class);

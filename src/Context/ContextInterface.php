@@ -18,7 +18,7 @@ interface ContextInterface
      *
      * @return array
      */
-    public function getVariables(): array;
+    public function getVariables();
 
     /**
      * Store the variable with the given key
@@ -27,7 +27,7 @@ interface ContextInterface
      * @param mixed  $value
      * @return ContextInterface
      */
-    public function setVariable(string $key, $value): ContextInterface;
+    public function setVariable( $key, $value);
 
     /**
      * Deletes the variable with the given key
@@ -35,7 +35,7 @@ interface ContextInterface
      * @param string $key
      * @return ContextInterface
      */
-    public function unsetVariable(string $key): ContextInterface;
+    public function unsetVariable( $key);
 
     /**
      * Set all variables from the given dictionary
@@ -43,5 +43,5 @@ interface ContextInterface
      * @param array $variables
      * @return ContextInterface
      */
-    public function addVariables(array $variables): ContextInterface;
+    public function addVariables(array $variables);
 }

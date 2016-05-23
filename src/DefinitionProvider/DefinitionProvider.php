@@ -210,7 +210,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @return DocCommentCodeDefinition
      */
     private function buildCodeDefinitionForClass(
-        string $className,
+        $className,
         FileInterface $file,
         ReflectionClass $reflectionClass
     ) {
