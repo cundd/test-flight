@@ -168,12 +168,15 @@ abstract class Assert
      *  assert($didThrow);
      *
      *  $didThrowWrongException = false;
+     *  $exceptionMessage = '';
      *  try {
      *      test_flight_throws(function() { throw new \LogicException(); }, 'RuntimeException');
      *  } catch (\Cundd\TestFlight\Exception\AssertionError $e) {
      *      $didThrowWrongException = true;
+     *      $exceptionMessage = $e->getMessage();
      *  }
-     *  assert($didThrowWrongException);
+     *  assert($didThrowWrongException, 'No exception thrown');
+     *  assert('Expected RuntimeException got LogicException' === $exceptionMessage, 'Exception message does not match');
      *
      * @param callable $callback
      * @param string   $expectedException

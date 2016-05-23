@@ -61,6 +61,26 @@ class File implements FileInterface
     }
 
     /**
+     * Returns the file extension
+     *
+     * @return string
+     */
+    public function getExtension(): string
+    {
+        return pathinfo($this->path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Returns the file parent (dirname)
+     *
+     * @return string
+     */
+    public function getParent(): string
+    {
+        return dirname($this->path);
+    }
+
+    /**
      * @return string
      */
     public function getContents()

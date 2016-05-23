@@ -9,6 +9,7 @@
 namespace Cundd\TestFlight\TestRunner;
 
 
+use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 
@@ -20,25 +21,28 @@ class CodeTestRunner extends AbstractTestRunner
 {
     /**
      * @param CodeDefinitionInterface|DefinitionInterface $definition
-     * @return void
+     * @param ContextInterface                            $context
      */
-    protected function performTest(DefinitionInterface $definition)
+    protected function performTest(DefinitionInterface $definition, ContextInterface $context)
     {
         $preprocessedCode = $definition->getPreProcessedCode();
         if (!$preprocessedCode || $preprocessedCode === ';') {
             $this->printer->warn('No test code given');
         }
-        $this->evaluate($preprocessedCode);
+        $this->evaluate($preprocessedCode, $context);
     }
 
     /**
-     * @param string $code
+     * @param string           $code
+     * @param ContextInterface $context
      * @return mixed
      */
-    private function evaluate($code)
+    private function evaluate(string $code, ContextInterface $context)
     {
         return call_user_func(
-            function () use ($code) {
+            function () use ($code, $context) {
+                extract($context->getVariables());
+
                 return eval($code);
             }
         );

@@ -1,0 +1,4 @@
+{
+    "path": "../../src/", // Comments are supported
+    "bootstrap": "test-bootstrap.php"
+}

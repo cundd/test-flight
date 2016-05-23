@@ -11,8 +11,12 @@ namespace Cundd\TestFlight;
 use Cundd\TestFlight\Autoload\Finder;
 use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\Cli\WindowHelper;
+use Cundd\TestFlight\Configuration\ConfigurationProviderInterface;
+use Cundd\TestFlight\Configuration\Exception\ConfigurationException;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
+use Cundd\TestFlight\Event\EventDispatcherInterface;
+use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\FileAnalysis\ClassProvider;
 use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
 use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
@@ -21,6 +25,7 @@ use Cundd\TestFlight\FileAnalysis\FileProvider;
 use Cundd\TestFlight\Output\CodeFormatter;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
+use Cundd\TestFlight\TestRunner\TestRunnerFactory;
 
 /**
  * Bootstrap the test environment
@@ -43,6 +48,16 @@ class Bootstrap
     private $classLoader;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var ConfigurationProviderInterface
+     */
+    private $configurationProvider;
+
+    /**
      * @var PrinterInterface
      */
     private $printer;
@@ -58,6 +73,7 @@ class Bootstrap
     public function init()
     {
         $this->objectManager = new ObjectManager();
+        $this->configurationProvider = $this->objectManager->get(ConfigurationProviderInterface::class);
         $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
         // Prepare the printers
@@ -76,6 +92,7 @@ class Bootstrap
             $windowHelper,
             $codeFormatter
         );
+        $this->eventDispatcher = $this->objectManager->get(EventDispatcherInterface::class);
 
         $this->checkDependencies();
         $this->initEnvironment();
@@ -92,48 +109,62 @@ class Bootstrap
      */
     public function run(array $arguments)
     {
-        $options = $this->prepareArguments($arguments);
+        $exception = null;
+        try {
+            $this->prepareConfigurationProvider($arguments);
+            $this->prepareCustomBootstrapAndAutoloading($this->configurationProvider->get('bootstrap'));
+            $this->printer->setVerbose($this->configurationProvider->get('verbose'));
+            $this->exceptionPrinter->setVerbose($this->configurationProvider->get('verbose'));
 
-        $this->prepareCustomBootstrapAndAutoloading($options['bootstrap']);
+            $testDefinitions = $this->collectTestDefinitions();
 
-        $this->printer->setVerbose($options['verbose']);
-        $this->exceptionPrinter->setVerbose($options['verbose']);
+            /** @var TestRunnerFactory $testRunnerFactory */
+            $testRunnerFactory = $this->objectManager->get(
+                TestRunnerFactory::class,
+                $this->classLoader,
+                $this->objectManager,
+                $this->environment,
+                $this->printer,
+                $this->exceptionPrinter,
+                $this->eventDispatcher
+            );
 
-        $testDefinitions = $this->collectTestDefinitions($options);
-        /** @var TestDispatcher $testRunner */
-        $testRunner = $this->objectManager->get(
-            TestDispatcher::class,
-            $this->classLoader,
-            $this->objectManager,
-            $this->environment,
-            $this->printer,
-            $this->exceptionPrinter
-        );
+            /** @var TestDispatcher $testDispatcher */
+            $testDispatcher = $this->objectManager->get(
+                TestDispatcher::class,
+                $testRunnerFactory,
+                $this->printer
+            );
 
-        $result = $testRunner->runTestDefinitions($testDefinitions);
-        $this->printFooter();
+            $result = $testDispatcher->runTestDefinitions($testDefinitions);
+            $this->printFooter();
 
-        return $result;
+            return $result;
+        } catch (ConfigurationException $exception) {
+        } catch (FileNotExistsException $exception) {
+        }
+        
+        $this->error($exception->getMessage());
+
+        return null;
     }
 
     /**
-     * @param array $options
      * @return Definition\DefinitionInterface[]
      */
-    private function collectTestDefinitions(array $options)
+    private function collectTestDefinitions()
     {
-        $testPath = $options['path'];
+        $testPath = $this->configurationProvider->get('path');
 
         /** @var FileProvider $fileProvider */
         $fileProvider = $this->objectManager->get(FileProvider::class);
-
         $allFiles = $fileProvider->findMatchingFiles($testPath);
         $codeExtractor = $this->objectManager->get(CodeExtractor::class);
 
         /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
         $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
-        if (0 !== count($options['types'])) {
-            $provider->setTypes($options['types']);
+        if (0 !== count($this->configurationProvider->get('types'))) {
+            $provider->setTypes($this->configurationProvider->get('types'));
         }
 
         return array_merge(
@@ -181,17 +212,12 @@ class Bootstrap
 
     /**
      * @param string[] $arguments
-     * @return array
      * @throws \Exception
      */
-    private function prepareArguments(array $arguments)
+    private function prepareConfigurationProvider(array $arguments)
     {
         $options = $this->objectManager->get(OptionParser::class)->parse($arguments);
 
-        if (!isset($options['path'])) {
-            // TODO: Read the composer.json and scan the sources?
-            $this->error('Please specify a path to look for tests');
-        }
         if (isset($options['types'])) {
             $options['types'] = explode(',', $options['types']);
         } elseif (isset($options['type'])) {
@@ -216,7 +242,20 @@ class Bootstrap
             $options['bootstrap'] = '';
         }
 
-        return $options;
+        // Check for a configuration file
+        if (!isset($options['configuration'])) {
+            $localConfigurationFilePath = getcwd().'/'.ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
+            if (file_exists($localConfigurationFilePath)) {
+                $options['configuration'] = $localConfigurationFilePath;
+            }
+        }
+
+        $this->configurationProvider->setConfiguration($options);
+
+        if (!$this->configurationProvider->get('path')) {
+            // TODO: Read the composer.json and scan the sources?
+            $this->error('Please specify a path to look for tests');
+        }
     }
 
     /**
@@ -298,15 +337,18 @@ class Bootstrap
      */
     private function prepareCustomBootstrapAndAutoloading($bootstrapFile)
     {
+        /** @var Finder $autoloadFinder */
+        $autoloadFinder = $this->objectManager->get(Finder::class);
+        $projectAutoloaderPath = $autoloadFinder->find(getcwd());
+        if ($projectAutoloaderPath !== '') {
+            require_once $projectAutoloaderPath;
+        }
+
+        // The variable will be exported to the bootstrap file
+        $eventDispatcher = $this->eventDispatcher;
         if ($bootstrapFile) {
             require_once $bootstrapFile;
-        } else {
-            /** @var Finder $autoloadFinder */
-            $autoloadFinder = $this->objectManager->get(Finder::class);
-            $projectAutoloaderPath = $autoloadFinder->find(getcwd());
-            if ($projectAutoloaderPath !== '') {
-                require_once $projectAutoloaderPath;
-            }
         }
+        unset($eventDispatcher);
     }
 }

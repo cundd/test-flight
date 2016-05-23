@@ -9,6 +9,7 @@
 namespace Cundd\TestFlight\TestRunner;
 
 
+use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
 
@@ -19,20 +20,19 @@ class StaticMethodTestRunner extends AbstractTestRunner
 {
     /**
      * @param StaticMethodDefinition|DefinitionInterface $definition
-     * @return void
+     * @param ContextInterface                           $context
      */
-    protected function performTest(DefinitionInterface $definition)
+    protected function performTest(DefinitionInterface $definition, ContextInterface $context)
     {
         $className = $definition->getClassName();
         $methodName = $definition->getMethodName();
 
         if ($definition->getMethodIsPublic()) {
-            call_user_func([$className, $methodName]);
+            call_user_func([$className, $methodName], $context);
         } else {
-            $method = new \ReflectionMethod($className, $methodName);
+            $method = $definition->getReflectionMethod();
             $method->setAccessible(true);
-            $method->invoke(null);
+            $method->invoke(null, $context);
         }
     }
-
 }
