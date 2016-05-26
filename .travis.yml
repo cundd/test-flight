@@ -39,5 +39,10 @@ script:
       rm .test-flight.json
     fi
 
-    bin/test-flight $arguments src/
-    bin/test-flight $arguments _Home.md
+    bin/test-flight $arguments;
+    bin/test-flight $arguments src/;
+    bin/test-flight $arguments _Home.md;
+
+    bin/test-flight --list $arguments;
+    bin/test-flight --list $arguments src/;
+    bin/test-flight --list $arguments _Home.md;
