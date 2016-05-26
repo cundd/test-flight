@@ -17,11 +17,17 @@ class OptionParser
      * Parse CLI arguments
      *
      * <code>
-     *  $arguments = ['path/to/cli-script', 'the/path', '--type', 'doccomment', '-v'];
+     *  $arguments = ['path/to/cli-script', 'the/path', '--type', 'doccomment', '-v', '--verbose', '--list', ''];
      *  $parser = new \Cundd\TestFlight\Cli\OptionParser();
      *  $parsedArguments = $parser->parse($arguments);
      *  test_flight_assert(is_array($parsedArguments));
-     *  test_flight_assert($parsedArguments === ['path' => 'the/path', 'type' => 'doccomment', 'v' => true]);
+     *  test_flight_assert_same([
+     *      'path' => 'the/path',
+     *      'type' => 'doccomment',
+     *      'v' => true,
+     *      'verbose' => true,
+     *      'list' => '',
+     *  ], $parsedArguments);
      * </code>
      *
      * @param string[] $arguments
@@ -40,12 +46,12 @@ class OptionParser
 
                 if (strpos($name, '=') !== false) {
                     list($name, $value) = explode('=', $name);
-                } elseif ($i + 1 < $argumentsLength) {
+                } elseif ($this->nextElementIsValueElement($arguments, $i, $argumentsLength)) {
                     $i += 1;
 
                     $value = $arguments[$i];
                 } else {
-                    throw new \Exception('Invalid arguments');
+                    $value = true;
                 }
                 $preparedArguments[$name] = $value;
             } elseif ($currentArgument[0] === '-') { // Flag option
@@ -56,5 +62,20 @@ class OptionParser
         }
 
         return $preparedArguments;
+    }
+
+    /**
+     * @param array $arguments
+     * @param       $currentIndex
+     * @param       $argumentsLength
+     * @return bool
+     */
+    private function nextElementIsValueElement(array $arguments, $currentIndex, $argumentsLength)
+    {
+        return $currentIndex + 1 < $argumentsLength
+        && is_string($arguments[$currentIndex + 1])
+        && (
+            strlen($arguments[$currentIndex + 1]) === 0 || $arguments[$currentIndex + 1][0] !== '-'
+        );
     }
 }
