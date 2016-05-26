@@ -15,6 +15,8 @@ use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\MethodDefinition;
+use Cundd\TestFlight\Exception\AssertionError;
+use Cundd\TestFlight\TestRunner\AbstractTestRunner;
 
 /**
  * Special printer for exception output
@@ -57,7 +59,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $traceAsString = $this->getTraceAsString($definition, $exception);
         $this->printError(
-            "Error %s #%s during test %s: \n%s \nin %s\n\n%s",
+            "\nError %s #%s during test %s \n%s \nin %s\n\n%s",
             get_class($exception),
             $exception->getCode(),
             $this->getTestDescriptionForDefinition($definition),
@@ -78,7 +80,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     ) {
         if ($definition instanceof AbstractMethodDefinition) {
             return sprintf(
-                '%s%s%s()',
+                '%s%s%s():',
                 $definition->getClassName(),
                 $definition->getMethodIsStatic() ? '::' : '->',
                 $definition->getMethodName()
@@ -86,7 +88,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         } elseif ($definition instanceof CodeDefinitionInterface) {
             $description = $definition->getDescription();
             if ($this->getVerbose()) {
-                $description .= "\nCode:\n"
+                $description .= ":\nCode:\n"
                     .$this->codeFormatter->formatCode(
                         $definition->getPreProcessedCode(),
                         $this->getEnableColoredOutput()
@@ -118,6 +120,10 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         $stackTraceCount = count($stackTrace);
         for ($i = 0; $i < $stackTraceCount; $i++) {
             $step = $stackTrace[$i];
+
+            if ($this->shouldStopTraceAtStep($step)) {
+                break;
+            }
             $stepAsString = $this->getTraceStepAsString($step, $i);
 
             if ($enableColoredOutput && $this->getTraceStepIsTestMethod($definition, $step, $previousStep)) {
@@ -129,6 +135,19 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         }
 
         return implode("\n", $stringParts);
+    }
+
+    /**
+     * Stop printing the stack trace at \Cundd\TestFlight\TestRunner\AbstractTestRunner->runTestDefinition()
+     *
+     * @param array $step
+     * @return bool
+     */
+    private function shouldStopTraceAtStep($step)
+    {
+        return isset($step['class'])
+        && $step['class'] === AbstractTestRunner::class
+        && $step['function'] === 'runTestDefinition';
     }
 
     /**
@@ -233,7 +252,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
      */
     private function getTestLocationForDefinitionAndException(DefinitionInterface $definition, $exception): string
     {
-        if ($definition instanceof DocCommentCodeDefinition) {
+        if ($exception instanceof AssertionError) {
             return $definition->getFilePath();
         }
 
@@ -276,12 +295,14 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         rewind($tempOutputStream);
         $output = stream_get_contents($tempOutputStream);
 
-        $testString = 'Error Exception #0 during test '
+        $testString = "\n"
+            .'Error Exception #0 during test '
             .'Cundd\\TestFlight\\Output\\ExceptionPrinter->thisIsTheDummyTestMethodForTheTest(): '
             ."\n"
             .'ExceptionMessage';
-        test_flight_assert(
-            $testString === substr($output, 0, strlen($testString))
+        test_flight_assert_same(
+            $testString,
+            substr($output, 0, strlen($testString))
         );
     }
 }
