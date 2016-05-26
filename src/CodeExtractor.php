@@ -46,7 +46,7 @@ class CodeExtractor
         $codeLines = array_filter(
             array_map(
                 function ($line) {
-                    return ltrim($line, " \t\n\r\0\x0B*");
+                    return ltrim(ltrim($line, " \t\n\r\0\x0B"), '*');
                 },
                 explode("\n", $matches)
             )
