@@ -72,7 +72,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * Create the test definitions for the given classes
      *
      * @param array $classNameToFiles
-     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
+     * @return DefinitionInterface[][]
      */
     public function createForClasses(array $classNameToFiles): array
     {
@@ -88,15 +88,35 @@ class DefinitionProvider implements DefinitionProviderInterface
      * Create the test definitions for the given documentation files
      *
      * @param FileInterface[] $files
-     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
+     * @return DefinitionInterface[][]
      */
     public function createForDocumentation(array $files): array
     {
         if (in_array(Constants::TEST_TYPE_DOCUMENTATION, $this->types)) {
-            return array_map([$this, 'collectDefinitionsForFile'], $files);
+            $definitions = [];
+            foreach ($files as $file) {
+                $key = $this->getTestGroupNameForDocumentationFile($file);
+                $definitions[$key] = $this->collectDefinitionsForFile($file);
+            }
+
+            return $definitions;
         }
 
         return [];
+    }
+
+    /**
+     * @param FileInterface $file
+     * @return string
+     */
+    private function getTestGroupNameForDocumentationFile(FileInterface $file)
+    {
+        $name = $file->getName();
+        if (substr(strtolower($name), 0, 7) === 'readme.') {
+            $name = basename($file->getParent()) . ': Readme';
+        }
+
+        return $name;
     }
 
     /**
@@ -157,7 +177,7 @@ class DefinitionProvider implements DefinitionProviderInterface
     /**
      * @param string        $className
      * @param FileInterface $file
-     * @return array
+     * @return DocCommentCodeDefinition[]
      */
     private function collectCodeDefinitionsForClass(
         string $className,
@@ -179,7 +199,7 @@ class DefinitionProvider implements DefinitionProviderInterface
      * @param string          $className
      * @param FileInterface   $file
      * @param ReflectionClass $reflectionClass
-     * @return array
+     * @return DocCommentCodeDefinition[]
      */
     private function collectCodeDefinitionsForClassMethods(
         string $className,
