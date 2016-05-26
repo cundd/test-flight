@@ -70,6 +70,11 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
             "'".dirname($filePath)."'",
             $code
         );
+        $code = preg_replace(
+            '/([^\w:])(__CLASS__)\(/',
+            '$1'.$this->getClassName().'(',
+            $code
+        );
         $code = str_replace(
             '__CLASS__',
             "'".$this->getClassName()."'",
