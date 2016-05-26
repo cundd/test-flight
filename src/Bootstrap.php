@@ -11,21 +11,16 @@ namespace Cundd\TestFlight;
 use Cundd\TestFlight\Autoload\Finder;
 use Cundd\TestFlight\Cli\OptionParser;
 use Cundd\TestFlight\Cli\WindowHelper;
+use Cundd\TestFlight\Command\CommandInterface;
+use Cundd\TestFlight\Command\ListCommand;
+use Cundd\TestFlight\Command\RunCommand;
 use Cundd\TestFlight\Configuration\ConfigurationProviderInterface;
 use Cundd\TestFlight\Configuration\Exception\ConfigurationException;
-use Cundd\TestFlight\Definition\DefinitionInterface;
-use Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface;
 use Cundd\TestFlight\Event\EventDispatcherInterface;
 use Cundd\TestFlight\Exception\FileNotExistsException;
-use Cundd\TestFlight\FileAnalysis\ClassProvider;
-use Cundd\TestFlight\DefinitionProvider\DefinitionProvider;
-use Cundd\TestFlight\FileAnalysis\DocumentationFileProvider;
-use Cundd\TestFlight\FileAnalysis\FileInterface;
-use Cundd\TestFlight\FileAnalysis\FileProvider;
 use Cundd\TestFlight\Output\CodeFormatter;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
-use Cundd\TestFlight\TestRunner\TestRunnerFactory;
 
 /**
  * Bootstrap the test environment
@@ -108,7 +103,7 @@ class Bootstrap
      * @param array $arguments
      * @return bool
      */
-    public function run(array $arguments)
+    public function run(array $arguments): bool
     {
         $exception = null;
         try {
@@ -117,61 +112,38 @@ class Bootstrap
             $this->printer->setVerbose($this->configurationProvider->get('verbose'));
             $this->exceptionPrinter->setVerbose($this->configurationProvider->get('verbose'));
 
-            $testDefinitions = $this->collectTestDefinitions();
+            switch ($this->configurationProvider->get('command')) {
+                case 'list':
+                    $commandClass = ListCommand::class;
+                    break;
 
-            /** @var TestRunnerFactory $testRunnerFactory */
-            $testRunnerFactory = $this->objectManager->get(
-                TestRunnerFactory::class,
-                $this->classLoader,
+                case 'run':
+                default:
+                    $commandClass = RunCommand::class;
+                    break;
+            }
+
+            /** @var CommandInterface $command */
+            $command = $this->objectManager->get(
+                $commandClass,
+                $this->configurationProvider,
                 $this->objectManager,
-                $this->environment,
+                $this->classLoader,
                 $this->printer,
-                $this->exceptionPrinter,
-                $this->eventDispatcher
+                $this->exceptionPrinter
             );
+            $result = $command->run();
 
-            /** @var TestDispatcher $testDispatcher */
-            $testDispatcher = $this->objectManager->get(
-                TestDispatcher::class,
-                $testRunnerFactory,
-                $this->printer
-            );
-
-            $result = $testDispatcher->runTestDefinitions($testDefinitions);
             $this->printFooter();
 
             return $result;
         } catch (ConfigurationException $exception) {
         } catch (FileNotExistsException $exception) {
         }
-        
+
         $this->error($exception->getMessage());
 
-        return null;
-    }
-
-    /**
-     * @return Definition\DefinitionInterface[]
-     */
-    private function collectTestDefinitions()
-    {
-        $testPath = $this->configurationProvider->get('path');
-
-        /** @var FileProvider $fileProvider */
-        $fileProvider = $this->objectManager->get(FileProvider::class);
-        $allFiles = $fileProvider->findMatchingFiles($testPath);
-        $codeExtractor = $this->objectManager->get(CodeExtractor::class);
-
-        /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
-        $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
-        if (0 !== count($this->configurationProvider->get('types'))) {
-            $provider->setTypes($this->configurationProvider->get('types'));
-        }
-
-        return array_merge(
-            $this->collectTestDefinitionsForClasses($provider, $allFiles),
-            $this->collectTestDefinitionsForDocumentation($provider, $allFiles)
-        );
+        return false;
     }
 
     /**
@@ -243,6 +215,12 @@ class Bootstrap
             $options['bootstrap'] = '';
         }
 
+        if (isset($options['list']) && $options['list']) {
+            $options['command'] = 'list';
+        } elseif (!isset($options['command'])) {
+            $options['command'] = 'run';
+        }
+
         // Check for a configuration file
         if (!isset($options['configuration'])) {
             $localConfigurationFilePath = getcwd().'/'.ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
@@ -285,33 +263,6 @@ class Bootstrap
     {
         $this->printer->printError($message);
         exit($status);
-    }
-
-    /**
-     * @param DefinitionProviderInterface $provider
-     * @param FileInterface[]             $allFiles
-     * @return DefinitionInterface[]
-     */
-    private function collectTestDefinitionsForDocumentation(DefinitionProviderInterface $provider, array $allFiles)
-    {
-        /** @var DocumentationFileProvider $documentationFileProvider */
-        $documentationFileProvider = $this->objectManager->get(DocumentationFileProvider::class);
-        $documentationFiles = $documentationFileProvider->findDocumentationFiles($allFiles);
-
-        return $provider->createForDocumentation($documentationFiles);
-    }
-
-    /**
-     * @param DefinitionProviderInterface $provider
-     * @param FileInterface[]             $allFiles
-     * @return DefinitionInterface[]
-     */
-    private function collectTestDefinitionsForClasses(DefinitionProviderInterface $provider, array $allFiles)
-    {
-        $classProvider = $this->objectManager->get(ClassProvider::class);
-        $classes = $classProvider->findClassesInFiles($allFiles);
-
-        return $provider->createForClasses($classes);
     }
 
     /**

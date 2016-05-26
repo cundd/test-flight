@@ -45,12 +45,13 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
         if ($testName[0] === '_') {
             $testName = substr($testName, 1);
         }
-        if ($testName === 'README') {
-            $testName = basename(dirname($this->getFilePath())).' - Readme';
+        if (strtoupper($testName) === 'README') {
+            $testName = basename(dirname($this->getFilePath())).': Readme';
         }
 
         return sprintf(
-            'Documentation test "%s"',
+            '%s "%s"',
+            $this->getType(),
             str_replace(
                 '  ',
                 ' ',
@@ -59,6 +60,16 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
                 )
             )
         );
+    }
+
+    /**
+     * Returns the descriptive type of the definition
+     *
+     * @return string
+     */
+    public function getType(): string
+    {
+        return 'Documentation test';
     }
 
     /**
@@ -91,9 +102,12 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
 $someValue = true;
 assert($someValue)';
         $definition = new DocumentationCodeDefinition($originalCode, $file);
-        test_flight_assert_same('
+        test_flight_assert_same(
+            '
 $someValue = true;
-test_flight_assert($someValue)', $definition->getPreProcessedCode());
+test_flight_assert($someValue)',
+            $definition->getPreProcessedCode()
+        );
 
         $originalCode = '\Cundd\TestFlight\Assert::assertSame(true)';
         $definition = new DocumentationCodeDefinition($originalCode, $file);

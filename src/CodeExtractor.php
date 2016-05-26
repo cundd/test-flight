@@ -46,13 +46,13 @@ class CodeExtractor
         $codeLines = array_filter(
             array_map(
                 function ($line) {
-                    return ltrim($line, " \t\n\r\0\x0B*");
+                    return ltrim(trim($line, " \t\n\r\0\x0B"), '*');
                 },
                 explode("\n", $matches)
             )
         );
 
-        return implode("\n", $codeLines).';';
+        return rtrim(implode("\n", $codeLines).';');
     }
 
     /**
@@ -162,8 +162,8 @@ class CodeExtractor
         $code = $this->getCodeFromDocComment($docComment);
         test_flight_assert(is_string($code));
         test_flight_assert_same(
-            'assert(__FILE__, (new File(__FILE__))->getPath());
-assert(__FILE__, (new File(__FILE__))->getPath());',
+            '  assert(__FILE__, (new File(__FILE__))->getPath());
+  assert(__FILE__, (new File(__FILE__))->getPath());',
             $code
         );
     }
@@ -218,8 +218,8 @@ assert(__FILE__, (new File(__FILE__))->getPath());',
         $code = $this->getCodeFromDocComment($docComment);
         test_flight_assert(is_string($code));
         test_flight_assert_same(
-            'assert(__FILE__, (new File(__FILE__))->getPath());
-assert(__FILE__, (new File(__FILE__))->getPath());',
+            '  assert(__FILE__, (new File(__FILE__))->getPath());
+  assert(__FILE__, (new File(__FILE__))->getPath());',
             $code
         );
     }

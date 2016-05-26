@@ -8,7 +8,7 @@
 namespace Cundd\TestFlight\DefinitionProvider;
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
-
+use Cundd\TestFlight\Definition\DefinitionInterface;
 
 /**
  * Provider for test definitions of classes containing test methods
@@ -27,7 +27,7 @@ interface DefinitionProviderInterface
      * Create the test definitions for the given classes
      *
      * @param array $classNameToFiles
-     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
+     * @return DefinitionInterface[][]
      */
     public function createForClasses(array $classNameToFiles);
 
@@ -35,7 +35,7 @@ interface DefinitionProviderInterface
      * Create the test definitions for the given documentation files
      *
      * @param FileInterface[] $files
-     * @return array|\Cundd\TestFlight\Definition\DefinitionInterface[]
+     * @return DefinitionInterface[][]
      */
     public function createForDocumentation(array $files);
 }
