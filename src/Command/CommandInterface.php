@@ -17,5 +17,5 @@ interface CommandInterface
      * 
      * @return bool
      */
-    public function run(): bool;
+    public function run();
 }

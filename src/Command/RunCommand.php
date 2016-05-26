@@ -23,7 +23,7 @@ class RunCommand extends AbstractTestDefinitionCommand
      *
      * @return bool
      */
-    public function run(): bool
+    public function run()
     {
         $testDefinitions = $this->collectTestDefinitions();
 

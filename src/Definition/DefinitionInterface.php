@@ -43,12 +43,12 @@ interface DefinitionInterface
      *
      * @return string
      */
-    public function getDescription(): string;
+    public function getDescription();
 
     /**
      * Returns the descriptive type of the definition
      *
      * @return string
      */
-    public function getType(): string;
+    public function getType();
 }

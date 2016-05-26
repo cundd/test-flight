@@ -142,7 +142,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
      * @param string $input
      * @return string
      */
-    private function stringToUpperCaseWhitespace(string $input)
+    private function stringToUpperCaseWhitespace($input)
     {
         return ucwords(
             ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $input)))

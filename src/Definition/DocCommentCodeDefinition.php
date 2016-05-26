@@ -77,7 +77,7 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
      *
      * @return string
      */
-    public function getType(): string
+    public function getType()
     {
         return 'DocComment test';
     }

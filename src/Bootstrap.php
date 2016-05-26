@@ -103,7 +103,7 @@ class Bootstrap
      * @param array $arguments
      * @return bool
      */
-    public function run(array $arguments): bool
+    public function run(array $arguments)
     {
         $exception = null;
         try {

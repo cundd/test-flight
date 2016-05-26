@@ -67,7 +67,7 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
      *
      * @return string
      */
-    public function getType(): string
+    public function getType()
     {
         return 'Documentation test';
     }

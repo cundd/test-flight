@@ -21,7 +21,7 @@ class ListCommand extends AbstractTestDefinitionCommand
      *
      * @return bool
      */
-    public function run(): bool
+    public function run()
     {
         foreach ($this->collectTestDefinitions() as $key => $testDefinitionCollection) {
             if (count($testDefinitionCollection) > 0) {
@@ -46,7 +46,7 @@ class ListCommand extends AbstractTestDefinitionCommand
      * @param DefinitionInterface $definition
      * @return string
      */
-    private function printGroupHeaderForKeyAndDefinition(string $key, DefinitionInterface $definition): string
+    private function printGroupHeaderForKeyAndDefinition($key, DefinitionInterface $definition)
     {
         return $key;
     }

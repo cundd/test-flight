@@ -17,7 +17,7 @@ class StaticMethodDefinition extends AbstractMethodDefinition
      *
      * @return string
      */
-    public function getType(): string
+    public function getType()
     {
         return 'Static method test';
     }
