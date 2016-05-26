@@ -66,10 +66,21 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
     public function getDescription(): string
     {
         return sprintf(
-            'DocComment test "%s"',
+            '%s "%s"',
+        $this->getType(),
             ucwords(
                 ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getRelatedMethodName())))
             )
         );
+    }
+
+    /**
+     * Returns the descriptive type of the definition
+     *
+     * @return string
+     */
+    public function getType(): string
+    {
+        return 'DocComment test';
     }
 }

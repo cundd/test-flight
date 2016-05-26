@@ -96,10 +96,14 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
      */
     public function getDescription(): string
     {
-        return ucwords(
-            ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getMethodName())))
-        );
+        return ''
+        .$this->getType()
+        .' '
+        .$this->stringToUpperCaseWhitespace(substr(strrchr($this->getClassName(), '\\'), 1))
+        .': '
+        .$this->stringToUpperCaseWhitespace($this->getMethodName());
     }
+
 
     /**
      * @return boolean
@@ -133,5 +137,16 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     public function getReflectionMethod(): ReflectionMethod
     {
         return $this->reflectionMethod;
+    }
+
+    /**
+     * @param string $input
+     * @return string
+     */
+    private function stringToUpperCaseWhitespace(string $input)
+    {
+        return ucwords(
+            ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $input)))
+        );
     }
 }
