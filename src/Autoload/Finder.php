@@ -46,7 +46,8 @@ class Finder
             if ($autoloaderPath !== '') {
                 return $autoloaderPath;
             }
-        } while ($basePath = dirname($basePath));
+            $basePath = dirname($basePath);
+        } while ($basePath && $basePath !== '/');
 
         return '';
     }
