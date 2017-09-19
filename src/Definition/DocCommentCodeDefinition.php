@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 22:34
- */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Definition;
 
@@ -67,7 +62,7 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
     {
         return sprintf(
             '%s "%s"',
-        $this->getType(),
+            $this->getType(),
             ucwords(
                 ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getRelatedMethodName())))
             )

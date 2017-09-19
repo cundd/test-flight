@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 18/04/16
- * Time: 21:33
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Output;
 
@@ -71,7 +67,7 @@ abstract class AbstractPrinter implements PrinterInterface
      */
     public function println(string $format, ...$arguments)
     {
-        return $this->printWithArray($format.PHP_EOL, $arguments);
+        return $this->printWithArray($format . PHP_EOL, $arguments);
     }
 
     /**
@@ -81,7 +77,7 @@ abstract class AbstractPrinter implements PrinterInterface
      */
     public function printError(string $format, ...$arguments)
     {
-        $format = $this->colorize(self::RED, $format).PHP_EOL;
+        $format = $this->colorize(self::RED, $format) . PHP_EOL;
         fwrite($this->errorStream, vsprintf($format, $arguments));
 
         return $this;
@@ -95,7 +91,7 @@ abstract class AbstractPrinter implements PrinterInterface
     public function debug(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($format.PHP_EOL, $arguments);
+            $this->printWithArray($format . PHP_EOL, $arguments);
         }
 
         return $this;
@@ -109,7 +105,7 @@ abstract class AbstractPrinter implements PrinterInterface
     public function info(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($this->colorize(self::BLUE, $format).PHP_EOL, $arguments);
+            $this->printWithArray($this->colorize(self::BLUE, $format) . PHP_EOL, $arguments);
         }
 
         return $this;
@@ -123,7 +119,7 @@ abstract class AbstractPrinter implements PrinterInterface
     public function warn(string $format, ...$arguments)
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($this->colorize(self::YELLOW, $format).PHP_EOL, $arguments);
+            $this->printWithArray($this->colorize(self::YELLOW, $format) . PHP_EOL, $arguments);
         }
 
         return $this;
@@ -182,7 +178,7 @@ abstract class AbstractPrinter implements PrinterInterface
     public function colorize(string $startColor, string $text, string $endColor = self::NORMAL): string
     {
         if ($this->getEnableColoredOutput()) {
-            return $startColor.$text.$endColor;
+            return $startColor . $text . $endColor;
         }
 
         return $text;

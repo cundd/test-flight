@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 27/04/16
- * Time: 21:37
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight;
 
@@ -48,11 +44,12 @@ class CodeExtractor
                 function ($line) {
                     return ltrim(trim($line, " \t\n\r\0\x0B"), '*');
                 },
-                explode("\n", $matches)
+                // TODO: Check what type $matches has
+                is_array($matches) ? $matches : explode("\n", (string)$matches)
             )
         );
 
-        return rtrim(implode("\n", $codeLines).';');
+        return rtrim(implode("\n", $codeLines) . ';');
     }
 
     /**
@@ -66,7 +63,7 @@ class CodeExtractor
         $start = strpos($fileContent, Constants::MARKDOWN_PHP_CODE_KEYWORD);
         $code = substr($fileContent, $start);
 
-        $regularExpression = '!'.Constants::MARKDOWN_PHP_CODE_KEYWORD.self::DOCUMENTATION_REGEX.'!';
+        $regularExpression = '!' . Constants::MARKDOWN_PHP_CODE_KEYWORD . self::DOCUMENTATION_REGEX . '!';
         if (!preg_match_all($regularExpression, $code, $matches)) {
             return [];
         }
@@ -88,7 +85,7 @@ class CodeExtractor
     {
         $code = substr($docComment, $start);
 
-        $regularExpression = '!'.Constants::EXAMPLE_KEYWORD.self::DOC_COMMENT_EXAMPLE_REGEX.'!';
+        $regularExpression = '!' . Constants::EXAMPLE_KEYWORD . self::DOC_COMMENT_EXAMPLE_REGEX . '!';
         if (!preg_match($regularExpression, $code, $matches)) {
             return [];
         }
@@ -105,7 +102,7 @@ class CodeExtractor
     {
         $code = substr($docComment, $start);
 
-        $regularExpression = '!'.self::DOC_COMMENT_CODE_REGEX.'!s';
+        $regularExpression = '!' . self::DOC_COMMENT_CODE_REGEX . '!s';
         if (!preg_match($regularExpression, $code, $matches)) {
             return [];
         }

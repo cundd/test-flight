@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 19/04/16
- * Time: 22:16
- */
 
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Cundd\TestFlight;
 
@@ -224,7 +219,8 @@ class Bootstrap
 
         // Check for a configuration file
         if (!isset($options['configuration'])) {
-            $localConfigurationFilePath = getcwd().'/'.ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
+            $localConfigurationFilePath = getcwd(
+                ) . '/' . ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
             if (file_exists($localConfigurationFilePath)) {
                 $options['configuration'] = $localConfigurationFilePath;
             }

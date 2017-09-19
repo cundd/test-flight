@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 26/05/16
- * Time: 13:07
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Command;
 

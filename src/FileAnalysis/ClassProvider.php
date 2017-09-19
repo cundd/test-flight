@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 13:05
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -44,7 +40,7 @@ class ClassProvider
     }
 
     /**
-     * @param string[] $classes
+     * @param string[]      $classes
      * @param FileInterface $file
      * @return array
      */

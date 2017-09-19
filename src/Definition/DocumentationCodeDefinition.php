@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 22:34
- */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Definition;
 
@@ -48,7 +43,7 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
             $testName = substr($testName, 1);
         }
         if (strtoupper($testName) === 'README') {
-            $testName = basename(dirname($this->getFilePath())).': Readme';
+            $testName = basename(dirname($this->getFilePath())) . ': Readme';
         }
 
         return sprintf(

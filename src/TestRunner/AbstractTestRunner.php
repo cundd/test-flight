@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 18/04/16
- * Time: 20:46
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\TestRunner;
 
@@ -84,7 +80,7 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     /**
      * @param DefinitionInterface $definition
      * @param ContextInterface    $context
-     * @return
+     * @return void
      */
     abstract protected function performTest(DefinitionInterface $definition, ContextInterface $context);
 

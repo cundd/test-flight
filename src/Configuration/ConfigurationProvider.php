@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 21/05/16
- * Time: 10:47
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Configuration;
 
@@ -129,7 +125,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             return;
         }
         if ($path[0] !== '/') {
-            $path = $file->getParent().'/'.$path;
+            $path = $file->getParent() . '/' . $path;
         }
 
         $configuration[$key] = realpath($path) ?: $path;
@@ -152,7 +148,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         test_flight_throws(
             function () {
                 new self(
-                    ['configuration' => __DIR__.'/../../tests/resources/test-configuration-invalid-json.json']
+                    ['configuration' => __DIR__ . '/../../tests/resources/test-configuration-invalid-json.json']
                 );
             },
             InvalidJsonException::class
@@ -160,7 +156,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         test_flight_throws(
             function () {
                 new self(
-                    ['configuration' => __DIR__.'/../../tests/resources/test-configuration-invalid-data.json']
+                    ['configuration' => __DIR__ . '/../../tests/resources/test-configuration-invalid-data.json']
                 );
             },
             InvalidConfigurationException::class

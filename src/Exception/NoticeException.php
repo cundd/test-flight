@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 18/04/16
- * Time: 22:50
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Exception;
 
 class NoticeException extends \ErrorException
 {
-    
+
 }

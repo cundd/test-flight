@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 13:05
- */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -117,9 +112,9 @@ class FileProvider
     private function getFileIncludesTest(FileInterface $file)
     {
         return $file->containsKeyword(Constants::TEST_KEYWORD)
-        || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
-        || $file->containsKeyword(Constants::CODE_KEYWORD)
-        || $file->containsKeyword(Constants::MARKDOWN_PHP_CODE_KEYWORD);
+            || $file->containsKeyword(Constants::EXAMPLE_KEYWORD)
+            || $file->containsKeyword(Constants::CODE_KEYWORD)
+            || $file->containsKeyword(Constants::MARKDOWN_PHP_CODE_KEYWORD);
     }
 
     /**

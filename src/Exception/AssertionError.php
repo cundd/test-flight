@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 22/04/16
- * Time: 21:57
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Exception;
 

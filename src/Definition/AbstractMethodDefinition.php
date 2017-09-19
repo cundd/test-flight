@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 22:34
- */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Definition;
 
@@ -97,11 +92,11 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     public function getDescription(): string
     {
         return ''
-        .$this->getType()
-        .' '
-        .$this->stringToUpperCaseWhitespace((string)substr((string)strrchr($this->getClassName(), '\\'), 1))
-        .': '
-        .$this->stringToUpperCaseWhitespace($this->getMethodName());
+            . $this->getType()
+            . ' '
+            . $this->stringToUpperCaseWhitespace((string)substr((string)strrchr($this->getClassName(), '\\'), 1))
+            . ': '
+            . $this->stringToUpperCaseWhitespace($this->getMethodName());
     }
 
 

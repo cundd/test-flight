@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 27/04/16
- * Time: 20:46
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\Definition;
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
@@ -22,21 +18,21 @@ interface DefinitionInterface
      *
      * @return string
      */
-    public function getClassName() : string;
+    public function getClassName(): string;
 
     /**
      * Returns the file containing the test
      *
      * @return FileInterface
      */
-    public function getFile() : FileInterface;
+    public function getFile(): FileInterface;
 
     /**
      * Returns the path to the file
      *
      * @return string
      */
-    public function getFilePath() : string;
+    public function getFilePath(): string;
 
     /**
      * Returns a description for the output

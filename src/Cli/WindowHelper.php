@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 08/05/16
- * Time: 16:10
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Cli;
 
@@ -25,7 +21,7 @@ class WindowHelper
 
     /**
      * Returns if the window supports colors
-     * 
+     *
      * @return bool
      */
     public function hasColorSupport()

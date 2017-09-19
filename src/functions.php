@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 20/04/16
- * Time: 20:26
- */
+declare(strict_types=1);
+
 
 /**
  * Test if the assertion is true

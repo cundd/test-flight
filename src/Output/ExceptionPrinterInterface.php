@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 24/04/16
- * Time: 18:00
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\Output;
 
 use Cundd\TestFlight\Definition\DefinitionInterface;
@@ -19,7 +15,7 @@ interface ExceptionPrinterInterface extends PrinterInterface
      * Prints the exception for the given test definition
      *
      * @param DefinitionInterface $definition
-     * @param \Throwable       $exception
+     * @param \Throwable          $exception
      * @return $this
      */
     public function printException(DefinitionInterface $definition, $exception);

@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 07/05/16
- * Time: 13:53
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\Definition;
 
 
@@ -15,10 +11,10 @@ interface CodeDefinitionInterface extends DefinitionInterface
 {
     /**
      * Returns the code
-     * 
+     *
      * @return string
      */
-    public function getCode() : string;
+    public function getCode(): string;
 
     /**
      * Returns the pre-processed code

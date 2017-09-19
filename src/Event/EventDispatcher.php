@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 17/05/16
- * Time: 21:18
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Event;
 

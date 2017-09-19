@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 26/05/16
- * Time: 13:13
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\Command;
 
 /**
@@ -14,7 +10,7 @@ interface CommandInterface
 {
     /**
      * Runs the command
-     * 
+     *
      * @return bool
      */
     public function run(): bool;

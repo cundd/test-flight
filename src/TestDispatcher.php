@@ -1,16 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 28/04/16
- * Time: 21:07
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight;
 
 
-use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
@@ -64,7 +60,7 @@ class TestDispatcher
         $this->testRunnerFactory = $testRunnerFactory;
         $this->printer = $printer;
     }
-    
+
     /**
      * @param DefinitionInterface[] $testCollection
      * @return bool Return if all tests succeeded
@@ -169,8 +165,8 @@ class TestDispatcher
         );
 
         $color = $this->failures > 0
-            ? (ColorInterface::RED_BACKGROUND.ColorInterface::WHITE)
-            : (ColorInterface::GREEN_BACKGROUND.ColorInterface::WHITE);
+            ? (ColorInterface::RED_BACKGROUND . ColorInterface::WHITE)
+            : (ColorInterface::GREEN_BACKGROUND . ColorInterface::WHITE);
         $printer = $this->getPrinter();
         $printer->println('');
         $printer->println(

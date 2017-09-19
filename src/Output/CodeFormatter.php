@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 24/04/16
- * Time: 17:57
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Output;
 
@@ -72,11 +68,11 @@ class CodeFormatter implements ColorInterface
             $this->prepareCodeLine($line, $block, $i);
         }
 
-        return "\n".$this->colorize(
-            self::NORMAL.self::LIGHT_GRAY_BACKGROUND.self::WHITE,
-            implode("\n", $block),
-            self::RED
-        );
+        return "\n" . $this->colorize(
+                self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::WHITE,
+                implode("\n", $block),
+                self::RED
+            );
     }
 
     /**
@@ -89,17 +85,17 @@ class CodeFormatter implements ColorInterface
         $width = $this->cliWindowHelper->getWidth() - $this->gutterWidth;
         $line = str_replace("\t", '    ', $line);
 
-        $gutter = str_pad($lineNumber, $this->gutterWidth - 1, ' ', STR_PAD_LEFT).' ';
+        $gutter = str_pad((string)$lineNumber, $this->gutterWidth - 1, ' ', STR_PAD_LEFT) . ' ';
 
         foreach (str_split($line, $width) as $lineChunk) {
             if (strlen($lineChunk) <= $width) {
                 $block[] = ''
-                    .$this->colorizeGutter($gutter)
-                    .$this->colorizeLine(str_pad($lineChunk, $width, ' '));
+                    . $this->colorizeGutter($gutter)
+                    . $this->colorizeLine(str_pad($lineChunk, $width, ' '));
             } else {
                 $block[] = ''
-                    .$this->colorizeGutter($gutter)
-                    .$this->colorizeLine($lineChunk);
+                    . $this->colorizeGutter($gutter)
+                    . $this->colorizeLine($lineChunk);
             }
             $gutter = str_repeat(' ', $this->gutterWidth);
         }
@@ -114,7 +110,7 @@ class CodeFormatter implements ColorInterface
     private function colorize(string $startColor, string $text, string $endColor = ''): string
     {
         if ($this->enableColors) {
-            return $startColor.$text.$endColor;
+            return $startColor . $text . $endColor;
         }
 
         return $text;
@@ -126,7 +122,7 @@ class CodeFormatter implements ColorInterface
      */
     private function colorizeLine(string $line): string
     {
-        return $this->colorize(self::NORMAL.self::LIGHT_GRAY_BACKGROUND.self::DARK_GRAY, $line);
+        return $this->colorize(self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::DARK_GRAY, $line);
     }
 
     /**
@@ -135,6 +131,6 @@ class CodeFormatter implements ColorInterface
      */
     private function colorizeGutter(string $line): string
     {
-        return $this->colorize(self::NORMAL.self::LIGHT_GRAY_BACKGROUND.self::WHITE, $line);
+        return $this->colorize(self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::WHITE, $line);
     }
 }

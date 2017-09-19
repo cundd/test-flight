@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 13:26
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -55,7 +51,7 @@ class File implements FileInterface
      *
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return basename($this->path);
     }

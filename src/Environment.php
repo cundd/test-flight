@@ -1,11 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 18/04/16
- * Time: 21:20
- */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Cundd\TestFlight;
 
 
@@ -195,9 +191,9 @@ class Environment
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getLocale(): string
+    public function getLocale(): array
     {
         return $this->locale;
     }

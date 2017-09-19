@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/05/16
- * Time: 14:44
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Autoload;
 
@@ -59,8 +55,8 @@ class Finder
     private function containsKnownAutoloader($path)
     {
         foreach ($this->knownAutoloaderPaths as $autoloaderPath) {
-            if (file_exists($path.'/'.$autoloaderPath)) {
-                return $path.'/'.$autoloaderPath;
+            if (file_exists($path . '/' . $autoloaderPath)) {
+                return $path . '/' . $autoloaderPath;
             }
         }
 

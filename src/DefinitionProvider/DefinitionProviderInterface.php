@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 07/05/16
- * Time: 13:05
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\DefinitionProvider;
 
-use Cundd\TestFlight\FileAnalysis\FileInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\FileAnalysis\FileInterface;
 
 /**
  * Provider for test definitions of classes containing test methods
@@ -17,7 +13,7 @@ interface DefinitionProviderInterface
 {
     /**
      * Set the types of tests to run
-     * 
+     *
      * @param string[] $types
      * @return $this
      */
@@ -29,7 +25,7 @@ interface DefinitionProviderInterface
      * @param array $classNameToFiles
      * @return DefinitionInterface[][]
      */
-    public function createForClasses(array $classNameToFiles) : array;
+    public function createForClasses(array $classNameToFiles): array;
 
     /**
      * Create the test definitions for the given documentation files

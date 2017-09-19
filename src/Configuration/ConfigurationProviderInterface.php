@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 21/05/16
- * Time: 15:07
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\Configuration;
 
 
@@ -14,7 +10,7 @@ namespace Cundd\TestFlight\Configuration;
 interface ConfigurationProviderInterface
 {
     const LOCAL_CONFIGURATION_FILE_NAME = '.test-flight.json';
-    
+
     /**
      * Returns the configuration for the given key
      *

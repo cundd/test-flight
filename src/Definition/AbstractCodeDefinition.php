@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 07/05/16
- * Time: 13:51
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Definition;
 
@@ -62,22 +58,22 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
         $filePath = $this->getFilePath();
         $code = str_replace(
             '__FILE__',
-            "'".$filePath."'",
+            "'" . $filePath . "'",
             $code
         );
         $code = str_replace(
             '__DIR__',
-            "'".dirname($filePath)."'",
+            "'" . dirname($filePath) . "'",
             $code
         );
         $code = preg_replace(
             '/([^\w:])(__CLASS__)\(/',
-            '$1'.$this->getClassName().'(',
+            '$1' . $this->getClassName() . '(',
             $code
         );
         $code = str_replace(
             '__CLASS__',
-            "'".$this->getClassName()."'",
+            "'" . $this->getClassName() . "'",
             $code
         );
         $code = preg_replace(

@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 22/04/16
- * Time: 22:08
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight;
 
@@ -351,7 +347,7 @@ abstract class Assert
      *
      * @return int
      */
-    public static function getCount():int
+    public static function getCount(): int
     {
         return self::$count;
     }

@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 07/05/16
- * Time: 13:16
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -21,8 +17,11 @@ class DocumentationFileProvider
      */
     public function findDocumentationFiles(array $files): array
     {
-        return array_filter($files, function(FileInterface $file) {
-            return substr($file->getPath(), -4) !== '.php';
-        });
+        return array_filter(
+            $files,
+            function (FileInterface $file) {
+                return substr($file->getPath(), -4) !== '.php';
+            }
+        );
     }
 }

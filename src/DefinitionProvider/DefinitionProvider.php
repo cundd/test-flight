@@ -1,18 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 16/04/16
- * Time: 13:05
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\DefinitionProvider;
 
 use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\CodeExtractor;
 use Cundd\TestFlight\Constants;
-use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DocumentationCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
@@ -66,6 +62,8 @@ class DefinitionProvider implements DefinitionProviderInterface
     public function setTypes(array $types)
     {
         $this->types = $types;
+
+        return $this;
     }
 
     /**

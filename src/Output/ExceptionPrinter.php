@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 24/04/16
- * Time: 17:57
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Output;
 
@@ -12,8 +8,8 @@ namespace Cundd\TestFlight\Output;
 use Cundd\TestFlight\Cli\WindowHelper;
 use Cundd\TestFlight\Definition\AbstractMethodDefinition;
 use Cundd\TestFlight\Definition\CodeDefinitionInterface;
-use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Exception\AssertionError;
 use Cundd\TestFlight\TestRunner\AbstractTestRunner;
@@ -89,11 +85,11 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             $description = $definition->getDescription();
             if ($this->getVerbose()) {
                 $description .= ":\nCode:\n"
-                    .$this->codeFormatter->formatCode(
+                    . $this->codeFormatter->formatCode(
                         $definition->getPreProcessedCode(),
                         $this->getEnableColoredOutput()
                     )
-                    ."\n";
+                    . "\n";
             }
 
             return $description;
@@ -110,8 +106,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     private function getTraceAsString(
         DefinitionInterface $definition,
         $exception
-    ): string
-    {
+    ): string {
         $stringParts = [];
         $previousStep = [];
         $enableColoredOutput = $this->getEnableColoredOutput();
@@ -127,7 +122,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             $stepAsString = $this->getTraceStepAsString($step, $i);
 
             if ($enableColoredOutput && $this->getTraceStepIsTestMethod($definition, $step, $previousStep)) {
-                $stringParts[] = self::NORMAL.self::RED_BACKGROUND.$stepAsString.self::RED;
+                $stringParts[] = self::NORMAL . self::RED_BACKGROUND . $stepAsString . self::RED;
             } else {
                 $stringParts[] = $stepAsString;
             }
@@ -146,8 +141,8 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     private function shouldStopTraceAtStep($step)
     {
         return isset($step['class'])
-        && $step['class'] === AbstractTestRunner::class
-        && $step['function'] === 'runTestDefinition';
+            && $step['class'] === AbstractTestRunner::class
+            && $step['function'] === 'runTestDefinition';
     }
 
     /**
@@ -202,7 +197,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             array_map(
                 function ($argument) {
                     if (is_array($argument)) {
-                        return '['.$this->argumentsToString($argument).']';
+                        return '[' . $this->argumentsToString($argument) . ']';
                     }
 
                     return is_object($argument)
@@ -224,8 +219,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         DefinitionInterface $definition,
         array $step,
         array $previousStep
-    ): bool
-    {
+    ): bool {
         $filePath = $previousStep['file'] ?? '';
 
         if ($definition instanceof AbstractMethodDefinition) {
@@ -256,7 +250,7 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
             return $definition->getFilePath();
         }
 
-        return $exception->getFile().' at '.$exception->getLine();
+        return $exception->getFile() . ' at ' . $exception->getLine();
     }
 
     /**
@@ -296,10 +290,10 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         $output = stream_get_contents($tempOutputStream);
 
         $testString = "\n"
-            .'Error Exception #0 during test '
-            .'Cundd\\TestFlight\\Output\\ExceptionPrinter->thisIsTheDummyTestMethodForTheTest(): '
-            ."\n"
-            .'ExceptionMessage';
+            . 'Error Exception #0 during test '
+            . 'Cundd\\TestFlight\\Output\\ExceptionPrinter->thisIsTheDummyTestMethodForTheTest(): '
+            . "\n"
+            . 'ExceptionMessage';
         test_flight_assert_same(
             $testString,
             substr($output, 0, strlen($testString))

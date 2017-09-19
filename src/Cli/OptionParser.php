@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 29/04/16
- * Time: 21:23
- */
+declare(strict_types=1);
+
 
 namespace Cundd\TestFlight\Cli;
 
@@ -73,9 +69,9 @@ class OptionParser
     private function nextElementIsValueElement(array $arguments, $currentIndex, $argumentsLength)
     {
         return $currentIndex + 1 < $argumentsLength
-        && is_string($arguments[$currentIndex + 1])
-        && (
-            strlen($arguments[$currentIndex + 1]) === 0 || $arguments[$currentIndex + 1][0] !== '-'
-        );
+            && is_string($arguments[$currentIndex + 1])
+            && (
+                strlen($arguments[$currentIndex + 1]) === 0 || $arguments[$currentIndex + 1][0] !== '-'
+            );
     }
 }

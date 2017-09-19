@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 24/04/16
- * Time: 17:30
- */
+declare(strict_types=1);
+
 namespace Cundd\TestFlight\FileAnalysis;
 
 /**
@@ -17,14 +13,14 @@ interface FileInterface
      *
      * @return string
      */
-    public function getPath() : string;
+    public function getPath(): string;
 
     /**
      * Returns the file name
      *
      * @return string
      */
-    public function getName() : string;
+    public function getName(): string;
 
     /**
      * Returns the file extension
@@ -45,7 +41,7 @@ interface FileInterface
      *
      * @return string
      */
-    public function getContents() : string;
+    public function getContents(): string;
 
     /**
      * Returns if the file contents contain the given keyword
@@ -53,5 +49,5 @@ interface FileInterface
      * @param string $keyword
      * @return bool
      */
-    public function containsKeyword(string $keyword) : bool;
+    public function containsKeyword(string $keyword): bool;
 }
