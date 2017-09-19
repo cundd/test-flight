@@ -99,7 +99,7 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
         return ''
         .$this->getType()
         .' '
-        .$this->stringToUpperCaseWhitespace(substr(strrchr($this->getClassName(), '\\'), 1))
+        .$this->stringToUpperCaseWhitespace(substr((string)strrchr($this->getClassName(), '\\'), 1))
         .': '
         .$this->stringToUpperCaseWhitespace($this->getMethodName());
     }
