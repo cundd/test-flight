@@ -156,7 +156,7 @@ class DefinitionProvider implements DefinitionProviderInterface
         $testMethods = [];
         $reflectionClass = new ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
-            if (false !== strpos($method->getDocComment(), Constants::TEST_KEYWORD)) {
+            if (false !== strpos((string)$method->getDocComment(), Constants::TEST_KEYWORD)) {
                 if ($this->getMethodIsStatic($method)) {
                     $testMethods[] = new StaticMethodDefinition(
                         $className, $method->getName(), $file, $method
@@ -232,12 +232,16 @@ class DefinitionProvider implements DefinitionProviderInterface
         FileInterface $file,
         ReflectionClass $reflectionClass
     ) {
-        if (false !== strpos($reflectionClass->getDocComment(), Constants::EXAMPLE_KEYWORD)
-            || false !== strpos($reflectionClass->getDocComment(), Constants::CODE_KEYWORD)
+        $docComment = $reflectionClass->getDocComment();
+        if (false === $docComment) {
+            return null;
+        }
+        if (false !== strpos($docComment, Constants::EXAMPLE_KEYWORD)
+            || false !== strpos($docComment, Constants::CODE_KEYWORD)
         ) {
             return new DocCommentCodeDefinition(
                 $className,
-                $this->codeExtractor->getCodeFromDocComment($reflectionClass->getDocComment()),
+                $this->codeExtractor->getCodeFromDocComment($docComment),
                 $file,
                 $className
             );
