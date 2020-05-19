@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\DefinitionProvider;
 
 use Cundd\TestFlight\ClassLoader;
@@ -206,15 +205,18 @@ class DefinitionProvider implements DefinitionProviderInterface
     ) {
         $testMethods = [];
         foreach ($reflectionClass->getMethods() as $method) {
-            if (false !== strpos($method->getDocComment(), Constants::EXAMPLE_KEYWORD)
-                || false !== strpos($method->getDocComment(), Constants::CODE_KEYWORD)
-            ) {
-                $testMethods[] = new DocCommentCodeDefinition(
-                    $className,
-                    $this->codeExtractor->getCodeFromDocComment($method->getDocComment()),
-                    $file,
-                    $method->getName()
-                );
+            $docComment = $method->getDocComment();
+            if ($docComment) {
+                if (false !== strpos($docComment, Constants::EXAMPLE_KEYWORD)
+                    || false !== strpos($docComment, Constants::CODE_KEYWORD)
+                ) {
+                    $testMethods[] = new DocCommentCodeDefinition(
+                        $className,
+                        $this->codeExtractor->getCodeFromDocComment($docComment),
+                        $file,
+                        $method->getName()
+                    );
+                }
             }
         }
 
