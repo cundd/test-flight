@@ -79,6 +79,16 @@ class ClassProvider
                 }
             }
 
+            // PHP8.0+
+            if (defined('T_NAME_QUALIFIED')) {
+              if ($tokens[$i - 2][0] === T_NAMESPACE
+                    && $tokens[$i - 1][0] === T_WHITESPACE
+                    && ($tokens[$i][0] === T_NAME_QUALIFIED)
+                ) {
+                    $namespace = $tokens[$i][1];
+                }
+            }
+
             if ($tokens[$i - 2][0] === T_CLASS
                 && $tokens[$i - 1][0] === T_WHITESPACE
                 && $tokens[$i][0] === T_STRING
