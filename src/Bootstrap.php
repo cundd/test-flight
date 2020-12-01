@@ -169,7 +169,7 @@ class Bootstrap
                 $_POST,
                 $_COOKIE,
                 $_SERVER,
-                $_SESSION,
+                $_SESSION ?? [],
                 $_FILES,
                 $_REQUEST
             );

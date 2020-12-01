@@ -2,7 +2,7 @@
 <?php
 
 if (version_compare(PHP_VERSION, '7.0.0') < 0) {
-    echo 'PHP 7 is required (installed: '.PHP_VERSION.')'.PHP_EOL;
+    echo 'PHP 7 or 8 is required (installed: '.PHP_VERSION.')'.PHP_EOL;
 }
 
 if (file_exists(__DIR__.'/../../../autoload.php')) {
@@ -18,4 +18,3 @@ $exitCode = (new \Cundd\TestFlight\Bootstrap())
     ->run($argv) ? 0 : 1;
 
 exit($exitCode);
-?>

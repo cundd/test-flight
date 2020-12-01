@@ -14,6 +14,10 @@ $testPath = __DIR__;
 $fileProvider = new \Cundd\TestFlight\FileAnalysis\FileProvider();
 $files = $fileProvider->findMatchingFiles($testPath);
 assert(is_array($files));
+
+usort($files, function($a, $b) {
+  return strcmp($a->getName(), $b->getName());
+});
 assert('ClassProvider.php' === $files[0]->getName());
 ```
 

@@ -77,11 +77,9 @@ class FileProvider
         );
 
         return array_filter(
-            array_map(
-                function ($pathCollection) {
-                    return $pathCollection[0];
-                },
-                iterator_to_array($regexIterator)
+            array_column(
+                iterator_to_array($regexIterator),
+                0
             ),
             'is_file'
         );
