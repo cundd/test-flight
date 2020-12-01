@@ -7,7 +7,7 @@ namespace Cundd\TestFlight;
 
 interface Constants
 {
-    const VERSION = '0.2.6';
+    const VERSION = '0.3.0';
 
     const TEST_KEYWORD = '@test';
     const EXAMPLE_KEYWORD = '@example';
