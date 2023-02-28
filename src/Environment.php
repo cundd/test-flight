@@ -160,8 +160,6 @@ class Environment
 
     /**
      * Reset the environment variables
-     *
-     * @example
      */
     public function reset()
     {
@@ -171,7 +169,7 @@ class Environment
         ini_set('zend.assertions', '1');
         ini_set('assert.exception', '1');
 
-        $GLOBALS = $this->prepareGlobalForRetrieval($this->globals);
+        $this->patchGlobals($this->prepareGlobalForRetrieval($this->globals));
         $_ENV = $this->prepareGlobalForRetrieval($this->env);
         $_GET = $this->prepareGlobalForRetrieval($this->get);
         $_POST = $this->prepareGlobalForRetrieval($this->post);
@@ -229,7 +227,7 @@ class Environment
 
     /**
      * @param $value
-     * @return null|string
+     * @return null|mixed
      */
     private function prepareGlobalForRetrieval($value)
     {
@@ -240,6 +238,17 @@ class Environment
         return unserialize($value);
     }
 
+    private function patchGlobals(array $restoredValues)
+    {
+        foreach ($restoredValues as $key => $value) {
+            $GLOBALS[$key] = $value;
+        }
+        foreach (array_keys($GLOBALS) as $key) {
+            if (!in_array($key, array_keys($restoredValues))) {
+                unset($GLOBALS[$key]);
+            }
+        }
+    }
 
     /**
      * @test
