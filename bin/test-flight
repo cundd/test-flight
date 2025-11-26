@@ -1,19 +1,19 @@
 #!/usr/bin/env php
 <?php
 
-if (version_compare(PHP_VERSION, '7.0.0') < 0) {
-    echo 'PHP 7 or 8 is required (installed: '.PHP_VERSION.')'.PHP_EOL;
+if (version_compare(PHP_VERSION, '8.1.0') < 0) {
+    echo 'PHP 8 is required (installed: ' . PHP_VERSION . ')' . PHP_EOL;
 }
 
-if (file_exists(__DIR__.'/../../../autoload.php')) {
-    require_once __DIR__.'/../../../autoload.php';
-} elseif (file_exists(__DIR__.'/../vendor/autoload.php')) {
-    require_once __DIR__.'/../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../../autoload.php')) {
+    require_once __DIR__ . '/../../../autoload.php';
+} elseif (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
 } else {
     throw new Exception('Could not find the autoloader');
 }
 
-$exitCode = (new \Cundd\TestFlight\Bootstrap())
+$exitCode = (new Cundd\TestFlight\Bootstrap())
     ->init()
     ->run($argv) ? 0 : 1;
 
