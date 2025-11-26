@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\Event;
-
 
 use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
@@ -13,26 +12,10 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
  */
 class Event implements EventInterface
 {
-    /**
-     * @var DefinitionInterface
-     */
-    private $definition;
-
-    /**
-     * @var ContextInterface
-     */
-    private $context;
-
-    /**
-     * Event constructor.
-     *
-     * @param DefinitionInterface $definition
-     * @param ContextInterface    $context
-     */
-    public function __construct(DefinitionInterface $definition, ContextInterface $context)
-    {
-        $this->definition = $definition;
-        $this->context = $context;
+    public function __construct(
+        private readonly DefinitionInterface $definition,
+        private readonly ContextInterface $context,
+    ) {
     }
 
     /**

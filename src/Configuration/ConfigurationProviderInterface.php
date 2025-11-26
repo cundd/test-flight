@@ -1,15 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cundd\TestFlight\Configuration;
-
 
 /**
  * Interface for Configuration Providers
  */
 interface ConfigurationProviderInterface
 {
-    const LOCAL_CONFIGURATION_FILE_NAME = '.test-flight.json';
+    public const LOCAL_CONFIGURATION_FILE_NAME = '.test-flight.json';
 
     /**
      * Returns the configuration for the given key
@@ -20,17 +20,11 @@ interface ConfigurationProviderInterface
      *  );
      *  test_flight_assert_same('/tests/resources/test-bootstrap.php', substr($cp->get('bootstrap'), -35));
      * </code>
-     *
-     * @param string $key
-     * @return mixed
      */
-    public function get(string $key);
+    public function get(string $key): mixed;
 
     /**
      * Sets the underlying configuration
-     *
-     * @param array $configuration
-     * @return ConfigurationProviderInterface
      */
     public function setConfiguration(array $configuration): ConfigurationProviderInterface;
 }

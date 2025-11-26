@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight;
-
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 
@@ -13,10 +12,9 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
 class ClassLoader
 {
     /**
-     * @param string        $className
-     * @param FileInterface $file
+     * @param class-string $className
      */
-    public function loadClass($className, FileInterface $file)
+    public function loadClass(string $className, FileInterface $file): void
     {
         if (!class_exists($className)) {
             include_once $file->getPath();

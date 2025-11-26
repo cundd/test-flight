@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\Cli;
+
+use Exception;
 
 /**
  * CLI option parser
@@ -27,30 +29,32 @@ class OptionParser
      * </code>
      *
      * @param string[] $arguments
+     *
      * @return array
-     * @throws \Exception
+     *
+     * @throws Exception
      */
     public function parse(array $arguments)
     {
         $preparedArguments = [];
         $argumentsLength = count($arguments);
 
-        for ($i = 1; $i < $argumentsLength; $i++) {
+        for ($i = 1; $i < $argumentsLength; ++$i) {
             $currentArgument = $arguments[$i];
-            if (substr($currentArgument, 0, 2) === '--') { // Value option
+            if ('--' === substr($currentArgument, 0, 2)) { // Value option
                 $name = substr($currentArgument, 2);
 
-                if (strpos($name, '=') !== false) {
+                if (false !== strpos($name, '=')) {
                     list($name, $value) = explode('=', $name);
                 } elseif ($this->nextElementIsValueElement($arguments, $i, $argumentsLength)) {
-                    $i += 1;
+                    ++$i;
 
                     $value = $arguments[$i];
                 } else {
                     $value = true;
                 }
                 $preparedArguments[$name] = $value;
-            } elseif ($currentArgument[0] === '-') { // Flag option
+            } elseif ('-' === $currentArgument[0]) { // Flag option
                 $preparedArguments[substr($currentArgument, 1)] = true;
             } else {
                 $preparedArguments['path'] = $currentArgument;
@@ -61,9 +65,6 @@ class OptionParser
     }
 
     /**
-     * @param array $arguments
-     * @param       $currentIndex
-     * @param       $argumentsLength
      * @return bool
      */
     private function nextElementIsValueElement(array $arguments, $currentIndex, $argumentsLength)
@@ -71,7 +72,7 @@ class OptionParser
         return $currentIndex + 1 < $argumentsLength
             && is_string($arguments[$currentIndex + 1])
             && (
-                strlen($arguments[$currentIndex + 1]) === 0 || $arguments[$currentIndex + 1][0] !== '-'
+                0 === strlen($arguments[$currentIndex + 1]) || '-' !== $arguments[$currentIndex + 1][0]
             );
     }
 }

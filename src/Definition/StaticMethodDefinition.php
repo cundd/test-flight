@@ -11,8 +11,6 @@ class StaticMethodDefinition extends AbstractMethodDefinition
 {
     /**
      * Returns the descriptive type of the definition
-     *
-     * @return string
      */
     public function getType(): string
     {

@@ -8,25 +8,22 @@ use Cundd\TestFlight\Exception\ClassDoesNotExistException;
 use Cundd\TestFlight\Exception\NoImplementationForInterfaceException;
 use ReflectionClass;
 
-
 /**
  * Class that manages the creation of instances of test classes
  */
-class ObjectManager implements ObjectManagerInterface
+final class ObjectManager implements ObjectManagerInterface
 {
     /**
-     * @var array
+     * @var array<class-string, object>
      */
-    private $container = [];
+    private array $container = [];
 
     /**
      * Retrieve a shared instance of the ObjectManager
-     *
-     * @return ObjectManager
      */
-    public static function sharedInstance()
+    public static function sharedInstance(): ObjectManagerInterface
     {
-        static $sharedInstance = null;
+        static $sharedInstance;
         if (!$sharedInstance) {
             $sharedInstance = new static();
         }
@@ -34,9 +31,6 @@ class ObjectManager implements ObjectManagerInterface
         return $sharedInstance;
     }
 
-    /**
-     * ObjectManager constructor
-     */
     public function __construct()
     {
         $this->container[__CLASS__] = $this;
@@ -46,11 +40,9 @@ class ObjectManager implements ObjectManagerInterface
     /**
      * Retrieve the class from the container or creates a new instance
      *
-     * @param string $className
-     * @param array  $constructorArguments
-     * @return object
+     * @param array $constructorArguments
      */
-    public function get(string $className, ...$constructorArguments)
+    public function get(string $className, ...$constructorArguments): object
     {
         if (!isset($this->container[$className])) {
             $instance = $this->createWithArguments(
@@ -71,28 +63,21 @@ class ObjectManager implements ObjectManagerInterface
     /**
      * Returns a new instance of the given class
      *
-     * @param string $className
-     * @param array  $constructorArguments
-     * @return object
+     * @param array $constructorArguments
      */
-    public function create(string $className, ...$constructorArguments)
+    public function create(string $className, ...$constructorArguments): object
     {
         return $this->createWithArguments($className, $constructorArguments);
     }
 
     /**
      * Returns a new instance of the given class
-     *
-     * @param string $className
-     * @param array  $constructorArguments
-     * @param string $implementationClassName
-     * @return object
      */
     private function createWithArguments(
         string $className,
         array $constructorArguments,
-        &$implementationClassName = null
-    ) {
+        ?string &$implementationClassName = null,
+    ): object {
         if (interface_exists($className)) {
             $className = $implementationClassName = $this->getClassForInterface($className);
         }
@@ -110,14 +95,11 @@ class ObjectManager implements ObjectManagerInterface
 
     /**
      * Try to find the class name for the given interface
-     *
-     * @param string $interfaceName
-     * @return string
      */
-    private function getClassForInterface(string $interfaceName)
+    private function getClassForInterface(string $interfaceName): string
     {
         $implementationName = '';
-        if (strtolower(substr($interfaceName, -9)) === 'interface') {
+        if ('interface' === strtolower(substr($interfaceName, -9))) {
             $implementationName = substr($interfaceName, 0, -9);
         }
 
@@ -131,7 +113,7 @@ class ObjectManager implements ObjectManagerInterface
     /**
      * @test
      */
-    protected function getObjectSingletonTest()
+    protected function getObjectSingletonTest(): void
     {
         test_flight_assert($this->get(__CLASS__) === $this);
         test_flight_assert($this->get(__CLASS__) === $this->get(__CLASS__));
@@ -149,7 +131,7 @@ class ObjectManager implements ObjectManagerInterface
     /**
      * @test
      */
-    protected function getObjectInterfaceTest()
+    protected function getObjectInterfaceTest(): void
     {
         test_flight_assert($this->get(ObjectManagerInterface::class) === $this);
     }
@@ -157,7 +139,7 @@ class ObjectManager implements ObjectManagerInterface
     /**
      * @test
      */
-    protected static function getSharedInstanceTest()
+    protected static function getSharedInstanceTest(): void
     {
         test_flight_assert(self::sharedInstance() instanceof ObjectManager);
         test_flight_assert(self::sharedInstance()->get(__CLASS__) === self::sharedInstance());

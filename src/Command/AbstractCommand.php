@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Command;
 
@@ -15,51 +15,12 @@ use Cundd\TestFlight\Output\PrinterInterface;
  */
 abstract class AbstractCommand implements CommandInterface
 {
-    /**
-     * @var ClassLoader
-     */
-    protected $classLoader;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var PrinterInterface
-     */
-    protected $printer;
-
-    /**
-     * @var ExceptionPrinterInterface
-     */
-    protected $exceptionPrinter;
-
-    /**
-     * @var ConfigurationProviderInterface
-     */
-    protected $configurationProvider;
-
-    /**
-     * AbstractCommand constructor.
-     *
-     * @param ConfigurationProviderInterface $configurationProvider
-     * @param ObjectManager                  $objectManager
-     * @param ClassLoader                    $classLoader
-     * @param PrinterInterface               $printer
-     * @param ExceptionPrinterInterface      $exceptionPrinter
-     */
     public function __construct(
-        ConfigurationProviderInterface $configurationProvider,
-        ObjectManager $objectManager,
-        ClassLoader $classLoader,
-        PrinterInterface $printer,
-        ExceptionPrinterInterface $exceptionPrinter
+        protected readonly ConfigurationProviderInterface $configurationProvider,
+        protected readonly ObjectManager $objectManager,
+        protected readonly ClassLoader $classLoader,
+        protected readonly PrinterInterface $printer,
+        protected readonly ExceptionPrinterInterface $exceptionPrinter,
     ) {
-        $this->configurationProvider = $configurationProvider;
-        $this->objectManager = $objectManager;
-        $this->classLoader = $classLoader;
-        $this->printer = $printer;
-        $this->exceptionPrinter = $exceptionPrinter;
     }
 }

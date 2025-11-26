@@ -11,19 +11,12 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
  */
 class DocumentationCodeDefinition extends AbstractCodeDefinition
 {
-    /**
-     * @param string        $code
-     * @param FileInterface $file
-     */
     public function __construct(string $code, FileInterface $file)
     {
         $this->code = $code;
         $this->file = $file;
     }
 
-    /**
-     * @return string
-     */
     public function getClassName(): string
     {
         return '';
@@ -31,18 +24,16 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
 
     /**
      * Returns a description for the output
-     *
-     * @return string
      */
     public function getDescription(): string
     {
         $fileName = pathinfo($this->getFilePath(), PATHINFO_FILENAME);
         $testName = $fileName;
 
-        if ($testName[0] === '_') {
+        if ('_' === $testName[0]) {
             $testName = substr($testName, 1);
         }
-        if (strtoupper($testName) === 'README') {
+        if ('README' === strtoupper($testName)) {
             $testName = basename(dirname($this->getFilePath())) . ': Readme';
         }
 
@@ -61,8 +52,6 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
 
     /**
      * Returns the descriptive type of the definition
-     *
-     * @return string
      */
     public function getType(): string
     {

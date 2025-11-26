@@ -1,22 +1,20 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight;
 
 use Cundd\TestFlight\Exception\AssertionError;
 use Cundd\TestFlight\Exception\AssertionLogicError;
-
+use Error;
+use Exception;
 
 /**
  * A collection of assert functions
  */
 abstract class Assert
 {
-    /**
-     * @var int
-     */
-    private static $count = 0;
+    private static int $count = 0;
 
     /**
      * Test if the assertion is true
@@ -26,13 +24,10 @@ abstract class Assert
      *  test_flight_throws(function() {
      *      \Cundd\TestFlight\Assert::assert(false);
      *  });
-     *
-     * @param mixed  $assertion
-     * @param string $message
      */
-    public static function assert($assertion, string $message = '')
+    public static function assert(mixed $assertion, string $message = ''): void
     {
-        self::$count += 1;
+        ++self::$count;
         assert($assertion, new AssertionError($message));
     }
 
@@ -48,14 +43,14 @@ abstract class Assert
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertSame([], [1]); });
      *  test_flight_throws(function() use($object) { \Cundd\TestFlight\Assert::assertSame($object, new stdClass()); });
      *
-     * @param mixed  $expected
-     * @param mixed  $actual
-     * @param string $message
      * @throws AssertionError if the values are not equal
      */
-    public static function assertSame($expected, $actual, string $message = '')
-    {
-        self::$count += 1;
+    public static function assertSame(
+        mixed $expected,
+        mixed $actual,
+        string $message = '',
+    ): void {
+        ++self::$count;
 
         if ($expected === $actual) {
             return;
@@ -86,15 +81,13 @@ abstract class Assert
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertTrue(null); });
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertTrue([]); });
      *
-     * @param mixed  $actual
-     * @param string $message
      * @throws AssertionError if the value is false, null, 0, '', '0', ...
      */
-    public static function assertTrue($actual, string $message = '')
+    public static function assertTrue(mixed $actual, string $message = ''): void
     {
-        self::$count += 1;
+        ++self::$count;
 
-        if ((bool)$actual) {
+        if ((bool) $actual) {
             return;
         }
 
@@ -123,15 +116,13 @@ abstract class Assert
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertFalse(new stdClass()); });
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertFalse([1]); });
      *
-     * @param mixed  $actual
-     * @param string $message
      * @throws AssertionError if the value is false, null, 0, '', '0', ...
      */
-    public static function assertFalse($actual, string $message = '')
+    public static function assertFalse(mixed $actual, string $message = ''): void
     {
-        self::$count += 1;
+        ++self::$count;
 
-        if (false === (bool)$actual) {
+        if (false === (bool) $actual) {
             return;
         }
 
@@ -171,25 +162,22 @@ abstract class Assert
      *  assert($didThrowWrongException, 'No exception thrown');
      *  assert('Expected RuntimeException got LogicException' === $exceptionMessage, 'Exception message does not match');
      *
-     * @param callable $callback
-     * @param string   $expectedException
-     * @param string   $message
+     * @param callable(): void $callback
+     *
      * @throws AssertionError
      */
-    public static function throws(callable $callback, string $expectedException = '', string $message = '')
+    public static function throws(callable $callback, string $expectedException = '', string $message = ''): void
     {
-        self::$count += 1;
+        ++self::$count;
 
         $exception = null;
         try {
             $callback();
-        } catch (\Error $exception) {
-
-        } catch (\Exception $exception) {
-
+        } catch (Error $exception) {
+        } catch (Exception $exception) {
         }
 
-        if ($exception === null) {
+        if (null === $exception) {
             throw new AssertionError($message ?: 'No exception thrown');
         } elseif ($expectedException && !is_a($exception, $expectedException)) {
             throw new AssertionError(
@@ -210,14 +198,14 @@ abstract class Assert
      *  \Cundd\TestFlight\Assert::assertInstanceOf('stdClass', new stdClass());
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertInstanceOf('stdClass', new Exception()); });
      *
-     * @param string $className
-     * @param mixed  $actual
-     * @param string $message
-     * @throws AssertionError
+     * @throws AssertionError* @param mixed $actual
      */
-    public static function assertInstanceOf(string $className, $actual, string $message = '')
-    {
-        self::$count += 1;
+    public static function assertInstanceOf(
+        string $className,
+        mixed $actual,
+        string $message = '',
+    ): void {
+        ++self::$count;
 
         if ($actual instanceof $className) {
             return;
@@ -226,7 +214,7 @@ abstract class Assert
         if (!$message) {
             $message = sprintf(
                 'Failed asserting that %s is an instance of %s',
-                static::getType($actual),
+                get_debug_type($actual),
                 $className
             );
         }
@@ -254,14 +242,14 @@ abstract class Assert
      *  \Cundd\TestFlight\Assert::assertTypeOf('string', 'null');
      *  \Cundd\TestFlight\Assert::assertTypeOf('resource', fopen('php://temp', 'a+'));
      *
-     * @param string $type
-     * @param mixed  $actual
-     * @param string $message
-     * @throws AssertionError
+     * @throws AssertionError* @param mixed $actual
      */
-    public static function assertTypeOf(string $type, $actual, string $message = '')
-    {
-        self::$count += 1;
+    public static function assertTypeOf(
+        string $type,
+        mixed $actual,
+        string $message = '',
+    ): void {
+        ++self::$count;
 
         switch (strtolower($type)) {
             case 'array':
@@ -335,7 +323,7 @@ abstract class Assert
         if (!$message) {
             $message = sprintf(
                 'Failed asserting that %s is of type %s',
-                static::getType($actual),
+                get_debug_type($actual),
                 $type
             );
         }
@@ -344,20 +332,9 @@ abstract class Assert
 
     /**
      * Returns the number of preformed assertions
-     *
-     * @return int
      */
     public static function getCount(): int
     {
         return self::$count;
-    }
-
-    /**
-     * @param mixed $input
-     * @return string
-     */
-    private static function getType($input)
-    {
-        return is_object($input) ? get_class($input) : gettype($input);
     }
 }

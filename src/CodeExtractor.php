@@ -1,34 +1,29 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight;
 
 /**
  * Class to read Code from the given doc comment
- *
- * @package Cundd\TestFlight
  */
 class CodeExtractor
 {
-    const DOC_COMMENT_EXAMPLE_REGEX = '\s+([^@]*)[.\s@]+';
-    const DOC_COMMENT_CODE_REGEX = '<code\b[^>]*>(.*?)</code>';
-    const DOCUMENTATION_REGEX = '\n([^`]*)```';
+    public const DOC_COMMENT_EXAMPLE_REGEX = '\s+([^@]*)[.\s@]+';
+    public const DOC_COMMENT_CODE_REGEX = '<code\b[^>]*>(.*?)</code>';
+    public const DOCUMENTATION_REGEX = '\n([^`]*)```';
 
     /**
      * Extract the example code from the doc comment
-     *
-     * @param string $docComment
-     * @return string
      */
     public function getCodeFromDocComment(string $docComment): string
     {
         $startExampleKeyword = strpos($docComment, Constants::EXAMPLE_KEYWORD);
         $startCodeKeyword = strpos($docComment, Constants::CODE_KEYWORD);
 
-        if ($startExampleKeyword !== false) {
+        if (false !== $startExampleKeyword) {
             $matches = $this->getCodeWithExampleKeyword($docComment, $startExampleKeyword);
-        } elseif ($startCodeKeyword !== false) {
+        } elseif (false !== $startCodeKeyword) {
             $matches = $this->getCodeWithCodeKeyword($docComment, $startCodeKeyword);
         } else {
             // None of the keywords was found
@@ -45,7 +40,7 @@ class CodeExtractor
                     return ltrim(trim($line, " \t\n\r\0\x0B"), '*');
                 },
                 // TODO: Check what type $matches has
-                is_array($matches) ? $matches : explode("\n", (string)$matches)
+                is_array($matches) ? $matches : explode("\n", (string) $matches)
             )
         );
 
@@ -55,7 +50,6 @@ class CodeExtractor
     /**
      * Extract the example code from the documentation file
      *
-     * @param string $fileContent
      * @return string[]
      */
     public function getCodeFromDocumentation(string $fileContent): array
@@ -76,12 +70,7 @@ class CodeExtractor
         );
     }
 
-    /**
-     * @param string $docComment
-     * @param int    $start
-     * @return array
-     */
-    private function getCodeWithExampleKeyword(string $docComment, int $start)
+    private function getCodeWithExampleKeyword(string $docComment, int $start): string|array
     {
         $code = substr($docComment, $start);
 
@@ -93,12 +82,7 @@ class CodeExtractor
         return $matches[1];
     }
 
-    /**
-     * @param string $docComment
-     * @param int    $start
-     * @return array
-     */
-    private function getCodeWithCodeKeyword(string $docComment, int $start)
+    private function getCodeWithCodeKeyword(string $docComment, int $start): string|array
     {
         $code = substr($docComment, $start);
 
@@ -113,7 +97,7 @@ class CodeExtractor
     /**
      * @test
      */
-    protected function getCodeFromDocCommentWithExampleTest()
+    protected function getCodeFromDocCommentWithExampleTest(): void
     {
         $docComment = '/**
      * Returns the file\'s path
@@ -150,7 +134,7 @@ class CodeExtractor
         $docComment = '/**
      * Returns the file\'s path
      *
-     * @example 
+     * @example
      *  assert(__FILE__, (new File(__FILE__))->getPath());
      *  assert(__FILE__, (new File(__FILE__))->getPath())
      * @param string $xy
@@ -168,7 +152,7 @@ class CodeExtractor
     /**
      * @test
      */
-    protected function getCodeFromDocCommentWithCodeTest()
+    protected function getCodeFromDocCommentWithCodeTest(): void
     {
         $docComment = '/**
      * Returns the file\'s path
@@ -224,7 +208,7 @@ class CodeExtractor
     /**
      * @test
      */
-    protected function getCodeFromDocumentationTest()
+    protected function getCodeFromDocumentationTest(): void
     {
         $documentation = '
 Documentation

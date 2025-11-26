@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\Configuration;
-
 
 use Cundd\TestFlight\Configuration\Exception\InvalidConfigurationException;
 use Cundd\TestFlight\Configuration\Exception\InvalidFileTypeException;
@@ -16,14 +15,9 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
  */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
-    /**
-     * @var array
-     */
-    private $configuration;
+    private array $configuration;
 
     /**
-     * ConfigurationProvider constructor.
-     *
      * @param array $coreConfiguration The core configuration (provided through CLI options)
      */
     public function __construct(array $coreConfiguration = [])
@@ -33,9 +27,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     /**
      * Sets the underlying configuration
-     *
-     * @param array $configuration
-     * @return ConfigurationProviderInterface
      */
     public function setConfiguration(array $configuration): ConfigurationProviderInterface
     {
@@ -65,24 +56,20 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      *  $cp->setConfiguration(['configuration' => __DIR__ . '/../../tests/resources/test-configuration.json']);
      *  test_flight_assert_same('/tests/resources/test-bootstrap.php', substr($cp->get('bootstrap'), -35));
      * </code>
-     *
-     * @param string $key
-     * @return mixed
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         return $this->configuration[$key] ?? null;
     }
 
     /**
      * @param string $path
-     * @return array
      */
     private function load($path): array
     {
         $file = new File($path);
 
-        if ($file->getExtension() !== 'json') {
+        if ('json' !== $file->getExtension()) {
             throw new InvalidFileTypeException(
                 sprintf('File type %s not supported (currently only JSON files are supported)', $file->getExtension()),
                 1463827284
@@ -109,13 +96,11 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         return $data;
     }
 
-    /**
-     * @param array         $configuration
-     * @param string        $key
-     * @param FileInterface $file
-     */
-    private function preparePathInConfiguration(array &$configuration, string $key, FileInterface $file)
-    {
+    private function preparePathInConfiguration(
+        array &$configuration,
+        string $key,
+        FileInterface $file,
+    ): void {
         if (!isset($configuration[$key])) {
             return;
         }
@@ -124,17 +109,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         if (!$path) {
             return;
         }
-        if ($path[0] !== '/') {
+        if ('/' !== $path[0]) {
             $path = $file->getParent() . '/' . $path;
         }
 
         $configuration[$key] = realpath($path) ?: $path;
     }
 
-    /**
-     * @param $file
-     * @return string
-     */
     private function prepareJsonContent(FileInterface $file): string
     {
         return preg_replace('!//.*!', '', $file->getContents());

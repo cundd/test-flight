@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Cli;
 
@@ -39,11 +39,12 @@ class WindowHelper
      * @example
      *  assert(is_int((new \Cundd\TestFlight\Cli\WindowHelper)->getWidth()));
      *  assert(0 < (new \Cundd\TestFlight\Cli\WindowHelper)->getWidth());
+     *
      * @return int
      */
     public function getWidth()
     {
-        if ($this->width === null) {
+        if (null === $this->width) {
             $this->width = intval($this->systemCall('tput cols'));
         }
 
@@ -56,11 +57,12 @@ class WindowHelper
      * @example
      *  assert(is_int((new \Cundd\TestFlight\Cli\WindowHelper)->getHeight()));
      *  assert(0 < (new \Cundd\TestFlight\Cli\WindowHelper)->getHeight());
+     *
      * @return int
      */
     public function getHeight()
     {
-        if ($this->height === null) {
+        if (null === $this->height) {
             $this->height = intval($this->systemCall('tput lines'));
         }
 
@@ -68,7 +70,6 @@ class WindowHelper
     }
 
     /**
-     * @param string $command
      * @return string
      */
     private function systemCall(string $command)

@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\Command;
-
 
 use Cundd\TestFlight\CodeExtractor;
 use Cundd\TestFlight\Definition\DefinitionInterface;
@@ -16,8 +15,6 @@ use Cundd\TestFlight\FileAnalysis\FileProvider;
 
 /**
  * Abstract class for commands that can collect test definitions
- *
- * @package Cundd\TestFlight\Command
  */
 abstract class AbstractTestDefinitionCommand extends AbstractCommand
 {
@@ -33,7 +30,7 @@ abstract class AbstractTestDefinitionCommand extends AbstractCommand
         $allFiles = $fileProvider->findMatchingFiles($testPath);
         $codeExtractor = $this->objectManager->get(CodeExtractor::class);
 
-        /** @var \Cundd\TestFlight\DefinitionProvider\DefinitionProviderInterface $provider */
+        /** @var DefinitionProviderInterface $provider */
         $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
         if (0 !== count($this->configurationProvider->get('types'))) {
             $provider->setTypes($this->configurationProvider->get('types'));
@@ -46,8 +43,8 @@ abstract class AbstractTestDefinitionCommand extends AbstractCommand
     }
 
     /**
-     * @param DefinitionProviderInterface $provider
-     * @param FileInterface[]             $allFiles
+     * @param FileInterface[] $allFiles
+     *
      * @return DefinitionInterface[][]
      */
     private function collectTestDefinitionsForDocumentation(DefinitionProviderInterface $provider, array $allFiles)
@@ -60,8 +57,8 @@ abstract class AbstractTestDefinitionCommand extends AbstractCommand
     }
 
     /**
-     * @param DefinitionProviderInterface $provider
-     * @param FileInterface[]             $allFiles
+     * @param FileInterface[] $allFiles
+     *
      * @return DefinitionInterface[][]
      */
     private function collectTestDefinitionsForClasses(DefinitionProviderInterface $provider, array $allFiles)

@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -13,14 +13,13 @@ class DocumentationFileProvider
      * Returns the documentation files from the given files
      *
      * @param FileInterface[] $files
-     * @return array
      */
     public function findDocumentationFiles(array $files): array
     {
         return array_filter(
             $files,
             function (FileInterface $file) {
-                return substr($file->getPath(), -4) !== '.php';
+                return '.php' !== substr($file->getPath(), -4);
             }
         );
     }

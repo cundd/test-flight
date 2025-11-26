@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cundd\TestFlight\Event;
@@ -10,19 +11,17 @@ interface EventDispatcherInterface
 {
     /**
      * Register a listener for the given event code
-     *
-     * @param string   $eventCode
-     * @param callable $listener
-     * @return $this
      */
-    public function register(string $eventCode, callable $listener);
+    public function register(
+        string $eventCode,
+        callable $listener,
+    ): EventDispatcherInterface;
 
     /**
      * Invoke all event listeners for the given event code
-     *
-     * @param string         $eventCode
-     * @param EventInterface $definition
-     * @return $this
      */
-    public function dispatch(string $eventCode, EventInterface $definition);
+    public function dispatch(
+        string $eventCode,
+        EventInterface $definition,
+    ): EventDispatcherInterface;
 }

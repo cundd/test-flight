@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight;
-
 
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
@@ -16,53 +15,28 @@ use Cundd\TestFlight\TestRunner\CodeTestRunner;
 use Cundd\TestFlight\TestRunner\MethodTestRunner;
 use Cundd\TestFlight\TestRunner\StaticMethodTestRunner;
 use Cundd\TestFlight\TestRunner\TestRunnerFactory;
+use Exception;
 
 /**
  * Class to forward the test definitions to the matching test runner
  */
 class TestDispatcher
 {
-    /**
-     * @var int
-     */
-    private $successes = 0;
+    private int $successes = 0;
 
-    /**
-     * @var int
-     */
-    private $failures = 0;
+    private int $failures = 0;
 
-    /**
-     * @var int
-     */
-    private $numberOfTests = 0;
+    private int $numberOfTests = 0;
 
-    /**
-     * @var PrinterInterface
-     */
-    private $printer;
-
-    /**
-     * @var TestRunnerFactory
-     */
-    private $testRunnerFactory;
-
-    /**
-     * TestDispatcher constructor
-     *
-     * @param TestRunnerFactory $testRunnerFactory
-     * @param PrinterInterface  $printer
-     */
     public function __construct(
-        TestRunnerFactory $testRunnerFactory,
-        PrinterInterface $printer
+        private readonly TestRunnerFactory $testRunnerFactory,
+        private readonly PrinterInterface $printer,
     ) {
-        $this->testRunnerFactory = $testRunnerFactory;
-        $this->printer = $printer;
     }
 
     /**
      * @param DefinitionInterface[] $testCollection
+     *
      * @return bool Return if all tests succeeded
      */
     public function runTestDefinitions(array $testCollection): bool
@@ -81,13 +55,13 @@ class TestDispatcher
 
     /**
      * @param DefinitionInterface[] $definitionCollection
-     * @param string                $classOrCollectionName
-     * @throws \Exception
+     *
+     * @throws Exception
      */
     protected function runTestDefinitionsForCollection(
         array $definitionCollection,
-        $classOrCollectionName
-    ) {
+        string $classOrCollectionName,
+    ): void {
         if (count($definitionCollection) > 0) {
             if (is_string($classOrCollectionName)) {
                 $this->printClassInfo($classOrCollectionName);
@@ -95,18 +69,16 @@ class TestDispatcher
 
             foreach ($definitionCollection as $definition) {
                 if ($this->runTestDefinition($definition)) {
-                    $this->successes += 1;
+                    ++$this->successes;
                 } else {
-                    $this->failures += 1;
+                    ++$this->failures;
                 }
             }
         }
     }
 
     /**
-     * @param DefinitionInterface $definition
-     * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     protected function runTestDefinition(DefinitionInterface $definition): bool
     {
@@ -128,14 +100,14 @@ class TestDispatcher
                 break;
 
             default:
-                throw new \Exception(
+                throw new Exception(
                     sprintf(
                         'No test runner found for definition type %s',
                         get_class($definition)
                     )
                 );
         }
-        $this->numberOfTests += 1;
+        ++$this->numberOfTests;
         $this->printTestInfo($definition);
 
         return $this->testRunnerFactory
@@ -143,10 +115,7 @@ class TestDispatcher
             ->runTestDefinition($definition);
     }
 
-    /**
-     * @return PrinterInterface
-     */
-    private function getPrinter()
+    private function getPrinter(): PrinterInterface
     {
         return $this->printer;
     }
@@ -154,7 +123,7 @@ class TestDispatcher
     /**
      * Print the test footer output
      */
-    private function printFooter()
+    private function printFooter(): void
     {
         $footerContent = sprintf(
             'Tests: %d | Assertions: %d | Successful: %d | Failures: %d',
@@ -180,26 +149,22 @@ class TestDispatcher
     /**
      * Print the test header output
      */
-    private function printHeader()
+    private function printHeader(): void
     {
     }
 
     /**
      * Print information about the current test class
-     *
-     * @param string $className
      */
-    private function printClassInfo(string $className)
+    private function printClassInfo(string $className): void
     {
         $this->getPrinter()->info('Run tests: %s', $className);
     }
 
     /**
      * Print information about the current test
-     *
-     * @param DefinitionInterface $definition
      */
-    private function printTestInfo(DefinitionInterface $definition)
+    private function printTestInfo(DefinitionInterface $definition): void
     {
     }
 }

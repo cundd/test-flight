@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\TestRunner;
 
@@ -17,69 +17,20 @@ use Cundd\TestFlight\Output\PrinterInterface;
  */
 class TestRunnerFactory
 {
-    /**
-     * @var ClassLoader
-     */
-    private $classLoader;
-
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
-    /**
-     * @var PrinterInterface
-     */
-    private $printer;
-
-    /**
-     * @var ExceptionPrinterInterface
-     */
-    private $exceptionPrinter;
-
-    /**
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * TestRunner
-     *
-     * @param ClassLoader               $classLoader
-     * @param ObjectManager             $objectManager
-     * @param Environment               $environment
-     * @param PrinterInterface          $printer
-     * @param ExceptionPrinterInterface $exceptionPrinter
-     * @param EventDispatcherInterface  $eventDispatcher
-     */
     public function __construct(
-        ClassLoader $classLoader,
-        ObjectManager $objectManager,
-        Environment $environment,
-        PrinterInterface $printer,
-        ExceptionPrinterInterface $exceptionPrinter,
-        EventDispatcherInterface $eventDispatcher
+        private readonly ClassLoader $classLoader,
+        private readonly ObjectManager $objectManager,
+        private readonly Environment $environment,
+        private readonly PrinterInterface $printer,
+        private readonly ExceptionPrinterInterface $exceptionPrinter,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
-        $this->classLoader = $classLoader;
-        $this->objectManager = $objectManager;
-        $this->printer = $printer;
-        $this->exceptionPrinter = $exceptionPrinter;
-        $this->environment = $environment;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Returns an instance of the given Test Runner class
-     *
-     * @param string $testRunnerClass
-     * @return TestRunnerInterface
      */
-    public function create(string $testRunnerClass)
+    public function create(string $testRunnerClass): TestRunnerInterface
     {
         $testRunner = $this->objectManager->get(
             $testRunnerClass,

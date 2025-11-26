@@ -1,10 +1,11 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Exception;
 
-class WarningException extends \ErrorException
-{
+use ErrorException;
 
+class WarningException extends ErrorException
+{
 }

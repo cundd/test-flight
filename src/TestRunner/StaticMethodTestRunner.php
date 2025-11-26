@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\TestRunner;
-
 
 use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
@@ -16,10 +15,11 @@ class StaticMethodTestRunner extends AbstractTestRunner
 {
     /**
      * @param StaticMethodDefinition|DefinitionInterface $definition
-     * @param ContextInterface                           $context
      */
-    protected function performTest(DefinitionInterface $definition, ContextInterface $context)
-    {
+    protected function performTest(
+        DefinitionInterface $definition,
+        ContextInterface $context,
+    ): void {
         $className = $definition->getClassName();
         $methodName = $definition->getMethodName();
 

@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\FileAnalysis;
-
 
 use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\Exception\FileNotReadableException;
@@ -13,24 +12,10 @@ use Cundd\TestFlight\Exception\FileNotReadableException;
  */
 class File implements FileInterface
 {
-    /**
-     * @var string
-     */
-    private $path;
+    private ?string $contents;
 
-    /**
-     * @var string
-     */
-    private $contents;
-
-    /**
-     * File constructor
-     *
-     * @param string $path
-     */
-    public function __construct(string $path)
+    public function __construct(private readonly string $path)
     {
-        $this->path = $path;
     }
 
     /**
@@ -39,7 +24,6 @@ class File implements FileInterface
      * @example
      *  $file = new \Cundd\TestFlight\FileAnalysis\File(__FILE__);
      *  assert(__FILE__ === $file->getPath())
-     * @return string
      */
     public function getPath(): string
     {
@@ -48,8 +32,6 @@ class File implements FileInterface
 
     /**
      * Returns the file name
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -58,8 +40,6 @@ class File implements FileInterface
 
     /**
      * Returns the file extension
-     *
-     * @return string
      */
     public function getExtension(): string
     {
@@ -68,20 +48,15 @@ class File implements FileInterface
 
     /**
      * Returns the file parent (dirname)
-     *
-     * @return string
      */
     public function getParent(): string
     {
         return dirname($this->path);
     }
 
-    /**
-     * @return string
-     */
     public function getContents(): string
     {
-        if (!$this->contents) {
+        if (!isset($this->contents)) {
             if (!file_exists($this->path)) {
                 FileNotExistsException::exceptionForFile($this->path);
             }
@@ -95,10 +70,6 @@ class File implements FileInterface
         return $this->contents;
     }
 
-    /**
-     * @param string $keyword
-     * @return bool
-     */
     public function containsKeyword(string $keyword): bool
     {
         return false !== strpos($this->getContents(), $keyword);

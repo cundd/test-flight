@@ -4,85 +4,34 @@ declare(strict_types=1);
 
 namespace Cundd\TestFlight;
 
+use InvalidArgumentException;
 
 class Environment
 {
-    /**
-     * @var array
-     */
-    private $env;
+    private string $env;
 
-    /**
-     * @var string
-     */
-    private $timeZone;
+    private string $timeZone;
 
-    /**
-     * @var array
-     */
-    private $locale;
+    private array $locale;
 
-    /**
-     * @var int
-     */
-    private $errorReporting;
+    private int $errorReporting;
 
-    /**
-     * @var array
-     */
-    private $globals;
+    private string $globals;
 
-    /**
-     * @var array
-     */
-    private $get;
+    private string $get;
 
-    /**
-     * @var array
-     */
-    private $post;
+    private string $post;
 
-    /**
-     * @var array
-     */
-    private $cookie;
+    private string $cookie;
 
-    /**
-     * @var array
-     */
-    private $server;
+    private string $server;
 
-    /**
-     * @var array
-     */
-    private $session;
+    private string $session;
 
-    /**
-     * @var array
-     */
-    private $files;
+    private string $files;
 
-    /**
-     * @var array
-     */
-    private $request;
+    private string $request;
 
-    /**
-     * Environment constructor.
-     *
-     * @param string $timeZone
-     * @param array  $locale
-     * @param int    $errorReporting
-     * @param array  $globals
-     * @param array  $env
-     * @param array  $get
-     * @param array  $post
-     * @param array  $cookie
-     * @param array  $server
-     * @param array  $session
-     * @param array  $files
-     * @param array  $request
-     */
     public function __construct(
         string $timeZone = '',
         array $locale = [],
@@ -95,7 +44,7 @@ class Environment
         array $server = [],
         array $session = [],
         array $files = [],
-        array $request = []
+        array $request = [],
     ) {
         $this->store(
             $timeZone,
@@ -116,33 +65,18 @@ class Environment
     /**
      * Store the given environment data
      *
-     * @param string $timeZone
-     * @param array  $locale
-     * @param int    $errorReporting
-     * @param array  $globals
-     * @param array  $env
-     * @param array  $get
-     * @param array  $post
-     * @param array  $cookie
-     * @param array  $server
-     * @param array  $session
-     * @param array  $files
-     * @param array  $request
+     * @param array $globals
+     * @param array $env
+     * @param array $get
+     * @param array $post
+     * @param array $cookie
+     * @param array $server
+     * @param array $session
+     * @param array $files
+     * @param array $request
      */
-    public function store(
-        string $timeZone,
-        array $locale,
-        int $errorReporting,
-        $globals,
-        $env,
-        $get,
-        $post,
-        $cookie,
-        $server,
-        $session,
-        $files,
-        $request
-    ) {
+    public function store(string $timeZone, array $locale, int $errorReporting, $globals, $env, $get, $post, $cookie, $server, $session, $files, $request): void
+    {
         $this->timeZone = $timeZone;
         $this->locale = $locale;
         $this->errorReporting = intval($errorReporting);
@@ -161,7 +95,7 @@ class Environment
     /**
      * Reset the environment variables
      */
-    public function reset()
+    public function reset(): void
     {
         ini_set('display_errors', '0');
         error_reporting(E_ALL);
@@ -180,41 +114,28 @@ class Environment
         $_REQUEST = $this->prepareGlobalForRetrieval($this->request);
     }
 
-    /**
-     * @return string
-     */
     public function getTimeZone(): string
     {
         return $this->timeZone;
     }
 
-    /**
-     * @return array
-     */
     public function getLocale(): array
     {
         return $this->locale;
     }
 
-    /**
-     * @return int
-     */
     public function getErrorReporting(): int
     {
         return $this->errorReporting;
     }
 
-    /**
-     * @param $value
-     * @return null|string
-     */
-    private function prepareGlobalForStorage($value)
+    private function prepareGlobalForStorage(mixed $value): ?string
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
         if (!is_array($value)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Expected argument "value" to be of type array or NULL, %s given',
                     is_object($value) ? get_class($value) : gettype($value)
@@ -225,20 +146,16 @@ class Environment
         return serialize($value);
     }
 
-    /**
-     * @param $value
-     * @return null|mixed
-     */
-    private function prepareGlobalForRetrieval($value)
+    private function prepareGlobalForRetrieval(mixed $value): mixed
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
         return unserialize($value);
     }
 
-    private function patchGlobals(array $restoredValues)
+    private function patchGlobals(array $restoredValues): void
     {
         foreach ($restoredValues as $key => $value) {
             $GLOBALS[$key] = $value;
@@ -253,14 +170,20 @@ class Environment
     /**
      * @test
      */
-    protected static function resetTest()
+    protected static function resetTest(): void
     {
         $_GET['my_get_var'] = 'get';
         $_POST['my_post_var'] = 'post';
         $_ENV['MY_ENV_VAR'] = 'nice';
-        $locale = ["UTF-8", "C", "C", "C", "C", "C/UTF-8/C/C/C/C", "C"];
+        $locale = ['UTF-8', 'C', 'C', 'C', 'C', 'C/UTF-8/C/C/C/C', 'C'];
         $env = new Environment(
-            'Europe/Vienna', $locale, E_ALL, $GLOBALS, $_ENV, $_GET, $_POST
+            'Europe/Vienna',
+            $locale,
+            E_ALL,
+            $GLOBALS,
+            $_ENV,
+            $_GET,
+            $_POST
         );
 
         $_GET['my_get_var'] = 'something else';

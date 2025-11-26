@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Command;
 
@@ -14,8 +14,6 @@ class ListCommand extends AbstractTestDefinitionCommand
 {
     /**
      * Runs the command
-     *
-     * @return bool
      */
     public function run(): bool
     {
@@ -37,11 +35,6 @@ class ListCommand extends AbstractTestDefinitionCommand
         return true;
     }
 
-    /**
-     * @param string              $key
-     * @param DefinitionInterface $definition
-     * @return string
-     */
     private function printGroupHeaderForKeyAndDefinition(string $key, DefinitionInterface $definition): string
     {
         return $key;

@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\Context;
 
@@ -9,10 +9,7 @@ namespace Cundd\TestFlight\Context;
  */
 class Context implements ContextInterface
 {
-    /**
-     * @var array
-     */
-    private $variables = [];
+    private array $variables = [];
 
     /**
      * Returns the variables defined for this context
@@ -24,8 +21,6 @@ class Context implements ContextInterface
      *  test_flight_assert(isset($variables['a']));
      *  test_flight_assert_same('b', $variables['a']);
      * </code>
-     *
-     * @return array
      */
     public function getVariables(): array
     {
@@ -46,10 +41,6 @@ class Context implements ContextInterface
      *  test_flight_assert(isset($variables['c']));
      *  test_flight_assert_same(100, $variables['c']);
      * </code>
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @return ContextInterface
      */
     public function setVariable(string $key, $value): ContextInterface
     {
@@ -69,9 +60,6 @@ class Context implements ContextInterface
      *  $variables = $ctx->getVariables();
      *  test_flight_assert(!isset($variables['a']));
      * </code>
-     *
-     * @param string $key
-     * @return ContextInterface
      */
     public function unsetVariable(string $key): ContextInterface
     {
@@ -95,9 +83,6 @@ class Context implements ContextInterface
      *  test_flight_assert(isset($variables['c']), 'Variable "c" not defined');
      *  test_flight_assert_same(100, $variables['c']);
      * </code>
-     *
-     * @param array $variables
-     * @return ContextInterface
      */
     public function addVariables(array $variables): ContextInterface
     {

@@ -11,43 +11,21 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
  */
 class DocCommentCodeDefinition extends AbstractCodeDefinition
 {
-    /**
-     * @var string
-     */
-    private $className;
-
-    /**
-     * @var string
-     */
-    private $relatedMethodName;
-
-    /**
-     * CodeDefinition constructor.
-     *
-     * @param string        $className
-     * @param string        $code
-     * @param FileInterface $file
-     * @param string        $relatedMethodName
-     */
-    public function __construct(string $className, string $code, FileInterface $file, string $relatedMethodName)
-    {
-        $this->className = $className;
+    public function __construct(
+        private readonly string $className,
+        string $code,
+        FileInterface $file,
+        private readonly string $relatedMethodName,
+    ) {
         $this->code = $code;
         $this->file = $file;
-        $this->relatedMethodName = $relatedMethodName;
     }
 
-    /**
-     * @return string
-     */
     public function getClassName(): string
     {
         return $this->className;
     }
 
-    /**
-     * @return string
-     */
     public function getRelatedMethodName(): string
     {
         return $this->relatedMethodName;
@@ -55,8 +33,6 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
 
     /**
      * Returns a description for the output
-     *
-     * @return string
      */
     public function getDescription(): string
     {
@@ -71,8 +47,6 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
 
     /**
      * Returns the descriptive type of the definition
-     *
-     * @return string
      */
     public function getType(): string
     {

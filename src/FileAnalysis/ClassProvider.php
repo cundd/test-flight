@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Cundd\TestFlight\FileAnalysis;
 
@@ -11,7 +11,6 @@ class ClassProvider
 {
     /**
      * @param FileInterface[] $files
-     * @return array
      */
     public function findClassesInFiles(array $files): array
     {
@@ -30,19 +29,13 @@ class ClassProvider
         return $classes;
     }
 
-    /**
-     * @param FileInterface $file
-     * @return bool
-     */
     private function isPhpFile(FileInterface $file): bool
     {
-        return pathinfo($file->getPath(), PATHINFO_EXTENSION) === 'php';
+        return 'php' === pathinfo($file->getPath(), PATHINFO_EXTENSION);
     }
 
     /**
-     * @param string[]      $classes
-     * @param FileInterface $file
-     * @return array
+     * @param string[] $classes
      */
     private function buildDictionaryWithClassesAndFile(array $classes, FileInterface $file): array
     {
@@ -58,7 +51,6 @@ class ClassProvider
     }
 
     /**
-     * @param FileInterface $file
      * @return string[]
      */
     private function getClassFromFile(FileInterface $file): array
@@ -67,36 +59,35 @@ class ClassProvider
         $tokens = token_get_all($file->getContents());
         $count = count($tokens);
         $namespace = '';
-        for ($i = 2; $i < $count; $i++) {
+        for ($i = 2; $i < $count; ++$i) {
             // Detect the namespace
-            if ($tokens[$i - 2][0] === T_NAMESPACE
-                && $tokens[$i - 1][0] === T_WHITESPACE
-                && $tokens[$i][0] === T_STRING
+            if (T_NAMESPACE === $tokens[$i - 2][0]
+                && T_WHITESPACE === $tokens[$i - 1][0]
+                && T_STRING === $tokens[$i][0]
             ) {
-                while ($tokens[$i][0] === T_STRING || $tokens[$i][0] === T_NS_SEPARATOR) {
+                while (T_STRING === $tokens[$i][0] || T_NS_SEPARATOR === $tokens[$i][0]) {
                     $namespace .= $tokens[$i][1];
-                    $i += 1;
+                    ++$i;
                 }
             }
 
             // PHP8.0+
             if (defined('T_NAME_QUALIFIED')) {
-              if ($tokens[$i - 2][0] === T_NAMESPACE
-                    && $tokens[$i - 1][0] === T_WHITESPACE
-                    && ($tokens[$i][0] === T_NAME_QUALIFIED)
+                if (T_NAMESPACE === $tokens[$i - 2][0]
+                      && T_WHITESPACE === $tokens[$i - 1][0]
+                      && (T_NAME_QUALIFIED === $tokens[$i][0])
                 ) {
                     $namespace = $tokens[$i][1];
                 }
             }
 
-            if ($tokens[$i - 2][0] === T_CLASS
-                && $tokens[$i - 1][0] === T_WHITESPACE
-                && $tokens[$i][0] === T_STRING
+            if (T_CLASS === $tokens[$i - 2][0]
+                && T_WHITESPACE === $tokens[$i - 1][0]
+                && T_STRING === $tokens[$i][0]
             ) {
                 $classes[] = $tokens[$i][1];
             }
         }
-
 
         if ($namespace) {
             return array_map(

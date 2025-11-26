@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\Event;
-
 
 use Cundd\TestFlight\Event\Exception\InvalidEventCodeException;
 
@@ -12,17 +11,20 @@ use Cundd\TestFlight\Event\Exception\InvalidEventCodeException;
  */
 class EventDispatcher implements EventDispatcherInterface
 {
-    private $eventListeners = [];
+    /**
+     * @var array<string, callable[]>
+     */
+    private array $eventListeners = [];
 
     /**
      * Register a listener for the given event code
      *
-     * @param string   $eventCode
-     * @param callable $listener
      * @return $this
      */
-    public function register(string $eventCode, callable $listener)
-    {
+    public function register(
+        string $eventCode,
+        callable $listener,
+    ): EventDispatcherInterface {
         $this->assertValidEventCode($eventCode);
         if (false === isset($this->eventListeners[$eventCode])) {
             $this->eventListeners[$eventCode] = [];
@@ -35,12 +37,12 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Invoke all event listeners for the given event code
      *
-     * @param string         $eventCode
-     * @param EventInterface $event
      * @return $this
      */
-    public function dispatch(string $eventCode, EventInterface $event)
-    {
+    public function dispatch(
+        string $eventCode,
+        EventInterface $event,
+    ): EventDispatcherInterface {
         $this->assertValidEventCode($eventCode);
         if (true === isset($this->eventListeners[$eventCode])) {
             foreach ($this->eventListeners[$eventCode] as $listener) {
@@ -51,15 +53,10 @@ class EventDispatcher implements EventDispatcherInterface
         return $this;
     }
 
-    /**
-     * @param string $eventCode
-     */
-    private function assertValidEventCode(string $eventCode)
+    private function assertValidEventCode(string $eventCode): void
     {
         if (!ctype_alnum(str_replace(['.', '_'], '', $eventCode))) {
             throw new InvalidEventCodeException(sprintf('Invalid event code "%s"', $eventCode));
         }
     }
 }
-
-

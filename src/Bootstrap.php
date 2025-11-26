@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 namespace Cundd\TestFlight;
@@ -18,51 +17,29 @@ use Cundd\TestFlight\Exception\FileNotExistsException;
 use Cundd\TestFlight\Output\CodeFormatter;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
+use Exception;
+use TypeError;
 
 /**
  * Bootstrap the test environment
  */
-class Bootstrap
+final class Bootstrap
 {
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
+    private ObjectManager $objectManager;
 
-    /**
-     * @var Environment
-     */
-    private $environment;
+    private Environment $environment;
 
-    /**
-     * @var ClassLoader
-     */
-    private $classLoader;
+    private ClassLoader $classLoader;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var ConfigurationProviderInterface
-     */
-    private $configurationProvider;
+    private ConfigurationProviderInterface $configurationProvider;
 
-    /**
-     * @var PrinterInterface
-     */
-    private $printer;
+    private PrinterInterface $printer;
 
-    /**
-     * @var ExceptionPrinterInterface
-     */
-    private $exceptionPrinter;
+    private ExceptionPrinterInterface $exceptionPrinter;
 
-    /**
-     * @return $this
-     */
-    public function init()
+    public function init(): self
     {
         $this->objectManager = new ObjectManager();
         $this->configurationProvider = $this->objectManager->get(ConfigurationProviderInterface::class);
@@ -96,8 +73,7 @@ class Bootstrap
     /**
      * Find and run the tests
      *
-     * @param array $arguments
-     * @return bool
+     * @param array<int,mixed> $arguments
      */
     public function run(array $arguments): bool
     {
@@ -142,10 +118,7 @@ class Bootstrap
         return false;
     }
 
-    /**
-     *
-     */
-    private function initEnvironment()
+    private function initEnvironment(): void
     {
         try {
             $locales = [
@@ -174,16 +147,17 @@ class Bootstrap
                 $_REQUEST
             );
             $this->environment->reset();
-        } catch (\TypeError $error) {
+        } catch (TypeError $error) {
             echo $error;
         }
     }
 
     /**
      * @param string[] $arguments
-     * @throws \Exception
+     *
+     * @throws Exception
      */
-    private function prepareConfigurationProvider(array $arguments)
+    private function prepareConfigurationProvider(array $arguments): void
     {
         $options = $this->objectManager->get(OptionParser::class)->parse($arguments);
 
@@ -220,7 +194,7 @@ class Bootstrap
         // Check for a configuration file
         if (!isset($options['configuration'])) {
             $localConfigurationFilePath = getcwd(
-                ) . '/' . ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
+            ) . '/' . ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
             if (file_exists($localConfigurationFilePath)) {
                 $options['configuration'] = $localConfigurationFilePath;
             }
@@ -237,7 +211,7 @@ class Bootstrap
     /**
      * Print the test header output
      */
-    private function printHeader()
+    private function printHeader(): void
     {
         $this->printer->println('Test-Flight %s', Constants::VERSION);
     }
@@ -245,7 +219,7 @@ class Bootstrap
     /**
      * Print the test footer output
      */
-    private function printFooter()
+    private function printFooter(): void
     {
         // Nothing to do at the moment
     }
@@ -253,21 +227,17 @@ class Bootstrap
     /**
      * Print a error message and exit
      *
-     * @param string $message
-     * @param int    $status
+     * @param int $status
      */
-    private function error(string $message, $status = 1)
+    private function error(string $message, $status = 1): void
     {
         $this->printer->printError($message);
         exit($status);
     }
 
-    /**
-     *
-     */
-    private function checkDependencies()
+    private function checkDependencies(): void
     {
-        if (php_sapi_name() !== 'cli') {
+        if ('cli' !== php_sapi_name()) {
             $this->error('Test-Flight must be run as CLI');
         }
         if (!class_exists('RecursiveDirectoryIterator')) {
@@ -281,15 +251,13 @@ class Bootstrap
 
     /**
      * Include the custom bootstrap file
-     *
-     * @param string $bootstrapFile
      */
-    private function prepareCustomBootstrapAndAutoloading(string $bootstrapFile)
+    private function prepareCustomBootstrapAndAutoloading(string $bootstrapFile): void
     {
         /** @var Finder $autoloadFinder */
         $autoloadFinder = $this->objectManager->get(Finder::class);
         $projectAutoloaderPath = $autoloadFinder->find(getcwd());
-        if ($projectAutoloaderPath !== '') {
+        if ('' !== $projectAutoloaderPath) {
             require_once $projectAutoloaderPath;
         }
 

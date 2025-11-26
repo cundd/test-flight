@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cundd\TestFlight\Definition;
-
 
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 
@@ -12,35 +11,20 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
  */
 abstract class AbstractCodeDefinition implements CodeDefinitionInterface
 {
-    /**
-     * @var string
-     */
-    protected $code;
+    protected string $code;
 
-    /**
-     * @var FileInterface
-     */
-    protected $file;
+    protected FileInterface $file;
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return FileInterface
-     */
     public function getFile(): FileInterface
     {
         return $this->file;
     }
 
-    /**
-     * @return string
-     */
     public function getFilePath(): string
     {
         return $this->getFile()->getPath();
@@ -48,8 +32,6 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
 
     /**
      * Returns the pre-processed code
-     *
-     * @return string
      */
     public function getPreProcessedCode(): string
     {
