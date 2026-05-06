@@ -18,19 +18,6 @@ final class ObjectManager implements ObjectManagerInterface
      */
     private array $container = [];
 
-    /**
-     * Retrieve a shared instance of the ObjectManager
-     */
-    public static function sharedInstance(): ObjectManagerInterface
-    {
-        static $sharedInstance;
-        if (!$sharedInstance) {
-            $sharedInstance = new static();
-        }
-
-        return $sharedInstance;
-    }
-
     public function __construct()
     {
         $this->container[__CLASS__] = $this;
@@ -134,14 +121,5 @@ final class ObjectManager implements ObjectManagerInterface
     protected function getObjectInterfaceTest(): void
     {
         test_flight_assert($this->get(ObjectManagerInterface::class) === $this);
-    }
-
-    /**
-     * @test
-     */
-    protected static function getSharedInstanceTest(): void
-    {
-        test_flight_assert(self::sharedInstance() instanceof ObjectManager);
-        test_flight_assert(self::sharedInstance()->get(__CLASS__) === self::sharedInstance());
     }
 }

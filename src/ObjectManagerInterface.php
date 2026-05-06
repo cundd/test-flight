@@ -10,13 +10,6 @@ namespace Cundd\TestFlight;
 interface ObjectManagerInterface
 {
     /**
-     * Retrieve a shared instance of the ObjectManager
-     *
-     * @return ObjectManager
-     */
-    public static function sharedInstance(): ObjectManagerInterface;
-
-    /**
      * Retrieve the class from the container or creates a new instance
      *
      * @param array $constructorArguments
