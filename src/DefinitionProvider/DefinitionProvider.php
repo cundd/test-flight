@@ -21,10 +21,10 @@ use ReflectionMethod;
 /**
  * Provider for test definitions of classes containing test methods
  */
-class DefinitionProvider implements DefinitionProviderInterface
+final class DefinitionProvider implements DefinitionProviderInterface
 {
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $types = [
         Constants::TEST_TYPE_METHOD,
@@ -38,13 +38,6 @@ class DefinitionProvider implements DefinitionProviderInterface
     ) {
     }
 
-    /**
-     * Set the types of tests to run
-     *
-     * @param string[] $types
-     *
-     * @return $this
-     */
     public function setTypes(array $types): DefinitionProviderInterface
     {
         $this->types = $types;
@@ -52,28 +45,19 @@ class DefinitionProvider implements DefinitionProviderInterface
         return $this;
     }
 
-    /**
-     * Create the test definitions for the given classes
-     *
-     * @return DefinitionInterface[][]
-     */
     public function createForClasses(array $classNameToFiles): array
     {
         $definitionCollection = [];
         foreach ($classNameToFiles as $className => $file) {
-            $definitionCollection[$className] = $this->collectDefinitionsForClass($className, $file);
+            $definitionCollection[$className] = $this->collectDefinitionsForClass(
+                $className,
+                $file
+            );
         }
 
         return $definitionCollection;
     }
 
-    /**
-     * Create the test definitions for the given documentation files
-     *
-     * @param FileInterface[] $files
-     *
-     * @return DefinitionInterface[][]
-     */
     public function createForDocumentation(array $files): array
     {
         if (in_array(Constants::TEST_TYPE_DOCUMENTATION, $this->types)) {
@@ -103,10 +87,14 @@ class DefinitionProvider implements DefinitionProviderInterface
     }
 
     /**
+     * @param class-string $className
+     *
      * @return DefinitionInterface[]
      */
-    private function collectDefinitionsForClass(string $className, FileInterface $file): array
-    {
+    private function collectDefinitionsForClass(
+        string $className,
+        FileInterface $file,
+    ): array {
         $this->classLoader->loadClass($className, $file);
 
         if ($this->types) {
@@ -133,6 +121,11 @@ class DefinitionProvider implements DefinitionProviderInterface
         );
     }
 
+    /**
+     * @param class-string $className
+     *
+     * @return list<StaticMethodDefinition|MethodDefinition>
+     */
     private function collectMethodDefinitionsForClass(
         string $className,
         FileInterface $file,
@@ -140,7 +133,11 @@ class DefinitionProvider implements DefinitionProviderInterface
         $testMethods = [];
         $reflectionClass = new ReflectionClass($className);
         foreach ($reflectionClass->getMethods() as $method) {
-            if (false !== strpos((string) $method->getDocComment(), Constants::TEST_KEYWORD)) {
+            $hasTestKeyword = str_contains(
+                (string) $method->getDocComment(),
+                Constants::TEST_KEYWORD
+            );
+            if ($hasTestKeyword) {
                 if ($this->getMethodIsStatic($method)) {
                     $testMethods[] = new StaticMethodDefinition(
                         $className,
@@ -163,15 +160,27 @@ class DefinitionProvider implements DefinitionProviderInterface
     }
 
     /**
+     * @param class-string $className
+     *
      * @return DocCommentCodeDefinition[]
      */
-    private function collectCodeDefinitionsForClass(string $className, FileInterface $file): array
-    {
+    private function collectCodeDefinitionsForClass(
+        string $className,
+        FileInterface $file,
+    ): array {
         $reflectionClass = new ReflectionClass($className);
 
-        $testMethods = $this->collectCodeDefinitionsForClassMethods($className, $file, $reflectionClass);
+        $testMethods = $this->collectCodeDefinitionsForClassMethods(
+            $className,
+            $file,
+            $reflectionClass
+        );
 
-        $definitionForClass = $this->buildCodeDefinitionForClass($className, $file, $reflectionClass);
+        $definitionForClass = $this->buildCodeDefinitionForClass(
+            $className,
+            $file,
+            $reflectionClass
+        );
         if ($definitionForClass) {
             $testMethods[] = $definitionForClass;
         }
@@ -180,14 +189,17 @@ class DefinitionProvider implements DefinitionProviderInterface
     }
 
     /**
-     * @param ReflectionClass $reflectionClass
+     * @template T of object
+     *
+     * @param class-string<T>    $className
+     * @param ReflectionClass<T> $reflectionClass,
      *
      * @return DocCommentCodeDefinition[]
      */
     private function collectCodeDefinitionsForClassMethods(
         string $className,
         FileInterface $file,
-        $reflectionClass,
+        ReflectionClass $reflectionClass,
     ) {
         $testMethods = [];
         foreach ($reflectionClass->getMethods() as $method) {
@@ -209,8 +221,17 @@ class DefinitionProvider implements DefinitionProviderInterface
         return $testMethods;
     }
 
-    private function buildCodeDefinitionForClass(string $className, FileInterface $file, ReflectionClass $reflectionClass): ?DocCommentCodeDefinition
-    {
+    /**
+     * @template T of object
+     *
+     * @param class-string<T>    $className
+     * @param ReflectionClass<T> $reflectionClass,
+     */
+    private function buildCodeDefinitionForClass(
+        string $className,
+        FileInterface $file,
+        ReflectionClass $reflectionClass,
+    ): ?DocCommentCodeDefinition {
         $docComment = $reflectionClass->getDocComment();
         if (false === $docComment) {
             return null;
@@ -252,8 +273,10 @@ class DefinitionProvider implements DefinitionProviderInterface
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected static function createForThisClassTest(): void
+    private static function createForThisClassTest(): void
     {
         $prophet = new \Prophecy\Prophet();
         /** @var ClassLoader $dummy */
@@ -274,7 +297,9 @@ class DefinitionProvider implements DefinitionProviderInterface
 
         test_flight_throws(
             function () use ($provider) {
-                $provider->createForClasses(['NotExistingClass' => new File(__FILE__)]);
+                /** @var class-string $className */
+                $className = 'NotExistingClass'; // @phpstan-ignore varTag.nativeType
+                $provider->createForClasses([$className => new File(__FILE__)]);
             },
             ReflectionException::class
         );

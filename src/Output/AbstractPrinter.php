@@ -4,63 +4,39 @@ declare(strict_types=1);
 
 namespace Cundd\TestFlight\Output;
 
-use Cundd\TestFlight\Cli\WindowHelper;
+use Cundd\TestFlight\Cli\WindowHelperInterface;
 
 /**
  * Abstract printer base class
  */
 abstract class AbstractPrinter implements PrinterInterface
 {
-    /**
-     * @var resource
-     */
-    private $outputStream;
-
-    /**
-     * @var resource
-     */
-    private $errorStream;
-
     private bool $enableColoredOutput = true;
 
     private bool $verbose = false;
-
-    private WindowHelper $cliWindowHelper;
 
     /**
      * @param resource $outputStream
      * @param resource $errorStream
      */
     public function __construct(
-        $outputStream,
-        $errorStream,
-        WindowHelper $cliWindowHelper,
+        private readonly mixed $outputStream,
+        private readonly mixed $errorStream,
+        private readonly WindowHelperInterface $cliWindowHelper,
     ) {
-        $this->outputStream = $outputStream;
-        $this->errorStream = $errorStream;
-        $this->cliWindowHelper = $cliWindowHelper;
     }
 
-    /**
-     * @param array ...$arguments
-     */
-    public function printf(string $format, ...$arguments): self
+    public function printf(string $format, mixed ...$arguments): self
     {
         return $this->printWithArray($format, $arguments);
     }
 
-    /**
-     * @param array ...$arguments
-     */
-    public function println(string $format, ...$arguments): self
+    public function println(string $format, mixed ...$arguments): self
     {
         return $this->printWithArray($format . PHP_EOL, $arguments);
     }
 
-    /**
-     * @param array ...$arguments
-     */
-    public function printError(string $format, ...$arguments): self
+    public function printError(string $format, mixed ...$arguments): self
     {
         $format = $this->colorize(self::RED, $format) . PHP_EOL;
         fwrite($this->errorStream, vsprintf($format, $arguments));
@@ -68,10 +44,7 @@ abstract class AbstractPrinter implements PrinterInterface
         return $this;
     }
 
-    /**
-     * @param array ...$arguments
-     */
-    public function debug(string $format, ...$arguments): self
+    public function debug(string $format, mixed ...$arguments): self
     {
         if ($this->getVerbose()) {
             $this->printWithArray($format . PHP_EOL, $arguments);
@@ -80,25 +53,25 @@ abstract class AbstractPrinter implements PrinterInterface
         return $this;
     }
 
-    /**
-     * @param array ...$arguments
-     */
-    public function info(string $format, ...$arguments): self
+    public function info(string $format, mixed ...$arguments): self
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($this->colorize(self::BLUE, $format) . PHP_EOL, $arguments);
+            $this->printWithArray(
+                $this->colorize(self::BLUE, $format) . PHP_EOL,
+                $arguments
+            );
         }
 
         return $this;
     }
 
-    /**
-     * @param array ...$arguments
-     */
-    public function warn(string $format, ...$arguments): self
+    public function warn(string $format, mixed ...$arguments): self
     {
         if ($this->getVerbose()) {
-            $this->printWithArray($this->colorize(self::YELLOW, $format) . PHP_EOL, $arguments);
+            $this->printWithArray(
+                $this->colorize(self::YELLOW, $format) . PHP_EOL,
+                $arguments
+            );
         }
 
         return $this;
@@ -150,6 +123,9 @@ abstract class AbstractPrinter implements PrinterInterface
         return $text;
     }
 
+    /**
+     * @param array<int|string,mixed> $arguments
+     */
     private function printWithArray(string $format, array $arguments): self
     {
         fwrite($this->outputStream, vsprintf($format, $arguments));

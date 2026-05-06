@@ -14,7 +14,7 @@ use Cundd\TestFlight\Definition\StaticMethodDefinition;
 class StaticMethodTestRunner extends AbstractTestRunner
 {
     /**
-     * @param StaticMethodDefinition|DefinitionInterface $definition
+     * @param StaticMethodDefinition&DefinitionInterface $definition
      */
     protected function performTest(
         DefinitionInterface $definition,
@@ -24,10 +24,10 @@ class StaticMethodTestRunner extends AbstractTestRunner
         $methodName = $definition->getMethodName();
 
         if ($definition->getMethodIsPublic()) {
+            assert(is_callable([$className, $methodName]));
             call_user_func([$className, $methodName], $context);
         } else {
             $method = $definition->getReflectionMethod();
-            $method->setAccessible(true);
             $method->invoke(null, $context);
         }
     }

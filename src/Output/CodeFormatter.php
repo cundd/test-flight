@@ -62,10 +62,19 @@ class CodeFormatter implements ColorInterface
         array &$block,
         int $lineNumber,
     ): void {
-        $width = $this->cliWindowHelper->getWidth() - $this->gutterWidth;
+        $width = max(
+            $this->cliWindowHelper->getWidth() - $this->gutterWidth,
+            1
+        );
+
         $line = str_replace("\t", '    ', $line);
 
-        $gutter = str_pad((string) $lineNumber, $this->gutterWidth - 1, ' ', STR_PAD_LEFT) . ' ';
+        $gutter = str_pad(
+            (string) $lineNumber,
+            $this->gutterWidth - 1,
+            ' ',
+            STR_PAD_LEFT
+        ) . ' ';
 
         foreach (str_split($line, $width) as $lineChunk) {
             if (strlen($lineChunk) <= $width) {
@@ -95,11 +104,17 @@ class CodeFormatter implements ColorInterface
 
     private function colorizeLine(string $line): string
     {
-        return $this->colorize(self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::DARK_GRAY, $line);
+        return $this->colorize(
+            self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::DARK_GRAY,
+            $line
+        );
     }
 
     private function colorizeGutter(string $line): string
     {
-        return $this->colorize(self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::WHITE, $line);
+        return $this->colorize(
+            self::NORMAL . self::LIGHT_GRAY_BACKGROUND . self::WHITE,
+            $line
+        );
     }
 }

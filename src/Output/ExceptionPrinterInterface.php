@@ -13,11 +13,10 @@ use Throwable;
 interface ExceptionPrinterInterface extends PrinterInterface
 {
     /**
-     * Prints the exception for the given test definition
-     *
-     * @param Throwable $exception
-     *
-     * @return $this
+     * Print the exception for the given test definition
      */
-    public function printException(DefinitionInterface $definition, $exception);
+    public function printException(
+        DefinitionInterface $definition,
+        Throwable $exception,
+    ): self;
 }

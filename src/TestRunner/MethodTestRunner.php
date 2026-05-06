@@ -15,7 +15,7 @@ use ReflectionMethod;
 class MethodTestRunner extends AbstractTestRunner
 {
     /**
-     * @param MethodDefinition|DefinitionInterface $definition
+     * @param MethodDefinition&DefinitionInterface $definition
      */
     protected function performTest(
         DefinitionInterface $definition,
@@ -29,12 +29,16 @@ class MethodTestRunner extends AbstractTestRunner
             $instance->$methodName($context);
         } else {
             $method = $definition->getReflectionMethod();
-            $method->setAccessible(true);
             $method->invoke($instance, $context);
         }
     }
 
-    protected function invokeSetup($instance): void
+    /**
+     * @template T of object
+     *
+     * @param T $instance
+     */
+    protected function invokeSetup(object $instance): void
     {
         if (!method_exists($instance, 'setUp')) {
             return;
@@ -43,8 +47,7 @@ class MethodTestRunner extends AbstractTestRunner
         if (is_callable([$instance, 'setUp'])) {
             $instance->setUp();
         } else {
-            $setUpMethodReflection = new ReflectionMethod(get_class($instance), 'setUp');
-            $setUpMethodReflection->setAccessible(true);
+            $setUpMethodReflection = new ReflectionMethod($instance, 'setUp');
             $setUpMethodReflection->invoke($instance);
         }
     }

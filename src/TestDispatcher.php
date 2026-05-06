@@ -20,7 +20,7 @@ use Exception;
 /**
  * Class to forward the test definitions to the matching test runner
  */
-class TestDispatcher
+final class TestDispatcher
 {
     private int $successes = 0;
 
@@ -35,7 +35,7 @@ class TestDispatcher
     }
 
     /**
-     * @param DefinitionInterface[] $testCollection
+     * @param array<class-string, DefinitionInterface[]> $testCollection
      *
      * @return bool Return if all tests succeeded
      */
@@ -58,14 +58,12 @@ class TestDispatcher
      *
      * @throws Exception
      */
-    protected function runTestDefinitionsForCollection(
+    private function runTestDefinitionsForCollection(
         array $definitionCollection,
         string $classOrCollectionName,
     ): void {
         if (count($definitionCollection) > 0) {
-            if (is_string($classOrCollectionName)) {
-                $this->printClassInfo($classOrCollectionName);
-            }
+            $this->printClassInfo($classOrCollectionName);
 
             foreach ($definitionCollection as $definition) {
                 if ($this->runTestDefinition($definition)) {
@@ -80,7 +78,7 @@ class TestDispatcher
     /**
      * @throws Exception
      */
-    protected function runTestDefinition(DefinitionInterface $definition): bool
+    private function runTestDefinition(DefinitionInterface $definition): bool
     {
         switch (true) {
             case $definition instanceof DocCommentCodeDefinition:

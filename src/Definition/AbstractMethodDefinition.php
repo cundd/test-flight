@@ -12,6 +12,10 @@ use ReflectionMethod;
  */
 abstract class AbstractMethodDefinition implements DefinitionInterface
 {
+    /**
+     * @param class-string     $className
+     * @param non-empty-string $methodName
+     */
     public function __construct(
         private readonly string $className,
         private readonly string $methodName,
@@ -40,15 +44,14 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
         return $this->getFile()->getPath();
     }
 
-    /**
-     * Returns a description for the output
-     */
     public function getDescription(): string
     {
         return ''
             . $this->getType()
             . ' '
-            . $this->stringToUpperCaseWhitespace((string) substr((string) strrchr($this->getClassName(), '\\'), 1))
+            . $this->stringToUpperCaseWhitespace(
+                (string) substr((string) strrchr($this->getClassName(), '\\'), 1)
+            )
             . ': '
             . $this->stringToUpperCaseWhitespace($this->getMethodName());
     }
@@ -56,9 +59,6 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     public function getMethodIsStatic(): bool
     {
         $reflectionMethod = $this->getReflectionMethod();
-        if (!$reflectionMethod) {
-            return false;
-        }
 
         return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_STATIC);
     }
@@ -66,9 +66,6 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
     public function getMethodIsPublic(): bool
     {
         $reflectionMethod = $this->getReflectionMethod();
-        if (!$reflectionMethod) {
-            return false;
-        }
 
         return 0 < ($reflectionMethod->getModifiers() & ReflectionMethod::IS_PUBLIC);
     }
@@ -78,13 +75,10 @@ abstract class AbstractMethodDefinition implements DefinitionInterface
         return $this->reflectionMethod;
     }
 
-    /**
-     * @return string
-     */
-    private function stringToUpperCaseWhitespace(string $input)
+    private function stringToUpperCaseWhitespace(string $input): string
     {
         return ucwords(
-            ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $input)))
+            ltrim(strtolower((string) preg_replace('/[A-Z]/', ' $0', $input)))
         );
     }
 }

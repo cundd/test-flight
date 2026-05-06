@@ -9,10 +9,13 @@ namespace Cundd\TestFlight\Context;
  */
 class Context implements ContextInterface
 {
+    /**
+     * @var array<non-empty-string,mixed>
+     */
     private array $variables = [];
 
     /**
-     * Returns the variables defined for this context
+     * Return the variables defined for this context
      *
      * <code>
      *  $ctx = new \Cundd\TestFlight\Context\Context();
@@ -42,7 +45,7 @@ class Context implements ContextInterface
      *  test_flight_assert_same(100, $variables['c']);
      * </code>
      */
-    public function setVariable(string $key, $value): ContextInterface
+    public function setVariable(string $key, mixed $value): ContextInterface
     {
         $this->variables[$key] = $value;
 
@@ -50,7 +53,7 @@ class Context implements ContextInterface
     }
 
     /**
-     * Deletes the variable with the given key
+     * Delete the variable with the given key
      *
      * <code>
      *  $ctx = new \Cundd\TestFlight\Context\Context();
@@ -82,6 +85,7 @@ class Context implements ContextInterface
      *  test_flight_assert_same('b', $variables['a']);
      *  test_flight_assert(isset($variables['c']), 'Variable "c" not defined');
      *  test_flight_assert_same(100, $variables['c']);
+     *
      * </code>
      */
     public function addVariables(array $variables): ContextInterface

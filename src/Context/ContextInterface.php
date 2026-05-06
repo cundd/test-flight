@@ -10,22 +10,30 @@ namespace Cundd\TestFlight\Context;
 interface ContextInterface
 {
     /**
-     * Returns the variables defined for this context
+     * Return the variables defined for this context
+     *
+     * @return array<non-empty-string,mixed>
      */
     public function getVariables(): array;
 
     /**
      * Store the variable with the given key
+     *
+     * @param non-empty-string $key
      */
-    public function setVariable(string $key, $value): ContextInterface;
+    public function setVariable(string $key, mixed $value): ContextInterface;
 
     /**
-     * Deletes the variable with the given key
+     * Delete the variable with the given key
+     *
+     * @param non-empty-string $key
      */
     public function unsetVariable(string $key): ContextInterface;
 
     /**
      * Set all variables from the given dictionary
+     *
+     * @param array<non-empty-string,mixed> $variables
      */
     public function addVariables(array $variables): ContextInterface;
 }

@@ -10,26 +10,26 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
 /**
  * Event
  */
-class Event implements EventInterface
+final readonly class Event implements EventInterface
 {
     public function __construct(
-        private readonly DefinitionInterface $definition,
-        private readonly ContextInterface $context,
+        public readonly DefinitionInterface $definition,
+        public readonly ContextInterface $context,
     ) {
     }
 
     /**
-     * @return DefinitionInterface
+     * @deprecated use `definition` directly
      */
-    public function getDefinition()
+    public function getDefinition(): DefinitionInterface
     {
         return $this->definition;
     }
 
     /**
-     * @return ContextInterface
+     * @deprecated use `context` directly
      */
-    public function getContext()
+    public function getContext(): ContextInterface
     {
         return $this->context;
     }

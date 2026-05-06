@@ -6,16 +6,20 @@ namespace Cundd\TestFlight\Exception;
 
 use Exception;
 
-class NoImplementationForInterfaceException extends ClassException
+final class NoImplementationForInterfaceException extends ClassException
 {
     /**
-     * @param string $interfaceName
-     * @param int    $code
-     *
-     * @return static
+     * @param interface-string $interfaceName
      */
-    public static function exceptionWithInterfaceName($interfaceName, $code = 0, ?Exception $previous = null)
-    {
-        return new static(sprintf('No class found for interface %s', $interfaceName), $code, $previous);
+    public static function exceptionWithInterfaceName(
+        string $interfaceName,
+        int $code = 0,
+        ?Exception $previous = null,
+    ): static {
+        return new self(
+            sprintf('No class found for interface %s', $interfaceName),
+            $code,
+            $previous
+        );
     }
 }

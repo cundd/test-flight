@@ -12,14 +12,28 @@ interface ObjectManagerInterface
     /**
      * Retrieve the class from the container or creates a new instance
      *
-     * @param array $constructorArguments
+     * @template T of object
+     *
+     * @param class-string<T> $className
+     *
+     * @return T
      */
-    public function get(string $className, ...$constructorArguments): object;
+    public function get(
+        string $className,
+        mixed ...$constructorArguments,
+    ): object;
 
     /**
-     * Returns a new instance of the given class
+     * Return a new instance of the given class
      *
-     * @param array $constructorArguments
+     * @template T of object
+     *
+     * @param class-string<T> $className
+     *
+     * @return T
      */
-    public function create(string $className, ...$constructorArguments): object;
+    public function create(
+        string $className,
+        mixed ...$constructorArguments,
+    ): object;
 }

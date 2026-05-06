@@ -6,16 +6,17 @@ namespace Cundd\TestFlight\Exception;
 
 use Exception;
 
-class FileNotWritableException extends FileException
+final class FileNotWritableException extends FileException
 {
-    /**
-     * @param string $filePath
-     * @param int    $code
-     *
-     * @return static
-     */
-    public static function exceptionForFile($filePath, $code = 0, ?Exception $previous = null)
-    {
-        return new static(sprintf('File %s is not writable', $filePath), $code, $previous);
+    public static function exceptionForFile(
+        string $filePath,
+        int $code = 0,
+        ?Exception $previous = null,
+    ): static {
+        return new static(
+            sprintf('File %s is not writable', $filePath),
+            $code,
+            $previous
+        );
     }
 }

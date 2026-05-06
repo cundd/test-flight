@@ -12,27 +12,29 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
 interface DefinitionInterface
 {
     /**
-     * Returns the name of the tested class
+     * Return the name of the tested class
+     *
+     * @return class-string
      */
-    public function getClassName(): string;
+    public function getClassName(): ?string;
 
     /**
-     * Returns the file containing the test
+     * Return the file containing the test
      */
     public function getFile(): FileInterface;
 
     /**
-     * Returns the path to the file
+     * Return the path to the file
      */
     public function getFilePath(): string;
 
     /**
-     * Returns a description for the output
+     * Return a description for the output
      */
     public function getDescription(): string;
 
     /**
-     * Returns the descriptive type of the definition
+     * Return the descriptive type of the definition
      */
     public function getType(): string;
 }

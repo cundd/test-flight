@@ -27,8 +27,6 @@ final class Bootstrap
 {
     private ObjectManager $objectManager;
 
-    private Environment $environment;
-
     private ClassLoader $classLoader;
 
     private EventDispatcherInterface $eventDispatcher;
@@ -42,12 +40,17 @@ final class Bootstrap
     public function init(): self
     {
         $this->objectManager = new ObjectManager();
-        $this->configurationProvider = $this->objectManager->get(ConfigurationProviderInterface::class);
+        $this->configurationProvider = $this->objectManager->get(
+            ConfigurationProviderInterface::class
+        );
         $this->classLoader = $this->objectManager->get(ClassLoader::class);
 
         // Prepare the printers
         $windowHelper = $this->objectManager->get(WindowHelper::class);
-        $codeFormatter = $this->objectManager->get(CodeFormatter::class, $windowHelper);
+        $codeFormatter = $this->objectManager->get(
+            CodeFormatter::class,
+            $windowHelper
+        );
         $this->printer = $this->objectManager->get(
             PrinterInterface::class,
             STDOUT,
@@ -61,10 +64,14 @@ final class Bootstrap
             $windowHelper,
             $codeFormatter
         );
-        $this->eventDispatcher = $this->objectManager->get(EventDispatcherInterface::class);
+        $this->eventDispatcher = $this->objectManager->get(
+            EventDispatcherInterface::class
+        );
+        $environment = $this->objectManager->get(Environment::class);
 
         $this->checkDependencies();
-        $this->initEnvironment();
+
+        $this->initEnvironment($environment);
         $this->printHeader();
 
         return $this;
@@ -75,14 +82,23 @@ final class Bootstrap
      *
      * @param array<int,mixed> $arguments
      */
-    public function run(array $arguments): bool
-    {
+    public function run(
+        array $arguments,
+    ): bool {
         $exception = null;
         try {
-            $this->prepareConfigurationProvider($arguments);
-            $this->prepareCustomBootstrapAndAutoloading($this->configurationProvider->get('bootstrap'));
-            $this->printer->setVerbose($this->configurationProvider->get('verbose'));
-            $this->exceptionPrinter->setVerbose($this->configurationProvider->get('verbose'));
+            $this->prepareConfigurationProvider(
+                $arguments
+            );
+            $this->prepareCustomBootstrapAndAutoloading(
+                $this->configurationProvider->get('bootstrap')
+            );
+            $this->printer->setVerbose(
+                $this->configurationProvider->get('verbose')
+            );
+            $this->exceptionPrinter->setVerbose(
+                $this->configurationProvider->get('verbose')
+            );
 
             switch ($this->configurationProvider->get('command')) {
                 case 'list':
@@ -118,21 +134,20 @@ final class Bootstrap
         return false;
     }
 
-    private function initEnvironment(): void
+    private function initEnvironment(Environment $environment): void
     {
         try {
             $locales = [
-                LC_CTYPE    => setlocale(LC_CTYPE, 0),
-                LC_NUMERIC  => setlocale(LC_NUMERIC, 0),
-                LC_TIME     => setlocale(LC_TIME, 0),
-                LC_COLLATE  => setlocale(LC_COLLATE, 0),
-                LC_MONETARY => setlocale(LC_MONETARY, 0),
-                LC_ALL      => setlocale(LC_ALL, 0),
-                LC_MESSAGES => setlocale(LC_MESSAGES, 0),
+                LC_CTYPE    => setlocale(LC_CTYPE, '0'),
+                LC_NUMERIC  => setlocale(LC_NUMERIC, '0'),
+                LC_TIME     => setlocale(LC_TIME, '0'),
+                LC_COLLATE  => setlocale(LC_COLLATE, '0'),
+                LC_MONETARY => setlocale(LC_MONETARY, '0'),
+                LC_ALL      => setlocale(LC_ALL, '0'),
+                LC_MESSAGES => setlocale(LC_MESSAGES, '0'),
             ];
 
-            $this->environment = $this->objectManager->get(Environment::class);
-            $this->environment->store(
+            $environment->store(
                 date_default_timezone_get(),
                 $locales,
                 error_reporting(null),
@@ -146,7 +161,7 @@ final class Bootstrap
                 $_FILES,
                 $_REQUEST
             );
-            $this->environment->reset();
+            $environment->reset();
         } catch (TypeError $error) {
             echo $error;
         }
@@ -159,12 +174,14 @@ final class Bootstrap
      */
     private function prepareConfigurationProvider(array $arguments): void
     {
-        $options = $this->objectManager->get(OptionParser::class)->parse($arguments);
+        $options = $this->objectManager
+            ->get(OptionParser::class)
+            ->parse($arguments);
 
         if (isset($options['types'])) {
-            $options['types'] = explode(',', $options['types']);
+            $options['types'] = explode(',', (string) $options['types']);
         } elseif (isset($options['type'])) {
-            $options['types'] = explode(',', $options['type']);
+            $options['types'] = explode(',', (string) $options['type']);
         } else {
             $options['types'] = [];
         }
@@ -193,8 +210,9 @@ final class Bootstrap
 
         // Check for a configuration file
         if (!isset($options['configuration'])) {
-            $localConfigurationFilePath = getcwd(
-            ) . '/' . ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
+            $localConfigurationFilePath = getcwd()
+                . '/'
+                . ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
             if (file_exists($localConfigurationFilePath)) {
                 $options['configuration'] = $localConfigurationFilePath;
             }
@@ -244,19 +262,22 @@ final class Bootstrap
             // This must not happen
             $this->error('SPL must be enabled');
         }
-        if (!is_callable('token_get_all')) {
+        if (!is_callable('token_get_all')) { // @phpstan-ignore function.alreadyNarrowedType
             $this->error('Tokenizer must be enabled and callable (http://php.net/manual/en/book.tokenizer.php)');
         }
     }
 
     /**
      * Include the custom bootstrap file
+     *
+     * @param non-empty-string $bootstrapFile
      */
-    private function prepareCustomBootstrapAndAutoloading(string $bootstrapFile): void
-    {
+    private function prepareCustomBootstrapAndAutoloading(
+        string $bootstrapFile,
+    ): void {
         /** @var Finder $autoloadFinder */
         $autoloadFinder = $this->objectManager->get(Finder::class);
-        $projectAutoloaderPath = $autoloadFinder->find(getcwd());
+        $projectAutoloaderPath = $autoloadFinder->find(getcwd() ?: __DIR__);
         if ('' !== $projectAutoloaderPath) {
             require_once $projectAutoloaderPath;
         }
@@ -264,7 +285,10 @@ final class Bootstrap
         // The variable will be exported to the bootstrap file
         $eventDispatcher = $this->eventDispatcher;
         if ($bootstrapFile) {
-            require_once $bootstrapFile;
+            $bootstrapCallback = require_once $bootstrapFile;
+            if (is_callable($bootstrapCallback)) {
+                $bootstrapCallback($eventDispatcher);
+            }
         }
         unset($eventDispatcher);
     }

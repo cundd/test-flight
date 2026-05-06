@@ -7,24 +7,16 @@ namespace Cundd\TestFlight\Cli;
 /**
  * CLI window helper
  */
-class WindowHelper
+final class WindowHelper implements WindowHelperInterface
 {
-    /**
-     * @var int
-     */
-    private $width;
+    private int $width;
+
+    private int $height;
 
     /**
-     * @var int
+     * Return if the window supports colors
      */
-    private $height;
-
-    /**
-     * Returns if the window supports colors
-     *
-     * @return bool
-     */
-    public function hasColorSupport()
+    public function hasColorSupport(): bool
     {
         if (isset($_SERVER['TERM'])) {
             return in_array($_SERVER['TERM'], ['xterm-256color']);
@@ -34,17 +26,15 @@ class WindowHelper
     }
 
     /**
-     * Returns the window's width
+     * Return the window's width
      *
      * @example
      *  assert(is_int((new \Cundd\TestFlight\Cli\WindowHelper)->getWidth()));
      *  assert(0 < (new \Cundd\TestFlight\Cli\WindowHelper)->getWidth());
-     *
-     * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
-        if (null === $this->width) {
+        if (!isset($this->width)) {
             $this->width = intval($this->systemCall('tput cols'));
         }
 
@@ -52,29 +42,24 @@ class WindowHelper
     }
 
     /**
-     * Returns the window's height
+     * Return the window's height
      *
      * @example
      *  assert(is_int((new \Cundd\TestFlight\Cli\WindowHelper)->getHeight()));
      *  assert(0 < (new \Cundd\TestFlight\Cli\WindowHelper)->getHeight());
-     *
-     * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
-        if (null === $this->height) {
+        if (!isset($this->height)) {
             $this->height = intval($this->systemCall('tput lines'));
         }
 
         return $this->height;
     }
 
-    /**
-     * @return string
-     */
-    private function systemCall(string $command)
+    private function systemCall(string $command): string|false
     {
-        if (is_callable('exec')) {
+        if (is_callable('exec')) { // @phpstan-ignore function.alreadyNarrowedType
             return exec($command);
         }
 

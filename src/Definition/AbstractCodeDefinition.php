@@ -30,9 +30,6 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
         return $this->getFile()->getPath();
     }
 
-    /**
-     * Returns the pre-processed code
-     */
     public function getPreProcessedCode(): string
     {
         $code = $this->getCode();
@@ -48,9 +45,9 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
             "'" . dirname($filePath) . "'",
             $code
         );
-        $code = preg_replace(
+        $code = (string) preg_replace(
             '/([^\w:])(__CLASS__)\(/',
-            '$1' . $this->getClassName() . '(',
+            '$1' . preg_quote((string) $this->getClassName(), '/') . '(',
             $code
         );
         $code = str_replace(
@@ -58,12 +55,12 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
             "'" . $this->getClassName() . "'",
             $code
         );
-        $code = preg_replace(
+        $code = (string) preg_replace(
             '/^(assert)\(/',
             'test_flight_assert(',
             $code
         );
-        $code = preg_replace(
+        $code = (string) preg_replace(
             '/([^\w:])(assert)\(/',
             '$1test_flight_assert(',
             $code

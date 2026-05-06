@@ -12,7 +12,7 @@ interface ConfigurationProviderInterface
     public const LOCAL_CONFIGURATION_FILE_NAME = '.test-flight.json';
 
     /**
-     * Returns the configuration for the given key
+     * Return the configuration for the given key
      *
      * <code>
      *  $cp = new \Cundd\TestFlight\Configuration\ConfigurationProvider(
@@ -24,7 +24,11 @@ interface ConfigurationProviderInterface
     public function get(string $key): mixed;
 
     /**
-     * Sets the underlying configuration
+     * Set the underlying configuration
+     *
+     * @param array<string,mixed> $configuration
      */
-    public function setConfiguration(array $configuration): ConfigurationProviderInterface;
+    public function setConfiguration(
+        array $configuration,
+    ): ConfigurationProviderInterface;
 }

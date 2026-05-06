@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Cundd\TestFlight\Output;
 
-use Cundd\TestFlight\Cli\WindowHelper;
+use Cundd\TestFlight\Cli\WindowHelperInterface;
 use Cundd\TestFlight\Definition\AbstractMethodDefinition;
 use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
@@ -13,15 +13,18 @@ use Cundd\TestFlight\Definition\MethodDefinition;
 use Cundd\TestFlight\Exception\AssertionError;
 use Cundd\TestFlight\TestRunner\AbstractTestRunner;
 use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
  * Special printer for exception output
+ *
+ * @phpstan-type Frame array{function:string,line?:int,file?:string,class?:string,type?:string}
  */
-class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
+final class ExceptionPrinter extends AbstractPrinter implements ExceptionPrinterInterface
 {
     /**
-     * Creates a new printer instance
+     * Create a new printer instance
      *
      * @param resource $outputStream
      * @param resource $errorStream
@@ -29,21 +32,16 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     public function __construct(
         $outputStream,
         $errorStream,
-        WindowHelper $cliWindowHelper,
+        WindowHelperInterface $cliWindowHelper,
         private readonly CodeFormatter $codeFormatter,
     ) {
         parent::__construct($outputStream, $errorStream, $cliWindowHelper);
     }
 
-    /**
-     * Prints the exception for the given test definition
-     *
-     * @param Throwable $exception
-     *
-     * @return $this
-     */
-    public function printException(DefinitionInterface $definition, $exception): self
-    {
+    public function printException(
+        DefinitionInterface $definition,
+        Throwable $exception,
+    ): self {
         $traceAsString = $this->getTraceAsString($definition, $exception);
         $this->printError(
             "\nError %s #%s during test %s \n%s \nin %s\n\n%s",
@@ -58,8 +56,9 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         return $this;
     }
 
-    private function getTestDescriptionForDefinition(DefinitionInterface $definition): string
-    {
+    private function getTestDescriptionForDefinition(
+        DefinitionInterface $definition,
+    ): string {
         if ($definition instanceof AbstractMethodDefinition) {
             return sprintf(
                 '%s%s%s():',
@@ -84,33 +83,35 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         return '';
     }
 
-    /**
-     * @param Throwable $exception
-     */
     private function getTraceAsString(
         DefinitionInterface $definition,
-        $exception,
+        Throwable $exception,
     ): string {
         $stringParts = [];
-        $previousStep = [];
+        $previousStep = null;
         $enableColoredOutput = $this->getEnableColoredOutput();
 
         $stackTrace = $exception->getTrace();
         $stackTraceCount = count($stackTrace);
         for ($i = 0; $i < $stackTraceCount; ++$i) {
-            $step = $stackTrace[$i];
+            $frame = $stackTrace[$i];
 
-            if ($this->shouldStopTraceAtStep($step)) {
+            if ($this->shouldStopTraceAtFrame($frame)) {
                 break;
             }
-            $stepAsString = $this->getTraceStepAsString($step, $i);
 
-            if ($enableColoredOutput && $this->getTraceStepIsTestMethod($definition, $step, $previousStep)) {
+            $stepAsString = $this->getTraceFrameAsString($frame, $i);
+            $isTestMethod = $this->getTraceStepIsTestMethod(
+                $definition,
+                $frame,
+                $previousStep
+            );
+            if ($enableColoredOutput && $isTestMethod) {
                 $stringParts[] = self::NORMAL . self::RED_BACKGROUND . $stepAsString . self::RED;
             } else {
                 $stringParts[] = $stepAsString;
             }
-            $previousStep = $step;
+            $previousStep = $frame;
         }
 
         return implode("\n", $stringParts);
@@ -119,47 +120,56 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     /**
      * Stop printing the stack trace at \Cundd\TestFlight\TestRunner\AbstractTestRunner->runTestDefinition()
      *
-     * @param array $step
+     * @param Frame $frame
      */
-    private function shouldStopTraceAtStep($step): bool
+    private function shouldStopTraceAtFrame(array $frame): bool
     {
-        return isset($step['class'])
-            && AbstractTestRunner::class === $step['class']
-            && 'runTestDefinition' === $step['function'];
+        return isset($frame['class'])
+            && AbstractTestRunner::class === $frame['class']
+            && 'runTestDefinition' === $frame['function'];
     }
 
-    private function getTraceStepAsString(array $step, int $stepNumber): string
+    /**
+     * @param Frame $frame
+     */
+    private function getTraceFrameAsString(array $frame, int $stepNumber): string
     {
-        if (isset($step['class'])) {
+        if (isset($frame['class'])) {
             return sprintf(
                 '#%d %s%s%s(%s)%s',
                 $stepNumber,
-                $step['class'],
-                $step['type'],
-                $step['function'],
-                $this->argumentsToString($step['args'] ?? []),
-                $this->pathFromStep($step)
+                $frame['class'],
+                $frame['type'] ?? '',
+                $frame['function'],
+                $this->argumentsToString($frame['args'] ?? []),
+                $this->pathFromFrame($frame)
             );
         }
 
         return sprintf(
             '#%d %s(%s)%s',
             $stepNumber,
-            $step['function'],
-            $this->argumentsToString($step['args'] ?? []),
-            $this->pathFromStep($step)
+            $frame['function'],
+            $this->argumentsToString($frame['args'] ?? []),
+            $this->pathFromFrame($frame)
         );
     }
 
-    private function pathFromStep(array $step): string
+    /**
+     * @param Frame $frame
+     */
+    private function pathFromFrame(array $frame): string
     {
-        if (!isset($step['file'])) {
+        if (!isset($frame['file']) || !isset($frame['line'])) {
             return '';
         }
 
-        return sprintf(': %s:%d', $step['file'], $step['line']);
+        return sprintf(': %s:%d', $frame['file'], $frame['line']);
     }
 
+    /**
+     * @param array<mixed> $arguments
+     */
     private function argumentsToString(array $arguments): string
     {
         return implode(
@@ -179,12 +189,16 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         );
     }
 
+    /**
+     * @param Frame  $frame
+     * @param ?Frame $previousFrame
+     */
     private function getTraceStepIsTestMethod(
         DefinitionInterface $definition,
-        array $step,
-        array $previousStep,
+        array $frame,
+        ?array $previousFrame,
     ): bool {
-        $filePath = $previousStep['file'] ?? '';
+        $filePath = $previousFrame['file'] ?? '';
 
         if ($definition instanceof AbstractMethodDefinition) {
             $functionName = $definition->getMethodName();
@@ -196,18 +210,15 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
 
         return (bool) (
             $filePath === $definition->getFilePath()
-            && $step['function'] === $functionName
+            && $frame['function'] === $functionName
         )
 
         ;
     }
 
-    /**
-     * @param Throwable $exception
-     */
     private function getTestLocationForDefinitionAndException(
         DefinitionInterface $definition,
-        $exception,
+        Throwable $exception,
     ): string {
         if ($exception instanceof AssertionError) {
             return $definition->getFilePath();
@@ -223,14 +234,13 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
     {
         $prophet = new \Prophecy\Prophet();
 
-        /** @var WindowHelper $windowHelper */
-        $windowHelper = $prophet->prophesize(WindowHelper::class)->reveal();
+        /** @var WindowHelperInterface $windowHelper */
+        $windowHelper = $prophet->prophesize(WindowHelperInterface::class)->reveal();
 
         /** @var CodeFormatter $codeFormatter */
         $codeFormatter = $prophet->prophesize(CodeFormatter::class)->reveal();
 
-        /** @var MethodDefinition $testDefinition */
-        /** @var MethodDefinition|\Prophecy\Prophecy\ObjectProphecy $prophecy */
+        /** @var \Prophecy\Prophecy\ObjectProphecy<MethodDefinition> $prophecy */
         $prophecy = $prophet->prophesize(MethodDefinition::class);
         $prophecy->getClassName()->willReturn(__CLASS__);
         $prophecy->getMethodIsStatic()->willReturn(false);
@@ -241,6 +251,9 @@ class ExceptionPrinter extends Printer implements ExceptionPrinterInterface
         $testDefinition = $prophecy->reveal();
 
         $tempOutputStream = fopen('php://memory', 'r+');
+        if (false === $tempOutputStream) {
+            throw new RuntimeException('Could not open temporary output stream');
+        }
 
         $printer = new static(
             $tempOutputStream,

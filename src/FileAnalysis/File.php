@@ -12,14 +12,17 @@ use Cundd\TestFlight\Exception\FileNotReadableException;
  */
 class File implements FileInterface
 {
-    private ?string $contents;
+    private string $contents;
 
+    /**
+     * @param non-empty-string $path
+     */
     public function __construct(private readonly string $path)
     {
     }
 
     /**
-     * Returns the file's path
+     * Return the file's path
      *
      * @example
      *  $file = new \Cundd\TestFlight\FileAnalysis\File(__FILE__);
@@ -30,9 +33,6 @@ class File implements FileInterface
         return $this->path;
     }
 
-    /**
-     * Returns the file name
-     */
     public function getName(): string
     {
         return basename($this->path);
@@ -64,7 +64,7 @@ class File implements FileInterface
                 FileNotReadableException::exceptionForFile($this->path);
             }
 
-            $this->contents = file_get_contents($this->path);
+            $this->contents = (string) file_get_contents($this->path);
         }
 
         return $this->contents;

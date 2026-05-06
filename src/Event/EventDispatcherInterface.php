@@ -11,6 +11,8 @@ interface EventDispatcherInterface
 {
     /**
      * Register a listener for the given event code
+     *
+     * @param non-empty-string $eventCode
      */
     public function register(
         string $eventCode,
@@ -19,6 +21,8 @@ interface EventDispatcherInterface
 
     /**
      * Invoke all event listeners for the given event code
+     *
+     * @param non-empty-string $eventCode
      */
     public function dispatch(
         string $eventCode,

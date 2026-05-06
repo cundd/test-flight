@@ -24,13 +24,10 @@ final class ObjectManager implements ObjectManagerInterface
         $this->container[ObjectManagerInterface::class] = $this;
     }
 
-    /**
-     * Retrieve the class from the container or creates a new instance
-     *
-     * @param array $constructorArguments
-     */
-    public function get(string $className, ...$constructorArguments): object
-    {
+    public function get(
+        string $className,
+        mixed ...$constructorArguments,
+    ): object {
         if (!isset($this->container[$className])) {
             $instance = $this->createWithArguments(
                 $className,
@@ -42,31 +39,41 @@ final class ObjectManager implements ObjectManagerInterface
             if ($implementationClassName) {
                 $this->container[$implementationClassName] = $instance;
             }
+
+            return $instance;
         }
 
+        // @phpstan-ignore return.type
         return $this->container[$className];
     }
 
-    /**
-     * Returns a new instance of the given class
-     *
-     * @param array $constructorArguments
-     */
-    public function create(string $className, ...$constructorArguments): object
-    {
+    public function create(
+        string $className,
+        mixed ...$constructorArguments,
+    ): object {
         return $this->createWithArguments($className, $constructorArguments);
     }
 
     /**
-     * Returns a new instance of the given class
+     * Return a new instance of the given class
+     *
+     * @template T of object
+     *
+     * @param class-string<T> $classOrInterfaceName
+     * @param mixed[]         $constructorArguments
+     * @param class-string<T> $implementationClassName
+     *
+     * @return T
      */
     private function createWithArguments(
-        string $className,
+        string $classOrInterfaceName,
         array $constructorArguments,
         ?string &$implementationClassName = null,
     ): object {
-        if (interface_exists($className)) {
-            $className = $implementationClassName = $this->getClassForInterface($className);
+        if (interface_exists($classOrInterfaceName)) {
+            $className = $implementationClassName = $this->getClassForInterface($classOrInterfaceName);
+        } else {
+            $className = $classOrInterfaceName;
         }
         if (!class_exists($className)) {
             throw ClassDoesNotExistException::exceptionWithClassName($className);
@@ -82,6 +89,12 @@ final class ObjectManager implements ObjectManagerInterface
 
     /**
      * Try to find the class name for the given interface
+     *
+     * @template T
+     *
+     * @param interface-string<T> $interfaceName
+     *
+     * @return class-string<T>
      */
     private function getClassForInterface(string $interfaceName): string
     {
@@ -91,7 +104,15 @@ final class ObjectManager implements ObjectManagerInterface
         }
 
         if (!class_exists($implementationName)) {
-            throw NoImplementationForInterfaceException::exceptionWithInterfaceName($interfaceName);
+            throw NoImplementationForInterfaceException::exceptionWithInterfaceName(
+                $interfaceName
+            );
+        }
+
+        if (!is_a($implementationName, $interfaceName, true)) {
+            throw NoImplementationForInterfaceException::exceptionWithInterfaceName(
+                $interfaceName
+            );
         }
 
         return $implementationName;
@@ -99,8 +120,10 @@ final class ObjectManager implements ObjectManagerInterface
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected function getObjectSingletonTest(): void
+    private function getObjectSingletonTest(): void
     {
         test_flight_assert($this->get(__CLASS__) === $this);
         test_flight_assert($this->get(__CLASS__) === $this->get(__CLASS__));
@@ -109,7 +132,7 @@ final class ObjectManager implements ObjectManagerInterface
 
         Assert::throws(
             function () {
-                $this->get('Not_Existing_Class');
+                $this->get('Not_Existing_Class'); // @phpstan-ignore argument.type
             },
             ClassDoesNotExistException::class
         );
@@ -117,8 +140,10 @@ final class ObjectManager implements ObjectManagerInterface
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected function getObjectInterfaceTest(): void
+    private function getObjectInterfaceTest(): void
     {
         test_flight_assert($this->get(ObjectManagerInterface::class) === $this);
     }

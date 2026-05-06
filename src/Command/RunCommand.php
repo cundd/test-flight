@@ -14,9 +14,6 @@ use Cundd\TestFlight\TestRunner\TestRunnerFactory;
  */
 class RunCommand extends AbstractTestDefinitionCommand
 {
-    /**
-     * Runs the command
-     */
     public function run(): bool
     {
         $testDefinitions = $this->collectTestDefinitions();

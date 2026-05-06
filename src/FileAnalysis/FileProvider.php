@@ -23,6 +23,9 @@ use RegexIterator;
  */
 class FileProvider
 {
+    /**
+     * @var list<non-empty-string>
+     */
     private array $fileSuffix = [
         'php',
         'md',
@@ -35,6 +38,8 @@ class FileProvider
      * If path is a single file and it contains test it will be returned,
      * if it is a directory it will be scanned for files with test in
      * it's content
+     *
+     * @param non-empty-string $path
      *
      * @return FileInterface[]
      */
@@ -51,8 +56,8 @@ class FileProvider
         }
 
         $fileIncludingTests = [];
-        foreach ($pathCollection as $path) {
-            $file = new File($path);
+        foreach ($pathCollection as $foundPath) {
+            $file = new File($foundPath);
             if ($this->getFileIncludesTest($file)) {
                 $fileIncludingTests[] = $file;
             }
@@ -61,9 +66,16 @@ class FileProvider
         return $fileIncludingTests;
     }
 
+    /**
+     * @param non-empty-string $path
+     *
+     * @return array<non-empty-string>
+     */
     private function findMatchingFilesInDirectory(string $path): array
     {
-        $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+        $directoryIterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path)
+        );
         $regexIterator = new RegexIterator(
             $directoryIterator,
             sprintf('/^.+\.(%s)$/i', implode('|', $this->fileSuffix)),
@@ -79,6 +91,9 @@ class FileProvider
         );
     }
 
+    /**
+     * @return non-empty-string
+     */
     private function validatePath(string $path): string
     {
         $path = realpath($path) ?: $path;

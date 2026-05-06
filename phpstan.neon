@@ -1,0 +1,8 @@
+parameters:
+	treatPhpDocTypesAsCertain: false
+	level: 8
+	paths:
+		- src
+		- tests
+includes:
+	- vendor/jangregor/phpstan-prophecy/extension.neon

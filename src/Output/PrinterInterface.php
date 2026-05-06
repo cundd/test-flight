@@ -6,38 +6,20 @@ namespace Cundd\TestFlight\Output;
 
 interface PrinterInterface extends ColorInterface
 {
-    /**
-     * @param array ...$arguments
-     */
-    public function printf(string $format, ...$arguments): self;
+    public function printf(string $format, mixed ...$arguments): self;
+
+    public function println(string $format, mixed ...$arguments): self;
+
+    public function printError(string $format, mixed ...$arguments): self;
+
+    public function info(string $format, mixed ...$arguments): self;
+
+    public function debug(string $format, mixed ...$arguments): self;
+
+    public function warn(string $format, mixed ...$arguments): self;
 
     /**
-     * @param array ...$arguments
-     */
-    public function println(string $format, ...$arguments): self;
-
-    /**
-     * @param array ...$arguments
-     */
-    public function printError(string $format, ...$arguments): self;
-
-    /**
-     * @param array ...$arguments
-     */
-    public function info(string $format, ...$arguments): self;
-
-    /**
-     * @param array ...$arguments
-     */
-    public function warn(string $format, ...$arguments): self;
-
-    /**
-     * @param array ...$arguments
-     */
-    public function debug(string $format, ...$arguments): self;
-
-    /**
-     * Returns if colors should be enabled
+     * Return if colors should be enabled
      */
     public function getEnableColoredOutput(): bool;
 
@@ -55,10 +37,7 @@ interface PrinterInterface extends ColorInterface
         string $endColor = self::NORMAL,
     ): string;
 
-    /**
-     * @return $this
-     */
-    public function setVerbose(bool $flag = false);
+    public function setVerbose(bool $flag = false): self;
 
     public function getVerbose(): bool;
 }

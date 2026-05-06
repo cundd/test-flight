@@ -7,10 +7,12 @@ namespace Cundd\TestFlight\FileAnalysis;
 /**
  * Provider for class names of classes containing test methods
  */
-class ClassProvider
+final class ClassProvider
 {
     /**
      * @param FileInterface[] $files
+     *
+     * @return array<class-string,FileInterface> $classes
      */
     public function findClassesInFiles(array $files): array
     {
@@ -35,10 +37,14 @@ class ClassProvider
     }
 
     /**
-     * @param string[] $classes
+     * @param class-string[] $classes
+     *
+     * @return array<class-string,FileInterface>
      */
-    private function buildDictionaryWithClassesAndFile(array $classes, FileInterface $file): array
-    {
+    private function buildDictionaryWithClassesAndFile(
+        array $classes,
+        FileInterface $file,
+    ): array {
         $dictionary = array_flip($classes);
         array_walk(
             $dictionary,
@@ -51,7 +57,7 @@ class ClassProvider
     }
 
     /**
-     * @return string[]
+     * @return class-string[]
      */
     private function getClassFromFile(FileInterface $file): array
     {
@@ -90,27 +96,31 @@ class ClassProvider
         }
 
         if ($namespace) {
+            // @phpstan-ignore return.type
             return array_map(
-                function ($class) use ($namespace) {
-                    return "$namespace\\$class";
-                },
+                fn ($class) => "$namespace\\$class",
                 $classes
             );
         }
 
+        // @phpstan-ignore return.type
         return $classes;
     }
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected function findClassesInFilesTest()
+    private function findClassesInFilesTest(): void
     {
         $classes = $this->findClassesInFiles([new File(__FILE__)]);
         test_flight_assert(1 === count($classes));
         test_flight_assert(__CLASS__ === key($classes));
 
-        $classes = $this->findClassesInFiles([new File(__DIR__ . '/../functions.php')]);
+        $classes = $this->findClassesInFiles([
+            new File(__DIR__ . '/../functions.php'),
+        ]);
         test_flight_assert(0 === count($classes));
     }
 }

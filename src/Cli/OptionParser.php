@@ -9,7 +9,7 @@ use Exception;
 /**
  * CLI option parser
  */
-class OptionParser
+final class OptionParser
 {
     /**
      * Parse CLI arguments
@@ -30,11 +30,11 @@ class OptionParser
      *
      * @param string[] $arguments
      *
-     * @return array
+     * @return array<string,string|bool>
      *
      * @throws Exception
      */
-    public function parse(array $arguments)
+    public function parse(array $arguments): array
     {
         $preparedArguments = [];
         $argumentsLength = count($arguments);
@@ -65,14 +65,21 @@ class OptionParser
     }
 
     /**
-     * @return bool
+     * @param array<int,mixed> $arguments
      */
-    private function nextElementIsValueElement(array $arguments, $currentIndex, $argumentsLength)
-    {
-        return $currentIndex + 1 < $argumentsLength
-            && is_string($arguments[$currentIndex + 1])
-            && (
-                0 === strlen($arguments[$currentIndex + 1]) || '-' !== $arguments[$currentIndex + 1][0]
-            );
+    private function nextElementIsValueElement(
+        array $arguments,
+        int $currentIndex,
+        int $argumentsLength,
+    ): bool {
+        if ($currentIndex + 1 >= $argumentsLength) {
+            return false;
+        }
+        if (!is_string($arguments[$currentIndex + 1])) {
+            return false;
+        }
+
+        return 0 === strlen($arguments[$currentIndex + 1])
+            || '-' !== $arguments[$currentIndex + 1][0];
     }
 }

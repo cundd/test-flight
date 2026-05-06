@@ -84,6 +84,8 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     }
 
     /**
+     * @param array<string,mixed> $errorContext
+     *
      * @throws ErrorException
      */
     public function handleError(
@@ -92,8 +94,9 @@ abstract class AbstractTestRunner implements TestRunnerInterface
         string $errorFile,
         int $errorLine,
         array $errorContext = [],
-    ): void {
-        // TODO: Allow to configure the error types that should be transformed to exceptions
+    ): never {
+        // TODO: Allow to configure the error types that should be transformed
+        // to exceptions
         throw $this->createExceptionFromError(
             [
                 'message' => $errorMessage,
@@ -105,12 +108,12 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     }
 
     /**
-     * @param int $code
-     *
-     * @return ErrorException
+     * @param array{message:string, type:int, file:string, line:int} $error
      */
-    protected function createExceptionFromError(array $error, $code = 0)
-    {
+    protected function createExceptionFromError(
+        array $error,
+        int $code = 0,
+    ): ErrorException {
         return new ErrorException(
             $error['message'],
             $code,

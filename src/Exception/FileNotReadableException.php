@@ -8,14 +8,25 @@ use Exception;
 
 class FileNotReadableException extends FileException
 {
-    /**
-     * @param string $filePath
-     * @param int    $code
-     *
-     * @return static
-     */
-    public static function exceptionForFile($filePath, $code = 0, ?Exception $previous = null)
-    {
-        return new static(sprintf('File %s is not readable', $filePath), $code, $previous);
+    protected const MESSAGE_TEMPLATE = 'File %s is not readable';
+
+    final public function __construct(
+        string $message,
+        int $code = 0,
+        ?Exception $previous = null,
+    ) {
+        parent::__construct($message, $code, $previous);
+    }
+
+    public static function exceptionForFile(
+        string $filePath,
+        int $code = 0,
+        ?Exception $previous = null,
+    ): static {
+        return new static(
+            sprintf(static::MESSAGE_TEMPLATE, $filePath),
+            $code,
+            $previous
+        );
     }
 }

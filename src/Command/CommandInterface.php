@@ -10,7 +10,7 @@ namespace Cundd\TestFlight\Command;
 interface CommandInterface
 {
     /**
-     * Runs the command
+     * Run the command
      */
     public function run(): bool;
 }

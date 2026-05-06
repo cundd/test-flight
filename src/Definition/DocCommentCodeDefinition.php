@@ -11,6 +11,9 @@ use Cundd\TestFlight\FileAnalysis\FileInterface;
  */
 class DocCommentCodeDefinition extends AbstractCodeDefinition
 {
+    /**
+     * @param class-string $className
+     */
     public function __construct(
         private readonly string $className,
         string $code,
@@ -31,23 +34,21 @@ class DocCommentCodeDefinition extends AbstractCodeDefinition
         return $this->relatedMethodName;
     }
 
-    /**
-     * Returns a description for the output
-     */
     public function getDescription(): string
     {
         return sprintf(
             '%s "%s"',
             $this->getType(),
             ucwords(
-                ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $this->getRelatedMethodName())))
+                ltrim(strtolower((string) preg_replace(
+                    '/[A-Z]/',
+                    ' $0',
+                    $this->getRelatedMethodName()
+                )))
             )
         );
     }
 
-    /**
-     * Returns the descriptive type of the definition
-     */
     public function getType(): string
     {
         return 'DocComment test';

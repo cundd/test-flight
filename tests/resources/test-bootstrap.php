@@ -1,15 +1,15 @@
 <?php
 
-// Define the variables '$aVariableSetInBootstrap' and '$eventDispatcher' for the tests in src/Context/README.md
-/* @var \Cundd\TestFlight\Event\EventDispatcherInterface $eventDispatcher */
-$eventDispatcher->register(
+use Cundd\TestFlight\Event\EventDispatcherInterface;
+
+// Define the variables '$aVariableSetInBootstrap' and '$eventDispatcher' for
+// the tests in src/Context/README.md
+return static fn (EventDispatcherInterface $eventDispatcher) => $eventDispatcher->register(
     Cundd\TestFlight\TestRunner\TestRunnerInterface::EVENT_TEST_WILL_RUN,
-    function (Cundd\TestFlight\Event\Event $event) use ($eventDispatcher) {
-        $event->getContext()->addVariables(
-            [
-                'aVariableSetInBootstrap' => 'variable-was-set-in-bootstrap',
-                'eventDispatcher'         => $eventDispatcher,
-            ]
-        );
-    }
+    fn (Cundd\TestFlight\Event\Event $event) => $event->context->addVariables(
+        [
+            'aVariableSetInBootstrap' => 'variable-was-set-in-bootstrap',
+            'eventDispatcher'         => $eventDispatcher,
+        ]
+    )
 );

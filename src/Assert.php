@@ -38,10 +38,23 @@ abstract class Assert
      *  \Cundd\TestFlight\Assert::assertSame([], []);
      *  \Cundd\TestFlight\Assert::assertSame(true, true);
      *  \Cundd\TestFlight\Assert::assertSame(PHP_INT_MAX, PHP_INT_MAX);
-     *  $object = new stdClass(); \Cundd\TestFlight\Assert::assertSame($object, $object);
-     *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertSame(true, false); });
-     *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertSame([], [1]); });
-     *  test_flight_throws(function() use($object) { \Cundd\TestFlight\Assert::assertSame($object, new stdClass()); });
+     *
+     *  $object = new stdClass();
+     *  \Cundd\TestFlight\Assert::assertSame($object, $object);
+     *  test_flight_throws(function() {
+     *      \Cundd\TestFlight\Assert::assertSame(true, false);
+     *  });
+     *  test_flight_throws(function() {
+     *      \Cundd\TestFlight\Assert::assertSame([], [1]);
+     *  });
+     *  test_flight_throws(function() use($object) {
+     *      \Cundd\TestFlight\Assert::assertSame($object, new stdClass());
+     *  });
+     *
+     * @template T
+     *
+     * @param T $expected
+     * @param T $actual
      *
      * @throws AssertionError if the values are not equal
      */
@@ -198,7 +211,12 @@ abstract class Assert
      *  \Cundd\TestFlight\Assert::assertInstanceOf('stdClass', new stdClass());
      *  test_flight_throws(function() { \Cundd\TestFlight\Assert::assertInstanceOf('stdClass', new Exception()); });
      *
-     * @throws AssertionError* @param mixed $actual
+     * @template T
+     *
+     * @param class-string<T> $className
+     * @param T               $actual
+     *
+     * @throws AssertionError
      */
     public static function assertInstanceOf(
         string $className,
@@ -242,7 +260,7 @@ abstract class Assert
      *  \Cundd\TestFlight\Assert::assertTypeOf('string', 'null');
      *  \Cundd\TestFlight\Assert::assertTypeOf('resource', fopen('php://temp', 'a+'));
      *
-     * @throws AssertionError* @param mixed $actual
+     * @throws AssertionError
      */
     public static function assertTypeOf(
         string $type,

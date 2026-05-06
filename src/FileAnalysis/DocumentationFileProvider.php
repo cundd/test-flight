@@ -13,6 +13,8 @@ class DocumentationFileProvider
      * Returns the documentation files from the given files
      *
      * @param FileInterface[] $files
+     *
+     * @return FileInterface[]
      */
     public function findDocumentationFiles(array $files): array
     {

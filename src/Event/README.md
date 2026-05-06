@@ -1,11 +1,8 @@
-Event Dispatcher
-================
+# Event Dispatcher
 
 A simple event dispatcher.
 
-
-Register listeners
-------------------
+## Register listeners
 
 ```php
 $dispatcher = new \Cundd\TestFlight\Event\EventDispatcher();
@@ -40,8 +37,7 @@ $listenerClosure = function (\Cundd\TestFlight\Event\EventInterface $event) {};
 $dispatcher->register('my.event', $listenerClosure);
 ```
 
-Dispatch an event
------------------
+## Dispatch an event
 
 ```php
 class MyEvent implements \Cundd\TestFlight\Event\EventInterface {}
@@ -54,9 +50,7 @@ $dispatcher->dispatch(
 );
 ```
 
-
-Example
--------
+## Example
 
 ```php
 

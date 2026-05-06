@@ -9,9 +9,6 @@ namespace Cundd\TestFlight\Definition;
  */
 class StaticMethodDefinition extends AbstractMethodDefinition
 {
-    /**
-     * Returns the descriptive type of the definition
-     */
     public function getType(): string
     {
         return 'Static method test';

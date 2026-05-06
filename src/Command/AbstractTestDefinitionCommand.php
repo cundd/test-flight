@@ -31,7 +31,11 @@ abstract class AbstractTestDefinitionCommand extends AbstractCommand
         $codeExtractor = $this->objectManager->get(CodeExtractor::class);
 
         /** @var DefinitionProviderInterface $provider */
-        $provider = $this->objectManager->get(DefinitionProvider::class, $this->classLoader, $codeExtractor);
+        $provider = $this->objectManager->get(
+            DefinitionProvider::class,
+            $this->classLoader,
+            $codeExtractor
+        );
         if (0 !== count($this->configurationProvider->get('types'))) {
             $provider->setTypes($this->configurationProvider->get('types'));
         }
@@ -47,8 +51,10 @@ abstract class AbstractTestDefinitionCommand extends AbstractCommand
      *
      * @return DefinitionInterface[][]
      */
-    private function collectTestDefinitionsForDocumentation(DefinitionProviderInterface $provider, array $allFiles)
-    {
+    private function collectTestDefinitionsForDocumentation(
+        DefinitionProviderInterface $provider,
+        array $allFiles,
+    ) {
         /** @var DocumentationFileProvider $documentationFileProvider */
         $documentationFileProvider = $this->objectManager->get(DocumentationFileProvider::class);
         $documentationFiles = $documentationFileProvider->findDocumentationFiles($allFiles);

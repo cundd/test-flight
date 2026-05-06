@@ -36,11 +36,8 @@ class CodeExtractor
 
         $codeLines = array_filter(
             array_map(
-                function ($line) {
-                    return ltrim(trim($line, " \t\n\r\0\x0B"), '*');
-                },
-                // TODO: Check what type $matches has
-                is_array($matches) ? $matches : explode("\n", (string) $matches)
+                fn ($line) => ltrim(trim($line, " \t\n\r\0\x0B"), '*'),
+                explode("\n", (string) $matches)
             )
         );
 
@@ -55,7 +52,7 @@ class CodeExtractor
     public function getCodeFromDocumentation(string $fileContent): array
     {
         $start = strpos($fileContent, Constants::MARKDOWN_PHP_CODE_KEYWORD);
-        $code = substr($fileContent, $start);
+        $code = substr($fileContent, (int) $start);
 
         $regularExpression = '!' . Constants::MARKDOWN_PHP_CODE_KEYWORD . self::DOCUMENTATION_REGEX . '!';
         if (!preg_match_all($regularExpression, $code, $matches)) {
@@ -70,25 +67,29 @@ class CodeExtractor
         );
     }
 
-    private function getCodeWithExampleKeyword(string $docComment, int $start): string|array
-    {
+    private function getCodeWithExampleKeyword(
+        string $docComment,
+        int $start,
+    ): ?string {
         $code = substr($docComment, $start);
 
         $regularExpression = '!' . Constants::EXAMPLE_KEYWORD . self::DOC_COMMENT_EXAMPLE_REGEX . '!';
         if (!preg_match($regularExpression, $code, $matches)) {
-            return [];
+            return null;
         }
 
         return $matches[1];
     }
 
-    private function getCodeWithCodeKeyword(string $docComment, int $start): string|array
-    {
+    private function getCodeWithCodeKeyword(
+        string $docComment,
+        int $start,
+    ): ?string {
         $code = substr($docComment, $start);
 
         $regularExpression = '!' . self::DOC_COMMENT_CODE_REGEX . '!s';
         if (!preg_match($regularExpression, $code, $matches)) {
-            return [];
+            return null;
         }
 
         return $matches[1];
@@ -96,8 +97,10 @@ class CodeExtractor
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected function getCodeFromDocCommentWithExampleTest(): void
+    private function getCodeFromDocCommentWithExampleTest(): void
     {
         $docComment = '/**
      * Returns the file\'s path
@@ -107,7 +110,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
@@ -117,7 +119,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
@@ -128,7 +129,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
@@ -141,7 +141,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same(
             '  assert(__FILE__, (new File(__FILE__))->getPath());
   assert(__FILE__, (new File(__FILE__))->getPath());',
@@ -151,8 +150,10 @@ class CodeExtractor
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected function getCodeFromDocCommentWithCodeTest(): void
+    private function getCodeFromDocCommentWithCodeTest(): void
     {
         $docComment = '/**
      * Returns the file\'s path
@@ -162,7 +163,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
@@ -172,7 +172,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
@@ -183,7 +182,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same('assert(__FILE__, (new File(__FILE__))->getPath());', $code);
 
         $docComment = '/**
@@ -197,7 +195,6 @@ class CodeExtractor
      * @return string
      */';
         $code = $this->getCodeFromDocComment($docComment);
-        test_flight_assert(is_string($code));
         test_flight_assert_same(
             '  assert(__FILE__, (new File(__FILE__))->getPath());
   assert(__FILE__, (new File(__FILE__))->getPath());',
@@ -207,8 +204,10 @@ class CodeExtractor
 
     /**
      * @test
+     *
+     * @phpstan-ignore method.unused
      */
-    protected function getCodeFromDocumentationTest(): void
+    private function getCodeFromDocumentationTest(): void
     {
         $documentation = '
 Documentation

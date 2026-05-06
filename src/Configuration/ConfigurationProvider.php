@@ -10,15 +10,15 @@ use Cundd\TestFlight\Configuration\Exception\InvalidJsonException;
 use Cundd\TestFlight\FileAnalysis\File;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 
-/**
- * Configuration Provider
- */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
+    /**
+     * @var array<string,mixed>
+     */
     private array $configuration;
 
     /**
-     * @param array $coreConfiguration The core configuration (provided through CLI options)
+     * @param array<string,mixed> $coreConfiguration The core configuration (provided through CLI options)
      */
     public function __construct(array $coreConfiguration = [])
     {
@@ -26,10 +26,11 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     }
 
     /**
-     * Sets the underlying configuration
+     * Set the underlying configuration
      */
-    public function setConfiguration(array $configuration): ConfigurationProviderInterface
-    {
+    public function setConfiguration(
+        array $configuration,
+    ): ConfigurationProviderInterface {
         if (isset($configuration['configuration']) && $configuration['configuration']) {
             $configuration = array_merge(
                 $configuration,
@@ -44,7 +45,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     }
 
     /**
-     * Returns the configuration for the given key
+     * Return the configuration for the given key
      *
      * <code>
      *  $cp = new \Cundd\TestFlight\Configuration\ConfigurationProvider(
@@ -63,15 +64,20 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     }
 
     /**
-     * @param string $path
+     * @param non-empty-string $path
+     *
+     * @return array<string,mixed>
      */
-    private function load($path): array
+    private function load(string $path): array
     {
         $file = new File($path);
 
         if ('json' !== $file->getExtension()) {
             throw new InvalidFileTypeException(
-                sprintf('File type %s not supported (currently only JSON files are supported)', $file->getExtension()),
+                sprintf(
+                    'File type %s not supported (currently only JSON files are supported)',
+                    $file->getExtension()
+                ),
                 1463827284
             );
         }
@@ -79,13 +85,20 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         $data = json_decode($this->prepareJsonContent($file), true);
         if (json_last_error() > 0) {
             throw new InvalidJsonException(
-                sprintf('Invalid JSON configuration in file %s: %s', $file->getPath(), json_last_error_msg()),
+                sprintf(
+                    'Invalid JSON configuration in file %s: %s',
+                    $file->getPath(),
+                    json_last_error_msg()
+                ),
                 1463827638
             );
         }
         if (!is_array($data)) {
             throw new InvalidConfigurationException(
-                sprintf('JSON configuration data must be an array in file %s', $file->getPath()),
+                sprintf(
+                    'JSON configuration data must be an array in file %s',
+                    $file->getPath()
+                ),
                 1463827639
             );
         }
@@ -96,6 +109,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         return $data;
     }
 
+    /**
+     * @param array<string,mixed> $configuration
+     */
     private function preparePathInConfiguration(
         array &$configuration,
         string $key,
@@ -118,28 +134,24 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     private function prepareJsonContent(FileInterface $file): string
     {
-        return preg_replace('!//.*!', '', $file->getContents());
+        return (string) preg_replace('!//.*!', '', $file->getContents());
     }
 
     /**
      * @test
      */
-    protected function createTest()
+    protected function createTest(): void
     {
         test_flight_throws(
-            function () {
-                new self(
-                    ['configuration' => __DIR__ . '/../../tests/resources/test-configuration-invalid-json.json']
-                );
-            },
+            fn () => new self([
+                'configuration' => __DIR__ . '/../../tests/resources/test-configuration-invalid-json.json',
+            ]),
             InvalidJsonException::class
         );
         test_flight_throws(
-            function () {
-                new self(
-                    ['configuration' => __DIR__ . '/../../tests/resources/test-configuration-invalid-data.json']
-                );
-            },
+            fn () => new self([
+                'configuration' => __DIR__ . '/../../tests/resources/test-configuration-invalid-data.json',
+            ]),
             InvalidConfigurationException::class
         );
     }

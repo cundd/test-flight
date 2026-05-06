@@ -15,7 +15,7 @@ use Cundd\TestFlight\Output\PrinterInterface;
 /**
  * Factory for the Test Runners
  */
-class TestRunnerFactory
+final class TestRunnerFactory
 {
     public function __construct(
         private readonly ClassLoader $classLoader,
@@ -28,7 +28,11 @@ class TestRunnerFactory
     }
 
     /**
-     * Returns an instance of the given Test Runner class
+     * Return an instance of the given Test Runner class
+     *
+     * @template T of TestRunnerInterface
+     *
+     * @param class-string<T> $testRunnerClass
      */
     public function create(string $testRunnerClass): TestRunnerInterface
     {

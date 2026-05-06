@@ -6,16 +6,18 @@ namespace Cundd\TestFlight\Exception;
 
 use Exception;
 
-class ClassDoesNotExistException extends ClassException
+final class ClassDoesNotExistException extends ClassException
 {
     /**
-     * @param string $className
-     * @param int    $code
+     * @param class-string $className
      *
      * @return static
      */
-    public static function exceptionWithClassName($className, $code = 0, ?Exception $previous = null)
-    {
+    public static function exceptionWithClassName(
+        string $className,
+        int $code = 0,
+        ?Exception $previous = null,
+    ): self {
         return new static(sprintf('Class %s does not exist or can not be found', $className), $code, $previous);
     }
 }

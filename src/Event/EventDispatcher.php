@@ -12,15 +12,10 @@ use Cundd\TestFlight\Event\Exception\InvalidEventCodeException;
 class EventDispatcher implements EventDispatcherInterface
 {
     /**
-     * @var array<string, callable[]>
+     * @var array<non-empty-string, callable[]>
      */
     private array $eventListeners = [];
 
-    /**
-     * Register a listener for the given event code
-     *
-     * @return $this
-     */
     public function register(
         string $eventCode,
         callable $listener,
@@ -34,11 +29,6 @@ class EventDispatcher implements EventDispatcherInterface
         return $this;
     }
 
-    /**
-     * Invoke all event listeners for the given event code
-     *
-     * @return $this
-     */
     public function dispatch(
         string $eventCode,
         EventInterface $event,
@@ -53,10 +43,16 @@ class EventDispatcher implements EventDispatcherInterface
         return $this;
     }
 
+    /**
+     * @phpstan-assert non-empty-string $eventCode
+     */
     private function assertValidEventCode(string $eventCode): void
     {
         if (!ctype_alnum(str_replace(['.', '_'], '', $eventCode))) {
-            throw new InvalidEventCodeException(sprintf('Invalid event code "%s"', $eventCode));
+            throw new InvalidEventCodeException(sprintf(
+                'Invalid event code "%s"',
+                $eventCode
+            ));
         }
     }
 }

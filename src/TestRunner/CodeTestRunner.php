@@ -14,7 +14,7 @@ use Cundd\TestFlight\Definition\DefinitionInterface;
 class CodeTestRunner extends AbstractTestRunner
 {
     /**
-     * @param CodeDefinitionInterface|DefinitionInterface $definition
+     * @param CodeDefinitionInterface&DefinitionInterface $definition
      */
     protected function performTest(
         DefinitionInterface $definition,

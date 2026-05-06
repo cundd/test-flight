@@ -17,9 +17,9 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
         $this->file = $file;
     }
 
-    public function getClassName(): string
+    public function getClassName(): ?string
     {
-        return '';
+        return null;
     }
 
     /**
@@ -44,15 +44,16 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
                 '  ',
                 ' ',
                 ucwords(
-                    ltrim(strtolower(preg_replace('/[A-Z]/', ' $0', $testName)))
+                    ltrim(strtolower((string) preg_replace(
+                        '/[A-Z]/',
+                        ' $0',
+                        $testName
+                    )))
                 )
             )
         );
     }
 
-    /**
-     * Returns the descriptive type of the definition
-     */
     public function getType(): string
     {
         return 'Documentation test';
@@ -61,7 +62,7 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
     /**
      * @test
      */
-    protected static function getPreProcessedCodeTest()
+    protected static function getPreProcessedCodeTest(): void
     {
         $file = new \Cundd\TestFlight\FileAnalysis\File('some/path');
         $originalCode = '';
@@ -78,11 +79,17 @@ class DocumentationCodeDefinition extends AbstractCodeDefinition
 
         $originalCode = 'assert(true)';
         $definition = new DocumentationCodeDefinition($originalCode, $file);
-        test_flight_assert_same('test_flight_assert(true)', $definition->getPreProcessedCode());
+        test_flight_assert_same(
+            'test_flight_assert(true)',
+            $definition->getPreProcessedCode()
+        );
 
         $originalCode = '//assert(true)';
         $definition = new DocumentationCodeDefinition($originalCode, $file);
-        test_flight_assert_same('//test_flight_assert(true)', $definition->getPreProcessedCode());
+        test_flight_assert_same(
+            '//test_flight_assert(true)',
+            $definition->getPreProcessedCode()
+        );
 
         $originalCode = '
 $someValue = true;
@@ -97,6 +104,9 @@ test_flight_assert($someValue)',
 
         $originalCode = '\Cundd\TestFlight\Assert::assertSame(true)';
         $definition = new DocumentationCodeDefinition($originalCode, $file);
-        test_flight_assert_same('\Cundd\TestFlight\Assert::assertSame(true)', $definition->getPreProcessedCode());
+        test_flight_assert_same(
+            '\Cundd\TestFlight\Assert::assertSame(true)',
+            $definition->getPreProcessedCode()
+        );
     }
 }

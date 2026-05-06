@@ -10,12 +10,12 @@ namespace Cundd\TestFlight\Definition;
 interface CodeDefinitionInterface extends DefinitionInterface
 {
     /**
-     * Returns the code
+     * Return the code
      */
     public function getCode(): string;
 
     /**
-     * Returns the pre-processed code
+     * Return the pre-processed code
      */
     public function getPreProcessedCode(): string;
 }

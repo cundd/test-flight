@@ -12,9 +12,6 @@ use Cundd\TestFlight\Output\PrinterInterface;
  */
 class ListCommand extends AbstractTestDefinitionCommand
 {
-    /**
-     * Runs the command
-     */
     public function run(): bool
     {
         foreach ($this->collectTestDefinitions() as $key => $testDefinitionCollection) {
@@ -22,7 +19,7 @@ class ListCommand extends AbstractTestDefinitionCommand
                 $this->printer->println(
                     $this->printer->colorize(
                         PrinterInterface::CYAN_BACKGROUND . PrinterInterface::WHITE,
-                        $this->printGroupHeaderForKeyAndDefinition($key, reset($testDefinitionCollection))
+                        $key
                     )
                 );
                 /** @var DefinitionInterface $testDefinition */
@@ -33,10 +30,5 @@ class ListCommand extends AbstractTestDefinitionCommand
         }
 
         return true;
-    }
-
-    private function printGroupHeaderForKeyAndDefinition(string $key, DefinitionInterface $definition): string
-    {
-        return $key;
     }
 }

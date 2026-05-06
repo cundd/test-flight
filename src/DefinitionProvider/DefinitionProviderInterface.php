@@ -15,14 +15,14 @@ interface DefinitionProviderInterface
     /**
      * Set the types of tests to run
      *
-     * @param string[] $types
-     *
-     * @return $this
+     * @param list<string> $types
      */
     public function setTypes(array $types): DefinitionProviderInterface;
 
     /**
      * Create the test definitions for the given classes
+     *
+     * @param array<class-string,FileInterface> $classNameToFiles
      *
      * @return DefinitionInterface[][]
      */
