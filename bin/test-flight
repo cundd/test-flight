@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-if (version_compare(PHP_VERSION, '8.1.0') < 0) {
-    echo 'PHP 8 is required (installed: ' . PHP_VERSION . ')' . PHP_EOL;
+if (version_compare(PHP_VERSION, '8.2.0') < 0) {
+    echo 'PHP 8.2 is required (installed: ' . PHP_VERSION . ')' . PHP_EOL;
 }
 
 if (file_exists(__DIR__ . '/../../../autoload.php')) {
