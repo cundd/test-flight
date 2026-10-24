@@ -109,13 +109,13 @@ final class ObjectManager implements ObjectManagerInterface
             );
         }
 
-        if (!is_a($implementationName, $interfaceName, true)) {
+        if (!is_a((string) $implementationName, $interfaceName, true)) {
             throw NoImplementationForInterfaceException::exceptionWithInterfaceName(
                 $interfaceName
             );
         }
 
-        return $implementationName;
+        return $implementationName; // @phpstan-ignore return.type
     }
 
     /**
