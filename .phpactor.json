@@ -6,5 +6,6 @@
         "worse.unused_import",
         "worse.docblock_missing_return_type",
         "worse.undefined_variable"
-    ]
+    ],
+    "language_server_phpstan.enabled": true
 }
