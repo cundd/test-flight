@@ -99,7 +99,7 @@ final class ObjectManager implements ObjectManagerInterface
     private function getClassForInterface(string $interfaceName): string
     {
         $implementationName = '';
-        if ('interface' === strtolower(substr($interfaceName, -9))) {
+        if (str_ends_with(strtolower($interfaceName), 'interface')) {
             $implementationName = substr($interfaceName, 0, -9);
         }
 
