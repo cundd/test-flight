@@ -27,9 +27,9 @@ final class Environment
     /**
      * @param array<int,string|false> $locale
      * @param array<int,mixed>        $globals
-     * @param array<int,mixed>        $env
-     * @param array<int,mixed>        $get
-     * @param array<int,mixed>        $post
+     * @param array<mixed>            $env
+     * @param array<mixed>            $get
+     * @param array<mixed>            $post
      * @param array<int,mixed>        $cookie
      * @param array<int,mixed>        $server
      * @param array<int,mixed>        $session
