@@ -132,8 +132,6 @@ final class Bootstrap
         }
 
         $this->error($exception->getMessage());
-
-        return false;
     }
 
     private function initEnvironment(Environment $environment): void
@@ -181,19 +179,7 @@ final class Bootstrap
             ->parse($arguments);
 
         $configuration = [];
-        if (isset($options['types'])) {
-            $configuration['types'] = array_filter(explode(
-                ',',
-                (string) $options['types']
-            ));
-        } elseif (isset($options['type'])) {
-            $configuration['types'] = array_filter(explode(
-                ',',
-                (string) $options['type']
-            ));
-        } else {
-            $configuration['types'] = [];
-        }
+        $configuration['types'] = $this->prepareTypes($options);
 
         $configuration['verbose'] = (bool) (
             $options['verbose']
@@ -202,8 +188,20 @@ final class Bootstrap
         );
 
         if (isset($options['bootstrap'])) {
+            if (!is_string($options['bootstrap'])) {
+                $this->error(sprintf(
+                    'If argument "bootstrap" is given, it must be of type "string", %s given',
+                    get_debug_type($options['bootstrap'])
+                ));
+            }
             $configuration['bootstrap'] = (string) $options['bootstrap'];
         } elseif (isset($options['classloader'])) {
+            if (!is_string($options['classloader'])) {
+                $this->error(sprintf(
+                    'If argument "classloader" is given, it must be of type "string", %s given',
+                    get_debug_type($options['classloader'])
+                ));
+            }
             $configuration['bootstrap'] = (string) $options['classloader'];
         } else {
             $configuration['bootstrap'] = '';
@@ -231,10 +229,46 @@ final class Bootstrap
 
         $this->configurationProvider->setConfiguration($configuration);
 
-        if (!$this->configurationProvider->get('path')) {
+        if (!$this->configurationProvider->get('paths')) {
             // TODO: Read the composer.json and scan the sources?
             $this->error('Please specify a path to look for tests');
         }
+    }
+
+    /**
+     * @param array<string,string|string[]|bool> $options
+     *
+     * @return array<int<0,max>, string>
+     */
+    private function prepareTypes(array $options): array
+    {
+        $rawTypes = $options['types'] ??
+        $options['type'] ?? null;
+        if (null === $rawTypes) {
+            return [];
+        }
+
+        if (is_array($rawTypes)) {
+            return array_map(function (mixed $rawType) {
+                if (!is_scalar($rawType)) {
+                    $this->error(sprintf(
+                        'Types must be strings, %s given',
+                        get_debug_type($rawType)
+                    ));
+                }
+
+                return (string) $rawType;
+            }, $rawTypes);
+        }
+
+        if (is_bool($rawTypes)) {
+            return [];
+        }
+
+        return array_filter(explode(
+            ',',
+            $rawTypes
+        ));
     }
 
     /**
@@ -258,7 +292,7 @@ final class Bootstrap
      *
      * @param int $status
      */
-    private function error(string $message, $status = 1): void
+    private function error(string $message, $status = 1): never
     {
         $this->printer->printError($message);
         exit($status);

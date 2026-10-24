@@ -33,37 +33,39 @@ class FileProvider
     ];
 
     /**
-     * Returns the matching files containing the test doc comment
+     * Return the matching files containing the test doc comment
      *
      * If path is a single file and it contains test it will be returned,
      * if it is a directory it will be scanned for files with test in
      * it's content
      *
-     * @param non-empty-string $path
+     * @param non-empty-string|non-empty-string[] $paths
      *
      * @return FileInterface[]
      */
-    public function findMatchingFiles(string $path): array
+    public function findMatchingFiles(string|array $paths): array
     {
-        $path = $this->validatePath($path);
-
-        if (is_dir($path)) {
-            $pathCollection = $this->findMatchingFilesInDirectory($path);
-        } elseif (is_file($path)) {
-            $pathCollection = [$path];
-        } else {
-            throw new FileException(sprintf('Could not get file(s) for path %s', $path));
-        }
-
         $fileIncludingTests = [];
-        foreach ($pathCollection as $foundPath) {
-            $file = new File($foundPath);
-            if ($this->getFileIncludesTest($file)) {
-                $fileIncludingTests[] = $file;
+        foreach ((array) $paths as $path) {
+            $path = $this->validatePath($path);
+
+            if (is_dir($path)) {
+                $pathCollection = $this->findMatchingFilesInDirectory($path);
+            } elseif (is_file($path)) {
+                $pathCollection = [$path];
+            } else {
+                throw new FileException(sprintf('Could not get file(s) for path %s', $path));
+            }
+
+            foreach ($pathCollection as $foundPath) {
+                $file = new File($foundPath);
+                if ($this->getFileIncludesTest($file)) {
+                    $fileIncludingTests[$file->getPath()] = $file;
+                }
             }
         }
 
-        return $fileIncludingTests;
+        return array_values($fileIncludingTests);
     }
 
     /**

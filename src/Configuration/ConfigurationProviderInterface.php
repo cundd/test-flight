@@ -12,7 +12,7 @@ namespace Cundd\TestFlight\Configuration;
  *   configuration?: string,
  *   verbose?: bool,
  *   bootstrap?: string,
- *   types?: list<string>,
+ *   types?: array<int<0,max>, string>,
  * }
  */
 interface ConfigurationProviderInterface

@@ -23,7 +23,7 @@ abstract class AbstractTestDefinitionCommand extends AbstractCommand
      */
     protected function collectTestDefinitions()
     {
-        $testPath = $this->configurationProvider->get('path');
+        $testPath = $this->configurationProvider->get('paths');
 
         /** @var FileProvider $fileProvider */
         $fileProvider = $this->objectManager->get(FileProvider::class);

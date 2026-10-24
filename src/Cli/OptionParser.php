@@ -20,22 +20,23 @@ final class OptionParser
      *  $parsedArguments = $parser->parse($arguments);
      *  test_flight_assert(is_array($parsedArguments));
      *  test_flight_assert_same([
-     *      'path' => 'the/path',
      *      'type' => 'doccomment',
      *      'v' => true,
      *      'verbose' => true,
      *      'list' => '',
+     *      'paths' => ['the/path'],
      *  ], $parsedArguments);
      * </code>
      *
      * @param string[] $arguments
      *
-     * @return array<string,string|bool>
+     * @return array<string,string|string[]|bool>
      *
      * @throws Exception
      */
     public function parse(array $arguments): array
     {
+        $paths = [];
         $preparedArguments = [];
         $argumentsLength = count($arguments);
 
@@ -57,9 +58,11 @@ final class OptionParser
             } elseif ('-' === $currentArgument[0]) { // Flag option
                 $preparedArguments[substr($currentArgument, 1)] = true;
             } else {
-                $preparedArguments['path'] = $currentArgument;
+                $paths[] = $currentArgument;
             }
         }
+
+        $preparedArguments['paths'] = $paths;
 
         return $preparedArguments;
     }

@@ -103,39 +103,61 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             );
         }
 
-        $this->preparePathInConfiguration($data, 'bootstrap', $file);
-        $this->preparePathInConfiguration($data, 'path', $file);
+        if (isset($data['bootstrap'])) {
+            if (!is_string($data['bootstrap'])) {
+                throw new InvalidConfigurationException(sprintf(
+                    'Bootstrap file path must be of type "string", "%s" given',
+                    get_debug_type($data['bootstrap'])
+                ));
+            }
+
+            $data['bootstrap'] = $this->preparePath($data['bootstrap'], $file);
+        }
+
+        $data['paths'] = $this->preparePaths(
+            $data['paths'] ?? $data['path'] ?? [],
+            $file
+        );
+        unset($data['path']);
 
         return $data;
     }
 
     /**
-     * @param array<string,mixed> $configuration
+     * @param string[]|string $rawPaths
+     *
+     * @return string[]
      */
-    private function preparePathInConfiguration(
-        array &$configuration,
-        string $key,
+    private function preparePaths(
+        array|string $rawPaths,
         FileInterface $file,
-    ): void {
-        if (!isset($configuration[$key])) {
-            return;
+    ): array {
+        $paths = [];
+        foreach ((array) $rawPaths as $path) {
+            if (!is_string($path)) {
+                throw new InvalidConfigurationException(sprintf(
+                    'Path must be of type "string", "%s" given',
+                    get_debug_type($path)
+                ));
+            }
+            $paths[] = $this->preparePath($path, $file);
         }
 
-        $path = $configuration[$key];
-        if (!$path) {
-            return;
-        }
-        if (!is_string($path)) {
-            throw new InvalidConfigurationException(sprintf(
-                'Path must be of type "string", "%s" given',
-                get_debug_type($path)
-            ));
+        return $paths;
+    }
+
+    private function preparePath(
+        string $path,
+        FileInterface $file,
+    ): string {
+        if ('' === trim($path)) {
+            throw new InvalidConfigurationException('Path must not be empty');
         }
         if ('/' !== $path[0]) {
             $path = $file->getParent() . '/' . $path;
         }
 
-        $configuration[$key] = realpath($path) ?: $path;
+        return realpath($path) ?: $path;
     }
 
     private function prepareJsonContent(FileInterface $file): string
