@@ -22,6 +22,8 @@ use TypeError;
 
 /**
  * Bootstrap the test environment
+ *
+ * @phpstan-import-type Configuration from ConfigurationProviderInterface
  */
 final class Bootstrap
 {
@@ -178,47 +180,56 @@ final class Bootstrap
             ->get(OptionParser::class)
             ->parse($arguments);
 
+        $configuration = [];
         if (isset($options['types'])) {
-            $options['types'] = explode(',', (string) $options['types']);
+            $configuration['types'] = array_filter(explode(
+                ',',
+                (string) $options['types']
+            ));
         } elseif (isset($options['type'])) {
-            $options['types'] = explode(',', (string) $options['type']);
+            $configuration['types'] = array_filter(explode(
+                ',',
+                (string) $options['type']
+            ));
         } else {
-            $options['types'] = [];
+            $configuration['types'] = [];
         }
 
-        if (isset($options['verbose'])) {
-            $options['verbose'] = boolval($options['verbose']);
-        } elseif (isset($options['v'])) {
-            $options['verbose'] = true;
-        } else {
-            $options['verbose'] = false;
-        }
+        $configuration['verbose'] = (bool) (
+            $options['verbose']
+            ?? $options['v']
+            ?? false
+        );
 
         if (isset($options['bootstrap'])) {
-            // Bootstrap is properly set
+            $configuration['bootstrap'] = (string) $options['bootstrap'];
         } elseif (isset($options['classloader'])) {
-            $options['bootstrap'] = $options['classloader'];
+            $configuration['bootstrap'] = (string) $options['classloader'];
         } else {
-            $options['bootstrap'] = '';
+            $configuration['bootstrap'] = '';
         }
 
         if (isset($options['list']) && $options['list']) {
-            $options['command'] = 'list';
-        } elseif (!isset($options['command'])) {
-            $options['command'] = 'run';
+            $configuration['command'] = 'list';
+        } elseif (is_string($options['command'] ?? null)) {
+            $configuration['command'] = (string) $options['command'];
+        } else {
+            $configuration['command'] = 'run';
         }
 
         // Check for a configuration file
-        if (!isset($options['configuration'])) {
+        if (is_string($options['configuration'] ?? null)) {
+            $configuration['configuration'] = $options['configuration'];
+        } else {
             $localConfigurationFilePath = getcwd()
                 . '/'
                 . ConfigurationProviderInterface::LOCAL_CONFIGURATION_FILE_NAME;
             if (file_exists($localConfigurationFilePath)) {
-                $options['configuration'] = $localConfigurationFilePath;
+                $configuration['configuration'] = $localConfigurationFilePath;
             }
         }
 
-        $this->configurationProvider->setConfiguration($options);
+        $this->configurationProvider->setConfiguration($configuration);
 
         if (!$this->configurationProvider->get('path')) {
             // TODO: Read the composer.json and scan the sources?
