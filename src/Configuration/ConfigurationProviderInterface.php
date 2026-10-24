@@ -6,6 +6,14 @@ namespace Cundd\TestFlight\Configuration;
 
 /**
  * Interface for Configuration Providers
+ *
+ * @phpstan-type Configuration array{
+ *   command?: string,
+ *   configuration?: string,
+ *   verbose?: bool,
+ *   bootstrap?: string,
+ *   types?: list<string>,
+ * }
  */
 interface ConfigurationProviderInterface
 {
@@ -26,7 +34,7 @@ interface ConfigurationProviderInterface
     /**
      * Set the underlying configuration
      *
-     * @param array<string,mixed> $configuration
+     * @param Configuration $configuration
      */
     public function setConfiguration(
         array $configuration,

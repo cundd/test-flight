@@ -10,28 +10,28 @@ use Cundd\TestFlight\Configuration\Exception\InvalidJsonException;
 use Cundd\TestFlight\FileAnalysis\File;
 use Cundd\TestFlight\FileAnalysis\FileInterface;
 
+/**
+ * @phpstan-import-type Configuration from ConfigurationProviderInterface
+ */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
     /**
-     * @var array<string,mixed>
+     * @var Configuration
      */
     private array $configuration;
 
     /**
-     * @param array<string,mixed> $coreConfiguration The core configuration (provided through CLI options)
+     * @param Configuration $coreConfiguration The core configuration (provided through CLI options)
      */
     public function __construct(array $coreConfiguration = [])
     {
         $this->setConfiguration($coreConfiguration);
     }
 
-    /**
-     * Set the underlying configuration
-     */
     public function setConfiguration(
         array $configuration,
     ): ConfigurationProviderInterface {
-        if (isset($configuration['configuration']) && $configuration['configuration']) {
+        if (!empty($configuration['configuration'])) {
             $configuration = array_merge(
                 $configuration,
                 $this->load($configuration['configuration']),
@@ -124,6 +124,12 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         $path = $configuration[$key];
         if (!$path) {
             return;
+        }
+        if (!is_string($path)) {
+            throw new InvalidConfigurationException(sprintf(
+                'Path must be of type "string", "%s" given',
+                get_debug_type($path)
+            ));
         }
         if ('/' !== $path[0]) {
             $path = $file->getParent() . '/' . $path;
