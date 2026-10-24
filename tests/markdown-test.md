@@ -1,7 +1,17 @@
 # Markdown file containing PHP code
 
+## Allow simple code blocks
+
 ```php
-// Make sure this test is run
+$love = true;
+test_flight_assert_same(true, $love);
+```
+
+## Allow code blocks starting with `<?php`
+
+```php
+<?php
+
 $love = true;
 test_flight_assert_same(true, $love);
 ```

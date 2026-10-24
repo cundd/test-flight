@@ -65,6 +65,9 @@ abstract class AbstractCodeDefinition implements CodeDefinitionInterface
             '$1test_flight_assert(',
             $code
         );
+        if (str_starts_with($code, '<?php')) {
+            $code = substr($code, 5);
+        }
 
         return $code;
     }
