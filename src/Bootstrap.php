@@ -178,7 +178,8 @@ final class Bootstrap
             ->get(OptionParser::class)
             ->parse($arguments);
 
-        $configuration = [];
+        /** @var Configuration $configuration */
+        $configuration = $options;
         $configuration['types'] = $this->prepareTypes($options);
 
         $configuration['verbose'] = (bool) (
