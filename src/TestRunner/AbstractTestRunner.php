@@ -14,9 +14,9 @@ use Cundd\TestFlight\Event\EventDispatcherInterface;
 use Cundd\TestFlight\ObjectManager;
 use Cundd\TestFlight\Output\ExceptionPrinterInterface;
 use Cundd\TestFlight\Output\PrinterInterface;
+use Cundd\TestFlight\Result;
 use Error;
 use ErrorException;
-use Exception;
 use Throwable;
 
 /**
@@ -34,10 +34,13 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     ) {
     }
 
+    /**
+     * @return Result<mixed, Throwable>
+     */
     abstract protected function performTest(
         DefinitionInterface $definition,
         ContextInterface $context,
-    ): void;
+    ): Result;
 
     public function runTestDefinition(DefinitionInterface $definition): bool
     {
@@ -51,19 +54,17 @@ abstract class AbstractTestRunner implements TestRunnerInterface
 
         set_error_handler($this->handleError(...));
         error_clear_last();
-        try {
-            $this->performTest($definition, $context);
-        } catch (Error $exception) {
-        } catch (Exception $exception) {
-        }
+
+        $result = $this->performTest($definition, $context);
+
         $this->environment->reset();
         $this->eventDispatcher->dispatch(
             self::EVENT_TEST_DID_RUN,
             new Event($definition, $context)
         );
 
-        if (null !== $exception) {
-            $this->printException($definition, $exception);
+        if ($result->isErr()) {
+            $this->printException($definition, $result->unwrapErr());
 
             return false;
         }
@@ -133,7 +134,10 @@ abstract class AbstractTestRunner implements TestRunnerInterface
     private function printSuccess(DefinitionInterface $definition): void
     {
         if ($this->printer->getVerbose()) {
-            $this->printer->info('Successfully ran %s', $definition->getDescription());
+            $this->printer->info(
+                'Successfully ran %s',
+                $definition->getDescription()
+            );
         } else {
             $this->printer->printf('.');
         }

@@ -10,9 +10,11 @@ use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
 use Cundd\TestFlight\Definition\MethodDefinition;
+use Cundd\TestFlight\ErrorBoundary;
 use Cundd\TestFlight\Exception\AssertionError;
-use Cundd\TestFlight\TestRunner\AbstractTestRunner;
+use Cundd\TestFlight\TestRunner\CodeTestRunner;
 use Exception;
+use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 
@@ -49,7 +51,10 @@ final class ExceptionPrinter extends AbstractPrinter implements ExceptionPrinter
             $exception->getCode(),
             $this->getTestDescriptionForDefinition($definition),
             $exception->getMessage(),
-            $this->getTestLocationForDefinitionAndException($definition, $exception),
+            $this->getTestLocationForDefinitionAndException(
+                $definition,
+                $exception
+            ),
             $traceAsString
         );
 
@@ -91,14 +96,10 @@ final class ExceptionPrinter extends AbstractPrinter implements ExceptionPrinter
         $previousStep = null;
         $enableColoredOutput = $this->getEnableColoredOutput();
 
-        $stackTrace = $exception->getTrace();
+        $stackTrace = $this->getUserTrace($exception->getTrace());
         $stackTraceCount = count($stackTrace);
         for ($i = 0; $i < $stackTraceCount; ++$i) {
             $frame = $stackTrace[$i];
-
-            if ($this->shouldStopTraceAtFrame($frame)) {
-                break;
-            }
 
             $stepAsString = $this->getTraceFrameAsString($frame, $i);
             $isTestMethod = $this->getTraceStepIsTestMethod(
@@ -107,7 +108,10 @@ final class ExceptionPrinter extends AbstractPrinter implements ExceptionPrinter
                 $previousStep
             );
             if ($enableColoredOutput && $isTestMethod) {
-                $stringParts[] = self::NORMAL . self::RED_BACKGROUND . $stepAsString . self::RED;
+                $stringParts[] = self::NORMAL
+                    . self::RED_BACKGROUND
+                    . $stepAsString
+                    . self::RED;
             } else {
                 $stringParts[] = $stepAsString;
             }
@@ -118,15 +122,45 @@ final class ExceptionPrinter extends AbstractPrinter implements ExceptionPrinter
     }
 
     /**
-     * Stop printing the stack trace at \Cundd\TestFlight\TestRunner\AbstractTestRunner->runTestDefinition()
+     * Collect the stack trace frames belonging to the user's code
      *
-     * @param Frame $frame
+     * @param list<Frame> $frames
+     *
+     * @return list<Frame>
      */
-    private function shouldStopTraceAtFrame(array $frame): bool
+    private function getUserTrace(array $frames): array
     {
-        return isset($frame['class'])
-            && AbstractTestRunner::class === $frame['class']
-            && 'runTestDefinition' === $frame['function'];
+        $userFrames = [];
+
+        if (!current($frames)) {
+            return [];
+        }
+
+        do {
+            $userFrames[] = current($frames);
+            next($frames);
+
+            $nextFrame = current($frames);
+        } while (
+            $nextFrame // @phpstan-ignore booleanAnd.leftAlwaysTrue
+            && ($nextFrame['class'] ?? null) !== ErrorBoundary::class
+        );
+
+        $lastFrame = $userFrames[count($userFrames) - 1];
+        if (!isset($lastFrame['class'])) {
+            return $userFrames;
+        }
+
+        $classesToTreatAsInternal = [
+            ReflectionMethod::class,
+            CodeTestRunner::class,
+        ];
+
+        if (in_array($lastFrame['class'], $classesToTreatAsInternal)) {
+            return array_slice($userFrames, 0, count($userFrames) - 1);
+        }
+
+        return $userFrames;
     }
 
     /**

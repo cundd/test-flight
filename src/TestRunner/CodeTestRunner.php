@@ -7,6 +7,11 @@ namespace Cundd\TestFlight\TestRunner;
 use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\CodeDefinitionInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
+use Cundd\TestFlight\ErrorBoundary;
+use Cundd\TestFlight\Exception\EvalError;
+use Cundd\TestFlight\Result;
+use Cundd\TestFlight\Result\Ok;
+use Throwable;
 
 /**
  * Test Runner for code string tests
@@ -19,21 +24,39 @@ class CodeTestRunner extends AbstractTestRunner
     protected function performTest(
         DefinitionInterface $definition,
         ContextInterface $context,
-    ): void {
+    ): Result {
         $preprocessedCode = $definition->getPreProcessedCode();
         if (!$preprocessedCode || ';' === $preprocessedCode) {
             $this->printer->warn('No test code given');
+
+            return new Ok(null);
         }
-        $this->evaluate($preprocessedCode, $context);
+
+        return $this->evaluate($preprocessedCode, $definition, $context);
     }
 
-    private function evaluate(string $code, ContextInterface $context): mixed
-    {
-        return call_user_func(
-            function () use ($code, $context) {
+    /**
+     * @return Result<mixed, Throwable>
+     */
+    private function evaluate(
+        string $code,
+        DefinitionInterface $definition,
+        ContextInterface $context,
+    ): Result {
+        return (new ErrorBoundary())->execute(
+            function () use ($code, $definition, $context) {
                 extract($context->getVariables());
 
-                return eval($code);
+                try {
+                    return eval($code);
+                } catch (Throwable $e) {
+                    throw new EvalError(
+                        $definition->getFile(),
+                        $e->getMessage(),
+                        $e->getCode(),
+                        $e
+                    );
+                }
             }
         );
     }

@@ -7,6 +7,8 @@ namespace Cundd\TestFlight\TestRunner;
 use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\StaticMethodDefinition;
+use Cundd\TestFlight\ErrorBoundary;
+use Cundd\TestFlight\Result;
 
 /**
  * Test Runner for static test methods
@@ -19,16 +21,25 @@ class StaticMethodTestRunner extends AbstractTestRunner
     protected function performTest(
         DefinitionInterface $definition,
         ContextInterface $context,
-    ): void {
+    ): Result {
         $className = $definition->getClassName();
         $methodName = $definition->getMethodName();
-
+        $exceptionBoundary = new ErrorBoundary();
         if ($definition->getMethodIsPublic()) {
             assert(is_callable([$className, $methodName]));
-            call_user_func([$className, $methodName], $context);
+
+            return $exceptionBoundary->execute(
+                $className::$methodName(...),
+                $context
+            );
         } else {
             $method = $definition->getReflectionMethod();
-            $method->invoke(null, $context);
+
+            return $exceptionBoundary->execute(
+                $method->invoke(...),
+                null,
+                $context
+            );
         }
     }
 }

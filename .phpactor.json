@@ -5,6 +5,7 @@
         "worse.missing_member",
         "worse.unused_import",
         "worse.docblock_missing_return_type",
+        "worse.docblock_missing_param",
         "worse.undefined_variable"
     ],
     "language_server_phpstan.enabled": true

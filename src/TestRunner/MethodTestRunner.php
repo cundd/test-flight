@@ -7,6 +7,8 @@ namespace Cundd\TestFlight\TestRunner;
 use Cundd\TestFlight\Context\ContextInterface;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\MethodDefinition;
+use Cundd\TestFlight\ErrorBoundary;
+use Cundd\TestFlight\Result;
 use ReflectionMethod;
 
 /**
@@ -20,16 +22,25 @@ class MethodTestRunner extends AbstractTestRunner
     protected function performTest(
         DefinitionInterface $definition,
         ContextInterface $context,
-    ): void {
+    ): Result {
         $instance = $this->objectManager->create($definition->getClassName());
         $this->invokeSetup($instance);
         $methodName = $definition->getMethodName();
 
+        $exceptionBoundary = new ErrorBoundary();
         if ($definition->getMethodIsPublic()) {
-            $instance->$methodName($context);
+            return $exceptionBoundary->execute(
+                $instance->$methodName(...),
+                $context
+            );
         } else {
             $method = $definition->getReflectionMethod();
-            $method->invoke($instance, $context);
+
+            return $exceptionBoundary->execute(
+                $method->invoke(...),
+                $instance,
+                $context
+            );
         }
     }
 
