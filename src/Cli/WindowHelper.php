@@ -18,11 +18,32 @@ final class WindowHelper implements WindowHelperInterface
      */
     public function hasColorSupport(): bool
     {
-        if (isset($_SERVER['TERM'])) {
-            return in_array($_SERVER['TERM'], ['xterm-256color']);
+        if (PHP_SAPI !== 'cli') {
+            return false;
         }
 
-        return false;
+        // Respect the NO_COLOR convention
+        if (false !== getenv('NO_COLOR')) {
+            return false;
+        }
+
+        // Respect dumb terminals
+        if ('dumb' === getenv('TERM')) {
+            return false;
+        }
+
+        // Windows heuristics
+        if (DIRECTORY_SEPARATOR === '\\') {
+            return false !== getenv('ANSICON')
+                || false !== getenv('ConEmuANSI')
+                || false !== getenv('WT_SESSION');
+        }
+
+        if (function_exists('posix_isatty')) {
+            return (bool) @posix_isatty(STDOUT);
+        } else {
+            return true;
+        }
     }
 
     /**
