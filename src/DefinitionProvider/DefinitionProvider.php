@@ -6,6 +6,7 @@ namespace Cundd\TestFlight\DefinitionProvider;
 
 use Cundd\TestFlight\ClassLoader;
 use Cundd\TestFlight\CodeExtractor;
+use Cundd\TestFlight\CodeExtractorInterface;
 use Cundd\TestFlight\Constants;
 use Cundd\TestFlight\Definition\DefinitionInterface;
 use Cundd\TestFlight\Definition\DocCommentCodeDefinition;
@@ -34,7 +35,7 @@ final class DefinitionProvider implements DefinitionProviderInterface
 
     public function __construct(
         private readonly ClassLoader $classLoader,
-        private readonly CodeExtractor $codeExtractor,
+        private readonly CodeExtractorInterface $codeExtractor,
     ) {
     }
 
@@ -282,10 +283,13 @@ final class DefinitionProvider implements DefinitionProviderInterface
         /** @var ClassLoader $dummy */
         $dummy = $prophet->prophesize(ClassLoader::class)->reveal();
         /** @var CodeExtractor $codeExtractor */
-        $codeExtractor = $prophet->prophesize(CodeExtractor::class)->reveal();
+        $codeExtractor = $prophet->prophesize(CodeExtractorInterface::class)
+            ->reveal();
         $provider = new static($dummy, $codeExtractor);
 
-        $definitions = $provider->createForClasses([__CLASS__ => new File(__FILE__)]);
+        $definitions = $provider->createForClasses([
+            __CLASS__ => new File(__FILE__),
+        ]);
         test_flight_assert(__CLASS__ === key($definitions));
         test_flight_assert(is_array($definitions[__CLASS__]));
         test_flight_assert(
@@ -298,8 +302,11 @@ final class DefinitionProvider implements DefinitionProviderInterface
         test_flight_throws(
             function () use ($provider) {
                 /** @var class-string $className */
-                $className = 'NotExistingClass'; // @phpstan-ignore varTag.nativeType
-                $provider->createForClasses([$className => new File(__FILE__)]);
+                // @phpstan-ignore varTag.nativeType
+                $className = 'NotExistingClass';
+                $provider->createForClasses([
+                    $className => new File(__FILE__),
+                ]);
             },
             ReflectionException::class
         );

@@ -5,26 +5,35 @@ declare(strict_types=1);
 namespace Cundd\TestFlight;
 
 /**
- * Class to read Code from the given doc comment
+ * Class to read code from the given doc comment
  */
-class CodeExtractor
+final class CodeExtractor implements CodeExtractorInterface
 {
     public const DOC_COMMENT_EXAMPLE_REGEX = '\s+([^@]*)[.\s@]+';
     public const DOC_COMMENT_CODE_REGEX = '<code\b[^>]*>(.*?)</code>';
     public const DOCUMENTATION_REGEX = '\n([^`]*)```';
 
-    /**
-     * Extract the example code from the doc comment
-     */
     public function getCodeFromDocComment(string $docComment): string
     {
-        $startExampleKeyword = strpos($docComment, Constants::EXAMPLE_KEYWORD);
-        $startCodeKeyword = strpos($docComment, Constants::CODE_KEYWORD);
+        $startExampleKeyword = strpos(
+            $docComment,
+            Constants::EXAMPLE_KEYWORD
+        );
+        $startCodeKeyword = strpos(
+            $docComment,
+            Constants::CODE_KEYWORD
+        );
 
         if (false !== $startExampleKeyword) {
-            $matches = $this->getCodeWithExampleKeyword($docComment, $startExampleKeyword);
+            $matches = $this->getCodeWithExampleKeyword(
+                $docComment,
+                $startExampleKeyword
+            );
         } elseif (false !== $startCodeKeyword) {
-            $matches = $this->getCodeWithCodeKeyword($docComment, $startCodeKeyword);
+            $matches = $this->getCodeWithCodeKeyword(
+                $docComment,
+                $startCodeKeyword
+            );
         } else {
             // None of the keywords was found
             return '';
@@ -44,11 +53,6 @@ class CodeExtractor
         return rtrim(implode("\n", $codeLines) . ';');
     }
 
-    /**
-     * Extract the example code from the documentation file
-     *
-     * @return string[]
-     */
     public function getCodeFromDocumentation(string $fileContent): array
     {
         $start = strpos($fileContent, Constants::MARKDOWN_PHP_CODE_KEYWORD);
@@ -218,6 +222,7 @@ assert(true);
 ```
 
 ```php
+<?php
 assert(true);
 
 assert(1 < 2);
@@ -228,7 +233,8 @@ assert(1 < 2);
         test_flight_assert_type('string', $codeSamples[0]);
         test_flight_assert_same('assert(true);', $codeSamples[0]);
         test_flight_assert_same(
-            'assert(true);
+            '<?php
+assert(true);
 
 assert(1 < 2);',
             $codeSamples[1]
