@@ -3,7 +3,9 @@
 
 if (version_compare(PHP_VERSION, '8.2.0') < 0) {
     echo 'PHP 8.2 is required (installed: ' . PHP_VERSION . ')' . PHP_EOL;
+    exit(1);
 }
+
 if (isset($_composer_autoload_path)) {
     require_once $_composer_autoload_path;
 } elseif (file_exists(__DIR__ . '/../../../autoload.php')) {
